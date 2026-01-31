@@ -1,14 +1,29 @@
-import 'dotenv/config'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@/generated/prisma/client'
 
-const connectionString = `${process.env.DATABASE_URL}`
+// PrismaClient is attached to the `global` object in development to prevent
+// exhausting the database connection limit.
+//
+// Learn more: https://pris.ly/d/help/next-js-best-practices
 
-if (!connectionString) {
-  throw new Error('DATABASE_URL environment variable is not set.')
+const prismaClientSingleton = () => {
+  const connectionString = process.env.DATABASE_URL
+  if (!connectionString) {
+    throw new Error('DATABASE_URL environment variable is not set.')
+  }
+  const adapter = new PrismaPg({ connectionString })
+  return new PrismaClient({ adapter })
 }
 
-const adapter = new PrismaPg({ connectionString })
-const prisma = new PrismaClient({ adapter })
+declare global {
+  // eslint-disable-next-line no-var
+  var prisma: undefined | ReturnType<typeof prismaClientSingleton>
+}
+
+const prisma = globalThis.prisma ?? prismaClientSingleton()
+
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.prisma = prisma
+}
 
 export { prisma }
