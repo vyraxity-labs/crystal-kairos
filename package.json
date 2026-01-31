@@ -1,0 +1,45 @@
+{
+  "name": "crystal-kairos",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.7",
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
+    "dotenv": "^17.2.3",
+    "next": "16.1.6",
+    "next-auth": "^5.0.0-beta.30",
+    "pg": "^8.18.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@tanstack/react-query": "^5.90.20",
+    "@tanstack/react-table": "^8.21.3",
+    "@types/node": "^20.19.30",
+    "@types/pg": "^8.16.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "date-fns": "^4.1.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "install": "^0.13.0",
+    "prisma": "^7.3.0",
+    "react-hook-form": "^7.71.1",
+    "react-number-format": "^5.4.4",
+    "recharts": "^3.7.0",
+    "sonner": "^2.0.7",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "zod": "^4.3.6"
+  }
+}
