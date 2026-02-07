@@ -23,6 +23,34 @@ enum UserRole {
   USER
 }
 
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum Relationship {
+  SPOUSE
+  SIBLING
+  PARENT
+  CHILD
+  FRIEND
+  COLLEAGUE
+  NEIGHBOR
+  ACQUAINTANCE
+  RELATIVE
+  EMPLOYER
+  EMPLOYEE
+  CUSTOMER
+  VENDOR
+  SUPPLIER
+  PARTNER
+  CLIENT
+  LEADER
+  MEMBER
+  GUEST
+  OTHER
+}
+
 enum MembershipInterest {
   AJO
   SAVINGS
@@ -161,6 +189,8 @@ model User {
   loanRepayments      LoanRepayment[]      @relation("RepaymentRecorder")
   eAjoPayouts         EAjoPayout[]         @relation("PayoutRecorder")
   guaranteedLoans     Loan[]               @relation("LoanGuarantor")
+  guarantorRewards    GuarantorReward[]
+  savingsWithdrawals  SavingsWithdrawal[]   @relation("WithdrawalProcessor")
 
   @@map("users")
 }
@@ -168,7 +198,7 @@ model User {
 model UserInfo {
   id            String   @id @default(uuid())
   address       String
-  gender        String
+  gender        Gender
   occupation    String
   phoneNumber   String
   stateOfOrigin String
@@ -198,7 +228,7 @@ model NextOfKin {
   id            String   @id @default(uuid())
   name          String
   phoneNumber   String
-  relationship  String
+  relationship  Relationship
   bankName      String
   accountNumber String
   accountName   String
@@ -401,7 +431,8 @@ model SavingsWithdrawal {
   receiptUrl        String?
   createdAt         DateTime @default(now())
 
-  savings Savings @relation(fields: [savingsId], references: [id], onDelete: Cascade)
+  savings   Savings @relation(fields: [savingsId], references: [id], onDelete: Cascade)
+  processor User    @relation("WithdrawalProcessor", fields: [processedBy], references: [id])
 
   @@map("savings_withdrawals")
 }
@@ -445,6 +476,7 @@ model Loan {
   user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   guarantor  User?           @relation("LoanGuarantor", fields: [guarantorId], references: [id])
   repayments LoanRepayment[]
+  reward     GuarantorReward?
 
   @@index([userId])
   @@index([guarantorId])
@@ -486,11 +518,14 @@ model LoanRepayment {
 model GuarantorReward {
   id           String   @id @default(uuid())
   guarantorId  String
-  loanId       String
+  loanId       String   @unique
   rewardAmount Decimal
   reason       String   @default("Successful loan completion by guaranteed member")
   awardedAt    DateTime @default(now())
   createdAt    DateTime @default(now())
+
+  guarantor User @relation(fields: [guarantorId], references: [id], onDelete: Cascade)
+  loan      Loan @relation(fields: [loanId], references: [id], onDelete: Cascade)
 
   @@index([guarantorId])
   @@map("guarantor_rewards")
