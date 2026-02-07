@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* CRYSTAL KAIROS Design Tokens - Tailwind v4 @theme */
 @theme {
@@ -25,7 +25,13 @@
   --color-border: #e2e8f0;
 
   /* Fonts - Geist loaded in layout, fallback to Inter */
-  --font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, Inter, sans-serif);
+  --font-sans: var(
+    --font-geist-sans,
+    ui-sans-serif,
+    system-ui,
+    Inter,
+    sans-serif
+  );
   --font-mono: var(--font-geist-mono, ui-monospace, monospace);
 
   /* Border radius */
@@ -36,13 +42,14 @@
   /* Shadows */
   --shadow-card: 0 8px 20px rgba(0, 0, 0, 0.05);
   --shadow-button-primary: 0 8px 16px rgba(26, 76, 235, 0.2);
+  --shadow-button-primary-hover: 0 12px 24px rgba(26, 76, 235, 0.3);
   --shadow-button-secondary: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* Additional CSS variables for non-Tailwind usage */
 :root {
-  --background: #f9fafc;
-  --foreground: #1e293b;
+  --background: var(--color-bg-main);
+  --foreground: var(--color-text-primary);
 }
 
 /* Utility classes for design patterns */
@@ -74,14 +81,6 @@
       var(--color-primary) 0%,
       var(--color-primary-dark) 100%
     );
-  }
-
-  .shadow-card {
-    box-shadow: var(--shadow-card);
-  }
-
-  .shadow-button-primary {
-    box-shadow: var(--shadow-button-primary);
   }
 }
 
