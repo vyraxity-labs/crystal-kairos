@@ -1,6 +1,6 @@
-@import "tailwindcss";
+/* Auto-generated from lib/designTokens.ts - do not edit manually */
+/* Run: pnpm generate:design-tokens */
 
-/* GENERATED_TOKENS_START - Do not edit. Run: pnpm generate:design-tokens */
 @theme {
   /* Brand colors → bg-primary, text-primary, etc. */
   --color-primary: #1a4ceb;
@@ -43,44 +43,4 @@
 :root {
   --background: var(--color-bg-main);
   --foreground: var(--color-text-primary);
-}
-
-/* GENERATED_TOKENS_END */
-
-/* Utility classes for design patterns */
-@layer utilities {
-  .text-hero {
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    font-weight: 700;
-    color: var(--color-text-primary);
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-  }
-
-  .text-display {
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 700;
-    color: var(--color-text-primary);
-    letter-spacing: -0.02em;
-  }
-
-  .text-card-title {
-    font-size: clamp(1.25rem, 2vw, 1.5rem);
-    font-weight: 700;
-    color: var(--color-text-primary);
-  }
-
-  .bg-primary-gradient {
-    background: linear-gradient(
-      135deg,
-      var(--color-primary) 0%,
-      var(--color-primary-dark) 100%
-    );
-  }
-}
-
-body {
-  background: var(--color-bg-main);
-  color: var(--color-text-primary);
-  font-family: var(--font-sans);
 }

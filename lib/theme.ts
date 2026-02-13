@@ -1,84 +1,89 @@
 import { createTheme } from "@mui/material/styles";
+import { designTokens } from "./designTokens";
+
+const { colors, radius, shadows } = designTokens;
 
 /**
  * CRYSTAL KAIROS Design System
- * MUI theme referencing CSS variables from globals.css as single source of truth
+ * MUI theme - palette uses designTokens (MUI requires literal colors, not CSS vars)
+ * Component overrides use CSS vars where MUI accepts them (shadows, radius)
  */
 
 const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "var(--color-primary)",
-      light: "var(--color-primary-light)",
-      dark: "var(--color-primary-dark)",
+      main: colors.primary.main,
+      light: colors.primary.light,
+      dark: colors.primary.dark,
       contrastText: "#FFFFFF",
     },
     secondary: {
-      main: "var(--color-accent)",
-      light: "var(--color-accent-light)",
-      dark: "var(--color-accent-dark)",
-      contrastText: "var(--color-text-primary)",
+      main: colors.accent.main,
+      light: colors.accent.light,
+      dark: colors.accent.dark,
+      contrastText: colors.text.primary,
     },
     background: {
-      default: "var(--color-bg-main)",
-      paper: "var(--color-bg-paper)",
+      default: colors.background.default,
+      paper: colors.background.paper,
     },
     text: {
-      primary: "var(--color-text-primary)",
-      secondary: "var(--color-text-secondary)",
-      disabled: "var(--color-text-muted)",
+      primary: colors.text.primary,
+      secondary: colors.text.secondary,
+      disabled: colors.text.muted,
     },
   },
   typography: {
-    fontFamily: "var(--font-sans)",
+    fontFamily:
+      "var(--font-geist-sans), Inter, 'Helvetica Neue', Arial, sans-serif",
     h1: {
       fontWeight: 700,
       fontSize: "3.5rem",
       lineHeight: 1.2,
       letterSpacing: "-0.02em",
-      color: "var(--color-text-primary)",
+      color: colors.text.primary,
     },
     h2: {
       fontWeight: 700,
       fontSize: "2.5rem",
       lineHeight: 1.3,
       letterSpacing: "-0.02em",
-      color: "var(--color-text-primary)",
+      color: colors.text.primary,
     },
     h3: {
       fontWeight: 700,
       fontSize: "2rem",
       lineHeight: 1.35,
-      color: "var(--color-text-primary)",
+      color: colors.text.primary,
     },
     h4: {
       fontWeight: 700,
       fontSize: "1.5rem",
       lineHeight: 1.4,
-      color: "var(--color-text-primary)",
+      color: colors.text.primary,
     },
     h5: {
       fontWeight: 600,
       fontSize: "1.25rem",
       lineHeight: 1.4,
-      color: "var(--color-text-primary)",
+      color: colors.text.primary,
     },
     h6: {
       fontWeight: 600,
       fontSize: "1.125rem",
       lineHeight: 1.4,
-      color: "var(--color-text-primary)",
+      color: colors.text.primary,
     },
     body1: {
       fontSize: "1rem",
       lineHeight: 1.6,
-      color: "var(--color-text-secondary)",
+      color: colors.text.secondary,
     },
     body2: {
       fontSize: "0.875rem",
       lineHeight: 1.5,
-      color: "var(--color-text-secondary)",
+      color: colors.text.secondary,
     },
     button: {
       textTransform: "none",
@@ -86,30 +91,30 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: parseInt(radius.button, 10),
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: "var(--radius-button)",
+          borderRadius: parseInt(radius.button, 10),
           padding: "10px 24px",
           fontSize: "1rem",
           fontWeight: 600,
         },
         containedPrimary: {
-          boxShadow: "var(--shadow-button-primary)",
+          boxShadow: shadows.buttonPrimary,
           "&:hover": {
-            boxShadow: "var(--shadow-button-primary-hover)",
-            backgroundColor: "var(--color-primary-dark)",
+            boxShadow: shadows.buttonPrimaryHover,
+            backgroundColor: colors.primary.dark,
           },
         },
         outlinedPrimary: {
-          borderColor: "var(--color-border)",
-          boxShadow: "var(--shadow-button-secondary)",
+          borderColor: colors.border,
+          boxShadow: shadows.buttonSecondary,
           "&:hover": {
-            borderColor: "var(--color-primary)",
-            backgroundColor: "var(--color-primary-light)",
+            borderColor: colors.primary.main,
+            backgroundColor: colors.primary.light,
           },
         },
       },
@@ -117,21 +122,21 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: "var(--radius-card)",
-          boxShadow: "var(--shadow-card)",
-          border: "1px solid var(--color-border)",
+          borderRadius: parseInt(radius.card, 10),
+          boxShadow: shadows.card,
+          border: `1px solid ${colors.border}`,
         },
       },
     },
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: "var(--radius-pill)",
+          borderRadius: parseInt(radius.pill, 10),
         },
         filled: {
           "&.MuiChip-colorPrimary": {
-            backgroundColor: "var(--color-primary-light)",
-            color: "var(--color-primary)",
+            backgroundColor: colors.primary.light,
+            color: colors.primary.main,
           },
         },
       },
