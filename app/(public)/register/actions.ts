@@ -53,7 +53,10 @@ export async function submitRegistration(formData: RegistrationFormData) {
   }
 
   if (formData.interests.length === 0 || formData.assumptions.length === 0) {
-    return { success: false, error: 'Please select interests and confirm all assumptions' }
+    return {
+      success: false,
+      error: 'Please select interests and confirm all assumptions',
+    }
   }
 
   try {
@@ -67,69 +70,76 @@ export async function submitRegistration(formData: RegistrationFormData) {
     })
 
     if (existingUser) {
-      return { success: false, error: 'An account with this email already exists' }
+      return {
+        success: false,
+        error: 'An account with this email already exists',
+      }
     }
 
-    const user = await prisma.user.create({
-      data: {
-        email: formData.email,
-        name: formData.fullName,
-      },
-    })
+    const user = await prisma.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          email: formData.email,
+          name: formData.fullName,
+        },
+      })
 
-    await prisma.userInfo.create({
-      data: {
-        userId: user.id,
-        address: formData.address,
-        dateOfBirth,
-        gender: formData.gender as Gender,
-        occupation: formData.occupation,
-        phoneNumber: formData.phoneNumber,
-        stateOfOrigin: formData.stateOfOrigin,
-      },
-    })
+      await tx.userInfo.create({
+        data: {
+          userId: newUser.id,
+          address: formData.address,
+          dateOfBirth,
+          gender: formData.gender as Gender,
+          occupation: formData.occupation,
+          phoneNumber: formData.phoneNumber,
+          stateOfOrigin: formData.stateOfOrigin,
+        },
+      })
 
-    await prisma.bankAccount.create({
-      data: {
-        userId: user.id,
-        bankName: formData.bankName,
-        accountNumber: formData.accountNumber,
-        accountName: formData.accountName,
-        isPrimary: true,
-      },
-    })
+      await tx.bankAccount.create({
+        data: {
+          userId: newUser.id,
+          bankName: formData.bankName,
+          accountNumber: formData.accountNumber,
+          accountName: formData.accountName,
+          isPrimary: true,
+        },
+      })
 
-    await prisma.nextOfKin.create({
-      data: {
-        userId: user.id,
-        name: formData.kinFullName,
-        phoneNumber: formData.kinPhoneNumber,
-        relationship: formData.kinRelationship as Relationship,
-        occupation: formData.kinOccupation,
-        address: formData.kinAddress,
-        bankName: formData.kinBankName,
-        accountNumber: formData.kinAccountNumber,
-        accountName: formData.kinAccountName,
-      },
-    })
+      await tx.nextOfKin.create({
+        data: {
+          userId: newUser.id,
+          name: formData.kinFullName,
+          phoneNumber: formData.kinPhoneNumber,
+          relationship: formData.kinRelationship as Relationship,
+          occupation: formData.kinOccupation,
+          address: formData.kinAddress,
+          bankName: formData.kinBankName,
+          accountNumber: formData.kinAccountNumber,
+          accountName: formData.kinAccountName,
+        },
+      })
 
-    const tier =
-      formData.interests.includes(MembershipInterest.SAVINGS) ||
-      formData.interests.includes(MembershipInterest.AJO)
-        ? MembershipTier.GOLD_MEMBER
-        : MembershipTier.MEMBER
+      const tier =
+        formData.interests.includes(MembershipInterest.SAVINGS) ||
+        formData.interests.includes(MembershipInterest.AJO)
+          ? MembershipTier.GOLD_MEMBER
+          : MembershipTier.MEMBER
 
-    await prisma.membership.create({
-      data: {
-        userId: user.id,
-        sourceOfIncome: [],
-        interests: formData.interests as MembershipInterest[],
-        referralName: formData.referrerName || null,
-        referralPhoneNumber: formData.referrerPhone || null,
-        assumptions: formData.assumptions as Assumptions[],
-        membershipNumber: generateMembershipNumber(),
-        tier,
-      },
+      await tx.membership.create({
+        data: {
+          userId: newUser.id,
+          sourceOfIncome: [],
+          interests: formData.interests as MembershipInterest[],
+          referralName: formData.referrerName || null,
+          referralPhoneNumber: formData.referrerPhone || null,
+          assumptions: formData.assumptions as Assumptions[],
+          membershipNumber: generateMembershipNumber(),
+          tier,
+        },
+      })
+
+      return newUser
     })
 
     return { success: true, userId: user.id }

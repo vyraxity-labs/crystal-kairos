@@ -1,4 +1,9 @@
-import type { Gender, Relationship, MembershipInterest, Assumptions } from '@/generated/prisma/client'
+import type {
+  Gender,
+  Relationship,
+  MembershipInterest,
+  Assumptions,
+} from '@/generated/prisma/client'
 
 export interface RegistrationFormData {
   // Step 1: Personal
@@ -51,7 +56,7 @@ export const initialRegistrationForm: RegistrationFormData = {
   accountName: '',
 
   kinFullName: '',
-  kinRelationship: '' as Relationship,
+  kinRelationship: '',
   kinPhoneNumber: '',
   kinOccupation: '',
   kinAddress: '',

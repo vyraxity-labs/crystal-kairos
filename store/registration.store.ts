@@ -2,6 +2,8 @@ import type { RegistrationFormData } from '@/types/registration.interface'
 import { initialRegistrationForm } from '@/types/registration.interface'
 import { createSlice } from '@reduxjs/toolkit'
 
+const MAX_STEP_INDEX = 4
+
 interface RegistrationState {
   currentStep: number
   formData: RegistrationFormData
@@ -20,12 +22,15 @@ const registrationSlice = createSlice({
       state.currentStep = payload
     },
     nextStep: (state) => {
-      if (state.currentStep < 4) state.currentStep += 1
+      if (state.currentStep < MAX_STEP_INDEX) state.currentStep += 1
     },
     prevStep: (state) => {
       if (state.currentStep > 0) state.currentStep -= 1
     },
-    updateForm: (state, { payload }: { payload: Partial<RegistrationFormData> }) => {
+    updateForm: (
+      state,
+      { payload }: { payload: Partial<RegistrationFormData> },
+    ) => {
       state.formData = { ...state.formData, ...payload }
     },
     resetForm: (state) => {
