@@ -14,7 +14,7 @@ i18n
     lng: 'en',
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'home'],
+    ns: ['common', 'home', 'auth'],
     interpolation: {
       escapeValue: false,
     },
