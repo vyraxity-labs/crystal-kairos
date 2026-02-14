@@ -1,0 +1,38 @@
+{
+  "header": {
+    "logo": {
+      "app_name": "Crystal Kairos"
+    },
+    "nav_items": {
+      "get_a_loan": "Get A Loan",
+      "join_a_savings": "Join A Savings",
+      "start_eajo": "Start EAjo",
+      "become_a_member": "Become A Member",
+      "login": "Login"
+    }
+  },
+  "footer": {
+    "app_slogan": "Redefining cooperative financial services for the digital age. Secure, transparent, and community-driven.",
+    "quick_links": {
+      "heading": "Quick Links",
+      "about_us": "About Us",
+      "about_eajo": "About Eajo",
+      "about_savings": "About Savings"
+    },
+    "support": {
+      "heading": "Support",
+      "help_center": "Help Center",
+      "privacy_policy": "Privacy Policy",
+      "terms_of_service": "Terms of Service",
+      "faq": "FAQ"
+    },
+    "contact_us": {
+      "heading": "Contact Us",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address"
+    },
+    "secure": "Secure SSL encrypted",
+    "copyright": "{{year}} Crystal Kairos Ventures Cooperative Society. All rights reserved."
+  }
+}

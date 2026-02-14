@@ -1,0 +1,554 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  OWNER
+  ADMIN
+  USER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum Relationship {
+  SPOUSE
+  SIBLING
+  PARENT
+  CHILD
+  FRIEND
+  COLLEAGUE
+  NEIGHBOR
+  ACQUAINTANCE
+  RELATIVE
+  EMPLOYER
+  EMPLOYEE
+  CUSTOMER
+  VENDOR
+  SUPPLIER
+  PARTNER
+  CLIENT
+  LEADER
+  MEMBER
+  GUEST
+  OTHER
+}
+
+enum MembershipInterest {
+  AJO
+  SAVINGS
+  LOAN
+}
+
+enum Assumptions {
+  HAS_SMART_PHONE
+  HAS_INTEGRITY
+  IS_TRUSTWORTHY
+  HAS_INTERNET_ACCESS
+  HAS_EMAIL
+  HAS_WHATS_APP
+}
+
+enum MembershipStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED // For yearly renewal tracking
+}
+
+enum MembershipTier {
+  MEMBER // Loan only
+  SILVER_MEMBER // Ajo participant
+  GOLD_MEMBER // Savings participant
+}
+
+// E-AJO ENUMS
+enum EAjoDuration {
+  FOUR_MONTHS // 4 months / 16 weeks
+  SIX_MONTHS // 6 months / 24 weeks  
+  TWELVE_MONTHS // 12 months
+}
+
+enum EAjoFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum EAjoStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+// SAVINGS ENUMS
+enum SavingsType {
+  FIXED // UPFRONT - bulk amount once
+  REGULAR // Regular interval savings
+  STAGGERED // Any amount, any time
+}
+
+enum SavingsFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  ONCE // For FIXED savings
+}
+
+enum SavingsMaturity {
+  SIX_MONTHS
+  TWELVE_MONTHS
+}
+
+enum SavingsStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ACTIVE
+  MATURED
+  WITHDRAWN
+  EARLY_WITHDRAWAL // Withdrawn before maturity (no interest)
+}
+
+// LOAN ENUMS
+enum LoanStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  DISBURSED
+  ACTIVE
+  COMPLETED
+  DEFAULTED
+  OVERDUE
+}
+
+enum LoanApplicantType {
+  MEMBER_WITH_SAVINGS
+  MEMBER_WITHOUT_SAVINGS
+  NON_MEMBER
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  INTEREST_CREDIT
+  PENALTY
+  FEE_DEDUCTION
+  REFUND
+}
+
+// ============================================
+// CORE USER MODELS
+// ============================================
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  username       String    @unique @default(uuid())
+  name           String
+  passwordHash   String? // Optional: null until user sets password
+  photoUrl       String?
+  role           UserRole  @default(USER)
+  emailVerified  DateTime? // For email verification
+  hasSetPassword Boolean   @default(false) // Track if user has activated account
+  lastLoginAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  userInfo            UserInfo?
+  bankAccounts        BankAccount[]
+  nextOfKin           NextOfKin?
+  membership          Membership?
+  eAjo                EAjo[]
+  savings             Savings[]
+  loans               Loan[]
+  activityLogs        ActivityLog[]
+  savingsTransactions SavingsTransaction[] @relation("TransactionRecorder")
+  eAjoTransactions    EAjoTransaction[]    @relation("TransactionRecorder")
+  loanRepayments      LoanRepayment[]      @relation("RepaymentRecorder")
+  eAjoPayouts         EAjoPayout[]         @relation("PayoutRecorder")
+  guaranteedLoans     Loan[]               @relation("LoanGuarantor")
+  guarantorRewards    GuarantorReward[]
+  savingsWithdrawals  SavingsWithdrawal[]  @relation("WithdrawalProcessor")
+
+  @@map("users")
+}
+
+model UserInfo {
+  id            String    @id @default(uuid())
+  address       String
+  dateOfBirth   DateTime
+  gender        Gender
+  occupation    String
+  phoneNumber   String
+  stateOfOrigin String
+  userId        String    @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_info")
+}
+
+model BankAccount {
+  id            String   @id @default(uuid())
+  accountNumber String
+  accountName   String
+  bankName      String
+  userId        String
+  isPrimary     Boolean  @default(false) // Mark primary account
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("bank_accounts")
+}
+
+model NextOfKin {
+  id            String       @id @default(uuid())
+  name          String
+  phoneNumber   String
+  relationship  Relationship
+  bankName      String
+  accountNumber String
+  accountName   String
+  occupation    String
+  address       String
+  userId        String       @unique
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("next_of_kins")
+}
+
+model Membership {
+  id                  String               @id @default(uuid())
+  sourceOfIncome      String[]
+  interests           MembershipInterest[]
+  referralName        String?
+  referralPhoneNumber String?
+  membershipNumber    String?              @unique
+  assumptions         Assumptions[]
+  tier                MembershipTier       @default(MEMBER)
+  status              MembershipStatus     @default(PENDING)
+  approvedAt          DateTime?
+  approvedBy          String?
+  rejectionReason     String?
+  membershipFee       Decimal              @default(0) // Currently 0, future: 5000
+  renewalFee          Decimal              @default(0) // Currently 0, future: 2000
+  expiryDate          DateTime? // For yearly renewal
+  lastRenewalDate     DateTime?
+  userId              String               @unique
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("memberships")
+}
+
+// ============================================
+// E-AJO (CONTRIBUTION) MODELS
+// ============================================
+
+model EAjo {
+  id                   String        @id @default(uuid())
+  userId               String
+  contributionAmount   Decimal // Amount to save per period (e.g., 10k)
+  totalParticipants    Int // Duration in months (4, 6, or 12)
+  duration             EAjoDuration
+  frequency            EAjoFrequency
+  payoutPosition       Int // Which position user wants to collect (1-4, 1-6, or 1-12)
+  feePercentage        Decimal // Calculated based on position and duration
+  feeAmount            Decimal // Actual fee to be deducted
+  totalExpectedPayout  Decimal // contributionAmount * totalParticipants
+  netPayoutAmount      Decimal // totalExpectedPayout - feeAmount
+  guarantorName        String
+  guarantorPhoneNumber String
+  bankName             String
+  accountNumber        String
+  accountName          String
+  currentBalance       Decimal       @default(0)
+  totalContributed     Decimal       @default(0)
+  hasReceivedPayout    Boolean       @default(false)
+  payoutDate           DateTime?
+  startDate            DateTime?
+  endDate              DateTime?
+  isAnonymousRequest   Boolean       @default(false) // True if submitted via public form with membership ID
+  status               EAjoStatus    @default(PENDING)
+  approvedAt           DateTime?
+  approvedBy           String?
+  rejectionReason      String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions EAjoTransaction[]
+  payout       EAjoPayout?
+
+  @@index([userId])
+  @@index([status])
+  @@map("e_ajo")
+}
+
+model EAjoTransaction {
+  id              String          @id @default(uuid())
+  eAjoId          String
+  amount          Decimal
+  transactionType TransactionType
+  recordedBy      String
+  transactionDate DateTime
+  recordedAt      DateTime        @default(now())
+  paymentMethod   String?
+  notes           String?
+  receiptUrl      String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  eAjo     EAjo @relation(fields: [eAjoId], references: [id], onDelete: Cascade)
+  recorder User @relation("TransactionRecorder", fields: [recordedBy], references: [id])
+
+  @@index([eAjoId])
+  @@index([transactionDate])
+  @@map("e_ajo_transactions")
+}
+
+model EAjoPayout {
+  id            String   @id @default(uuid())
+  eAjoId        String   @unique
+  grossAmount   Decimal // Total expected (contributionAmount * totalParticipants)
+  feeAmount     Decimal // Fee deducted
+  netAmount     Decimal // Amount actually paid out
+  payoutDate    DateTime
+  processedBy   String
+  bankName      String
+  accountNumber String
+  accountName   String
+  notes         String?
+  receiptUrl    String?
+  createdAt     DateTime @default(now())
+
+  eAjo      EAjo @relation(fields: [eAjoId], references: [id], onDelete: Cascade)
+  processor User @relation("PayoutRecorder", fields: [processedBy], references: [id])
+
+  @@map("e_ajo_payouts")
+}
+
+// ============================================
+// SAVINGS MODELS
+// ============================================
+
+model Savings {
+  id                     String           @id @default(uuid())
+  userId                 String
+  savingsType            SavingsType
+  targetAmount           Decimal? // For FIXED, the bulk amount; For REGULAR, amount per period
+  frequency              SavingsFrequency
+  maturity               SavingsMaturity
+  interestRate           Decimal // 12% or 36% for FIXED; 4.5% or 10.5% for REGULAR
+  bankName               String
+  accountNumber          String
+  accountName            String
+  currentBalance         Decimal          @default(0)
+  accruedInterest        Decimal          @default(0)
+  totalDeposited         Decimal          @default(0)
+  expectedMaturityAmount Decimal?
+  isAnonymousRequest     Boolean          @default(false) // True if submitted via public form with membership ID
+  status                 SavingsStatus    @default(PENDING)
+  approvedAt             DateTime?
+  approvedBy             String?
+  rejectionReason        String?
+  startDate              DateTime?
+  maturityDate           DateTime?
+  earlyWithdrawal        Boolean          @default(false) // If true, no interest
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions SavingsTransaction[]
+  withdrawal   SavingsWithdrawal?
+
+  @@index([userId])
+  @@index([status])
+  @@map("savings")
+}
+
+model SavingsTransaction {
+  id              String          @id @default(uuid())
+  savingsId       String
+  amount          Decimal
+  transactionType TransactionType
+  recordedBy      String
+  transactionDate DateTime
+  recordedAt      DateTime        @default(now())
+  paymentMethod   String?
+  notes           String?
+  receiptUrl      String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  savings  Savings @relation(fields: [savingsId], references: [id], onDelete: Cascade)
+  recorder User    @relation("TransactionRecorder", fields: [recordedBy], references: [id])
+
+  @@index([savingsId])
+  @@index([transactionDate])
+  @@map("savings_transactions")
+}
+
+model SavingsWithdrawal {
+  id                String   @id @default(uuid())
+  savingsId         String   @unique
+  principalAmount   Decimal // Total deposited
+  interestAmount    Decimal // Interest earned (0 if early withdrawal)
+  totalAmount       Decimal // Principal + Interest
+  isEarlyWithdrawal Boolean  @default(false)
+  withdrawnAt       DateTime
+  processedBy       String
+  bankName          String
+  accountNumber     String
+  accountName       String
+  notes             String?
+  receiptUrl        String?
+  createdAt         DateTime @default(now())
+
+  savings   Savings @relation(fields: [savingsId], references: [id], onDelete: Cascade)
+  processor User    @relation("WithdrawalProcessor", fields: [processedBy], references: [id])
+
+  @@map("savings_withdrawals")
+}
+
+// ============================================
+// LOAN MODELS
+// ============================================
+
+model Loan {
+  id                   String            @id @default(uuid())
+  userId               String
+  applicantType        LoanApplicantType
+  requestedAmount      Decimal
+  approvedAmount       Decimal?
+  interestRate         Decimal // 0%, 3.5%, 5%, or 10% per month based on type
+  duration             Int // In months (max 6)
+  purpose              String
+  guarantorId          String? // Another User ID (must be Crystal member)
+  guarantorName        String?
+  guarantorPhoneNumber String?
+  collateralDetails    String? // For non-members
+  applicationFee       Decimal           @default(0) // 0, 500, or 2000
+  outstandingBalance   Decimal           @default(0)
+  totalRepaid          Decimal           @default(0)
+  defaultPenalty       Decimal           @default(0) // 10% on defaulted periods
+  gracePeriodDays      Int               @default(7)
+  isAnonymousRequest   Boolean           @default(false) // True if submitted via public form with membership ID
+  status               LoanStatus        @default(PENDING)
+  requestedAt          DateTime          @default(now())
+  approvedAt           DateTime?
+  approvedBy           String?
+  disbursedAt          DateTime?
+  repaymentStartDate   DateTime?
+  repaymentEndDate     DateTime?
+  actualRepaymentDate  DateTime?
+  rejectionReason      String?
+  isDefaulted          Boolean           @default(false)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guarantor  User?            @relation("LoanGuarantor", fields: [guarantorId], references: [id])
+  repayments LoanRepayment[]
+  reward     GuarantorReward?
+
+  @@index([userId])
+  @@index([guarantorId])
+  @@index([status])
+  @@map("loans")
+}
+
+model LoanRepayment {
+  id             String    @id @default(uuid())
+  loanId         String
+  amount         Decimal
+  penaltyAmount  Decimal   @default(0)
+  totalPaid      Decimal // amount + penaltyAmount
+  recordedBy     String
+  paymentDate    DateTime
+  dueDate        DateTime?
+  recordedAt     DateTime  @default(now())
+  paymentMethod  String?
+  isEarlyPayment Boolean   @default(false) // For discount eligibility
+  hasDiscount    Boolean   @default(false)
+  discountAmount Decimal   @default(0)
+  notes          String?
+  receiptUrl     String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  loan     Loan @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  recorder User @relation("RepaymentRecorder", fields: [recordedBy], references: [id])
+
+  @@index([loanId])
+  @@index([paymentDate])
+  @@map("loan_repayments")
+}
+
+// ============================================
+// GUARANTOR REWARDS (New Feature)
+// ============================================
+
+model GuarantorReward {
+  id           String   @id @default(uuid())
+  guarantorId  String
+  loanId       String   @unique
+  rewardAmount Decimal
+  reason       String   @default("Successful loan completion by guaranteed member")
+  awardedAt    DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  guarantor User @relation(fields: [guarantorId], references: [id], onDelete: Cascade)
+  loan      Loan @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@index([guarantorId])
+  @@map("guarantor_rewards")
+}
+
+// ============================================
+// AUDIT & ACTIVITY TRACKING
+// ============================================
+
+model ActivityLog {
+  id         String   @id @default(uuid())
+  adminId    String
+  action     String
+  entityType String
+  entityId   String
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  admin User @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
