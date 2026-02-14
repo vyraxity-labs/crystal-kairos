@@ -4,11 +4,11 @@ import MemberSteps from '@/components/home/MemberSteps'
 
 const Home = () => {
   return (
-    <div>
+    <main>
       <Hero />
       <MemberBenefits />
       <MemberSteps />
-    </div>
+    </main>
   )
 }
 

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { Button } from '@mui/material'
+import theme from '@/lib/theme'
 
 const Hero = () => {
   const { t } = useTranslation('home')
@@ -22,7 +23,7 @@ const Hero = () => {
           className='inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6 shadow-sm'
           style={{
             backgroundColor: 'var(--color-primary-light)',
-            borderColor: '#a3b7ed',
+            borderColor: theme.palette.primary.main,
           }}
         >
           <CheckCircleIcon

@@ -39,7 +39,7 @@ const Logo = ({
         width={50}
         height={50}
         alt='Logo'
-        className={cx(logoSize, 'aspect-square')}
+        className={cx(logoSize)}
       />
       {showText && (
         <Typography

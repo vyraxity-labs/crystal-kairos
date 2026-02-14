@@ -19,14 +19,14 @@ export const navItems = [
     href: '/eajo',
   },
   {
-    id: '5',
-    label: 'header.nav_items.become_a_member',
-    href: '/register',
-  },
-  {
     id: '4',
     label: 'header.nav_items.login',
     href: '/login',
+  },
+  {
+    id: '5',
+    label: 'header.nav_items.become_a_member',
+    href: '/register',
   },
 ]
 

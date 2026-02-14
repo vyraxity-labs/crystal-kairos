@@ -40,25 +40,23 @@ const PublicMobileNav = () => {
         </div>
 
         <div className='px-2 flex flex-col gap-2'>
-          {navItems
-            .sort((a, b) => Number(a.id) - Number(b.id))
-            .map((item) => {
-              return (
-                <Link href={item.href} key={item.id}>
-                  <Button
-                    fullWidth
-                    variant={
-                      ['/register', '/login'].includes(item.href)
-                        ? 'contained'
-                        : 'text'
-                    }
-                    color={item.href === '/register' ? 'primary' : 'secondary'}
-                  >
-                    {t(item.label)}
-                  </Button>
-                </Link>
-              )
-            })}
+          {navItems.map((item) => {
+            return (
+              <Link href={item.href} key={item.id}>
+                <Button
+                  fullWidth
+                  variant={
+                    ['/register', '/login'].includes(item.href)
+                      ? 'contained'
+                      : 'text'
+                  }
+                  color={item.href === '/register' ? 'primary' : 'secondary'}
+                >
+                  {t(item.label)}
+                </Button>
+              </Link>
+            )
+          })}
         </div>
       </div>
     </div>

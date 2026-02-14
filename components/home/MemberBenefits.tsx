@@ -2,46 +2,38 @@
 
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
-import GroupIcon from '@mui/icons-material/Group'
-import TrendingUpIcon from '@mui/icons-material/TrendingUp'
-import RequestQuoteIcon from '@mui/icons-material/RequestQuote'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
-
-const cardConfig = [
-  { key: 'eajo', icon: GroupIcon, iconBg: '#FFF3E0', iconColor: '#E65100', href: '/eajo' },
-  { key: 'savings', icon: TrendingUpIcon, iconBg: '#F3E5F5', iconColor: '#7B1FA2', href: '/savings' },
-  { key: 'loans', icon: RequestQuoteIcon, iconBg: '#E8F5E9', iconColor: '#2E7D32', href: '/loans' },
-] as const
+import { cardConfig } from './data'
 
 const MemberBenefits = () => {
   const { t } = useTranslation('home')
 
   return (
     <section
-      className="px-6 py-16 md:py-24"
+      className='px-6 py-16 md:py-24'
       style={{ backgroundColor: 'var(--color-bg-main)' }}
     >
-      <div className="max-w-6xl mx-auto">
+      <div className='max-w-6xl mx-auto'>
         {/* Section header */}
-        <div className="text-center mb-12">
+        <div className='text-center mb-12'>
           <h2
-            className="text-display mb-3"
+            className='text-display mb-3'
             style={{ color: 'var(--color-text-primary)' }}
           >
             {t('memberBenefits.heading')}
           </h2>
           <div
-            className="w-16 h-1 rounded-full mx-auto"
+            className='w-16 h-1 rounded-full mx-auto'
             style={{ backgroundColor: 'var(--color-accent)' }}
           />
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8'>
           {cardConfig.map(({ key, icon: Icon, iconBg, iconColor, href }) => (
             <article
               key={key}
-              className="flex flex-col p-6 rounded-xl"
+              className='flex flex-col p-6 rounded-xl'
               style={{
                 backgroundColor: 'var(--color-bg-paper)',
                 boxShadow: 'var(--shadow-card)',
@@ -50,7 +42,7 @@ const MemberBenefits = () => {
             >
               {/* Icon */}
               <div
-                className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
+                className='w-12 h-12 rounded-lg flex items-center justify-center mb-4'
                 style={{ backgroundColor: iconBg }}
               >
                 <Icon sx={{ fontSize: 24, color: iconColor }} />
@@ -58,7 +50,7 @@ const MemberBenefits = () => {
 
               {/* Title */}
               <h3
-                className="text-card-title mb-3"
+                className='text-card-title mb-3'
                 style={{ color: 'var(--color-text-primary)' }}
               >
                 {t(`memberBenefits.cards.${key}.title`)}
@@ -66,7 +58,7 @@ const MemberBenefits = () => {
 
               {/* Description */}
               <p
-                className="flex-1 text-sm leading-relaxed mb-4"
+                className='flex-1 text-sm leading-relaxed mb-4'
                 style={{ color: 'var(--color-text-secondary)' }}
               >
                 {t(`memberBenefits.cards.${key}.description`)}
@@ -75,7 +67,7 @@ const MemberBenefits = () => {
               {/* CTA link */}
               <Link
                 href={href}
-                className="inline-flex items-center gap-1 text-sm font-semibold hover:underline"
+                className='inline-flex items-center gap-1 text-sm font-semibold hover:underline'
                 style={{ color: 'var(--color-primary)' }}
               >
                 {t(`memberBenefits.cards.${key}.cta`)}

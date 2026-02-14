@@ -14,7 +14,7 @@ const PublicFooter = () => {
   const { t } = useTranslation('common')
 
   return (
-    <div className='border-t border-amber-100'>
+    <div className='border-t border-border'>
       <div className='w-[90%] max-w-300 mx-auto py-5'>
         <div
           className='flex flex-col gap-5 md:grid md:grid-cols-2 md:gap-8 lg:grid-cols-4 pb-5
@@ -71,7 +71,7 @@ const PublicFooter = () => {
           </div>
         </div>
 
-        <div className='border-t border-amber-200/80 flex flex-col gap-4 justify-center items-center md:flex-row md:justify-between pt-5'>
+        <div className='border-t border-border/70 flex flex-col gap-4 justify-center items-center md:flex-row md:justify-between pt-5'>
           <Typography variant='body2' sx={{ textAlign: 'center' }}>
             &copy; {t('footer.copyright', { year: new Date().getFullYear() })}
           </Typography>

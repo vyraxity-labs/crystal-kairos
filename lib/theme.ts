@@ -1,7 +1,7 @@
-import { createTheme } from "@mui/material/styles";
-import { designTokens } from "./designTokens";
+import { createTheme } from '@mui/material/styles'
+import { designTokens } from './designTokens'
 
-const { colors, radius, shadows } = designTokens;
+const { colors, radius, shadows } = designTokens
 
 /**
  * CRYSTAL KAIROS Design System
@@ -11,12 +11,12 @@ const { colors, radius, shadows } = designTokens;
 
 const theme = createTheme({
   palette: {
-    mode: "light",
+    mode: 'light',
     primary: {
       main: colors.primary.main,
       light: colors.primary.light,
       dark: colors.primary.dark,
-      contrastText: "#FFFFFF",
+      contrastText: '#FFFFFF',
     },
     secondary: {
       main: colors.accent.main,
@@ -35,58 +35,57 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily:
-      "var(--font-geist-sans), Inter, 'Helvetica Neue', Arial, sans-serif",
+    fontFamily: 'var(--font-sans)',
     h1: {
       fontWeight: 700,
-      fontSize: "3.5rem",
+      fontSize: '3.5rem',
       lineHeight: 1.2,
-      letterSpacing: "-0.02em",
+      letterSpacing: '-0.02em',
       color: colors.text.primary,
     },
     h2: {
       fontWeight: 700,
-      fontSize: "2.5rem",
+      fontSize: '2.5rem',
       lineHeight: 1.3,
-      letterSpacing: "-0.02em",
+      letterSpacing: '-0.02em',
       color: colors.text.primary,
     },
     h3: {
       fontWeight: 700,
-      fontSize: "2rem",
+      fontSize: '2rem',
       lineHeight: 1.35,
       color: colors.text.primary,
     },
     h4: {
       fontWeight: 700,
-      fontSize: "1.5rem",
+      fontSize: '1.5rem',
       lineHeight: 1.4,
       color: colors.text.primary,
     },
     h5: {
       fontWeight: 600,
-      fontSize: "1.25rem",
+      fontSize: '1.25rem',
       lineHeight: 1.4,
       color: colors.text.primary,
     },
     h6: {
       fontWeight: 600,
-      fontSize: "1.125rem",
+      fontSize: '1.125rem',
       lineHeight: 1.4,
       color: colors.text.primary,
     },
     body1: {
-      fontSize: "1rem",
+      fontSize: '1rem',
       lineHeight: 1.6,
       color: colors.text.secondary,
     },
     body2: {
-      fontSize: "0.875rem",
+      fontSize: '0.875rem',
       lineHeight: 1.5,
       color: colors.text.secondary,
     },
     button: {
-      textTransform: "none",
+      textTransform: 'none',
       fontWeight: 600,
     },
   },
@@ -98,13 +97,13 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: parseInt(radius.button, 10),
-          padding: "10px 24px",
-          fontSize: "1rem",
+          padding: '10px 24px',
+          fontSize: '1rem',
           fontWeight: 600,
         },
         containedPrimary: {
           boxShadow: shadows.buttonPrimary,
-          "&:hover": {
+          '&:hover': {
             boxShadow: shadows.buttonPrimaryHover,
             backgroundColor: colors.primary.dark,
           },
@@ -112,7 +111,7 @@ const theme = createTheme({
         outlinedPrimary: {
           borderColor: colors.border,
           boxShadow: shadows.buttonSecondary,
-          "&:hover": {
+          '&:hover': {
             borderColor: colors.primary.main,
             backgroundColor: colors.primary.light,
           },
@@ -134,7 +133,7 @@ const theme = createTheme({
           borderRadius: parseInt(radius.pill, 10),
         },
         filled: {
-          "&.MuiChip-colorPrimary": {
+          '&.MuiChip-colorPrimary': {
             backgroundColor: colors.primary.light,
             color: colors.primary.main,
           },
@@ -142,6 +141,6 @@ const theme = createTheme({
       },
     },
   },
-});
+})
 
-export default theme;
+export default theme
