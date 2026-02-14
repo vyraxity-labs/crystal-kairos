@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import navReducer from '@/store/nav.store'
+import registrationReducer from '@/store/registration.store'
 
 const store = configureStore({
   reducer: {
     nav: navReducer,
+    registration: registrationReducer,
   },
 })
 

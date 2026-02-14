@@ -190,19 +190,20 @@ model User {
   eAjoPayouts         EAjoPayout[]         @relation("PayoutRecorder")
   guaranteedLoans     Loan[]               @relation("LoanGuarantor")
   guarantorRewards    GuarantorReward[]
-  savingsWithdrawals  SavingsWithdrawal[]   @relation("WithdrawalProcessor")
+  savingsWithdrawals  SavingsWithdrawal[]  @relation("WithdrawalProcessor")
 
   @@map("users")
 }
 
 model UserInfo {
-  id            String   @id @default(uuid())
+  id            String    @id @default(uuid())
   address       String
+  dateOfBirth   DateTime
   gender        Gender
   occupation    String
   phoneNumber   String
   stateOfOrigin String
-  userId        String   @unique
+  userId        String    @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -225,7 +226,7 @@ model BankAccount {
 }
 
 model NextOfKin {
-  id            String   @id @default(uuid())
+  id            String       @id @default(uuid())
   name          String
   phoneNumber   String
   relationship  Relationship
@@ -234,10 +235,10 @@ model NextOfKin {
   accountName   String
   occupation    String
   address       String
-  userId        String   @unique
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String       @unique
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("next_of_kins")
 }
@@ -246,8 +247,8 @@ model Membership {
   id                  String               @id @default(uuid())
   sourceOfIncome      String[]
   interests           MembershipInterest[]
-  referralName        String
-  referralPhoneNumber String
+  referralName        String?
+  referralPhoneNumber String?
   membershipNumber    String?              @unique
   assumptions         Assumptions[]
   tier                MembershipTier       @default(MEMBER)
@@ -473,8 +474,8 @@ model Loan {
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
 
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  guarantor  User?           @relation("LoanGuarantor", fields: [guarantorId], references: [id])
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guarantor  User?            @relation("LoanGuarantor", fields: [guarantorId], references: [id])
   repayments LoanRepayment[]
   reward     GuarantorReward?
 
