@@ -26,5 +26,25 @@
         "cta": "Calculate Loan"
       }
     }
+  },
+  "memberSteps": {
+    "title_part1": "Start your journey in",
+    "title_part2": "3 simple steps",
+    "intro": "We've simplified financial management so you can focus on what matters most.",
+    "steps": {
+      "1": {
+        "title": "Register Online",
+        "description": "Complete our quick digital application form with basic KYC details and join the community."
+      },
+      "2": {
+        "title": "Choose your Plan",
+        "description": "Select from our range of savings targets, E-Ajo cycles, or apply for an instant loan."
+      },
+      "3": {
+        "title": "Achieve Stability",
+        "description": "Automate your finances through our secure dashboard and watch your portfolio flourish."
+      }
+    },
+    "dashboard_preview": "Member Dashboard Preview"
   }
 }

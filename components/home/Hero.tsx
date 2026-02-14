@@ -40,7 +40,8 @@ const Hero = () => {
         <h1 className='text-hero mb-4'>
           <span
             style={{
-              background: 'linear-gradient(90deg, #1E3A5F 0%, #1A4CEB 50%, #4361ee 100%)',
+              background:
+                'linear-gradient(90deg, #1E3A5F 0%, #1A4CEB 50%, #4361ee 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -63,27 +64,10 @@ const Hero = () => {
 
         {/* CTA Buttons */}
         <div className='flex flex-col sm:flex-row gap-4 mb-16'>
-          <Link
-            href='/register'
-            // className="inline-flex items-center justify-center px-8 py-3.5 rounded-full font-semibold text-white transition-shadow hover:shadow-lg"
-            // style={{
-            //   background:
-            //     'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%)',
-            //   boxShadow: 'var(--shadow-button-primary)',
-            // }}
-          >
+          <Link href='/register'>
             <Button variant='contained'>{t('hero.button_member')}</Button>
           </Link>
-          <Link
-            href='/eajo'
-            // className='inline-flex items-center justify-center px-8 py-3.5 rounded-full font-semibold border transition-shadow hover:shadow-md'
-            // style={{
-            //   backgroundColor: 'var(--color-bg-paper)',
-            //   color: 'var(--color-text-primary)',
-            //   borderColor: 'var(--color-border)',
-            //   boxShadow: 'var(--shadow-button-secondary)',
-            // }}
-          >
+          <Link href='/eajo'>
             <Button variant='contained' color='secondary'>
               {t('hero.button_explore')}
             </Button>
