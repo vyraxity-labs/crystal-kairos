@@ -16,9 +16,10 @@ const Step1PersonalInfo = () => {
   const dispatch = useDispatch()
   const formData = useSelector((s: RootState) => s.registration.formData)
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(updateForm({ [field]: e.target.value }))
-  }
+  const handleChange =
+    (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      dispatch(updateForm({ [field]: e.target.value }))
+    }
 
   return (
     <div
@@ -30,7 +31,10 @@ const Step1PersonalInfo = () => {
     >
       <div className='flex items-center gap-2 mb-6'>
         <PersonIcon sx={{ color: 'var(--color-primary)' }} />
-        <h2 className='text-xl font-bold' style={{ color: 'var(--color-text-primary)' }}>
+        <h2
+          className='text-xl font-bold'
+          style={{ color: 'var(--color-text-primary)' }}
+        >
           {t('personal_info.heading')}
         </h2>
       </div>
@@ -62,7 +66,9 @@ const Step1PersonalInfo = () => {
           select
           label={t('personal_info.gender')}
           value={formData.gender || ''}
-          onChange={(e) => dispatch(updateForm({ gender: e.target.value as Gender }))}
+          onChange={(e) =>
+            dispatch(updateForm({ gender: e.target.value as Gender }))
+          }
           fullWidth
         >
           <MenuItem value=''>{t('personal_info.gender_placeholder')}</MenuItem>
@@ -111,7 +117,11 @@ const Step1PersonalInfo = () => {
       </div>
 
       <div className='flex flex-wrap justify-between gap-4 mt-8'>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => dispatch(prevStep())} disabled>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => dispatch(prevStep())}
+          disabled
+        >
           {t('register.buttons.back')}
         </Button>
         <div className='flex gap-2'>
