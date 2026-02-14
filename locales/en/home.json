@@ -1,0 +1,50 @@
+{
+  "hero": {
+    "badge": "Regulated Financial Cooperative",
+    "title_part1": "Your Path to Financial",
+    "title_part2": "Stability",
+    "description": "Empowering Crystal Kairos members with secure savings, ethical loans, and the innovative E-Ajo system for collective growth.",
+    "button_member": "Become a Member",
+    "button_explore": "Explore E-Ajo"
+  },
+  "memberBenefits": {
+    "heading": "Core Member Benefits",
+    "cards": {
+      "eajo": {
+        "title": "Zero-risk E-Ajo",
+        "description": "Digitized rotational savings with automated contributions and guaranteed payouts. Secure your slot and grow together.",
+        "cta": "Learn More"
+      },
+      "savings": {
+        "title": "High-interest Savings",
+        "description": "Competitive annual yields on your deposits. Watch your wealth grow with flexible withdrawal options and full transparency.",
+        "cta": "View Rates"
+      },
+      "loans": {
+        "title": "Flexible Loans",
+        "description": "Access quick, low-interest credit for personal or business needs. Our approval process is members-first and hassle-free.",
+        "cta": "Calculate Loan"
+      }
+    }
+  },
+  "memberSteps": {
+    "title_part1": "Start your journey in",
+    "title_part2": "3 simple steps",
+    "intro": "We've simplified financial management so you can focus on what matters most.",
+    "steps": {
+      "1": {
+        "title": "Register Online",
+        "description": "Complete our quick digital application form with basic KYC details and join the community."
+      },
+      "2": {
+        "title": "Choose your Plan",
+        "description": "Select from our range of savings targets, E-Ajo cycles, or apply for an instant loan."
+      },
+      "3": {
+        "title": "Achieve Stability",
+        "description": "Automate your finances through our secure dashboard and watch your portfolio flourish."
+      }
+    },
+    "dashboard_preview": "Member Dashboard Preview"
+  }
+}
