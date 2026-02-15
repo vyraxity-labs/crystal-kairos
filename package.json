@@ -22,7 +22,9 @@
     "docker:clean": "docker compose down -v",
     "generate:design-tokens": "tsx scripts/generate-design-tokens-css.ts",
     "predev": "pnpm run generate:design-tokens",
-    "prebuild": "pnpm run generate:design-tokens"
+    "prebuild": "pnpm run generate:design-tokens",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@emotion/css": "^11.13.5",
@@ -64,6 +66,18 @@
     "tailwindcss": "^4",
     "tsx": "^4.19.2",
     "typescript": "^5",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "storybook": "^10.2.8",
+    "@storybook/nextjs-vite": "^10.2.8",
+    "@chromatic-com/storybook": "^5.0.1",
+    "@storybook/addon-vitest": "^10.2.8",
+    "@storybook/addon-a11y": "^10.2.8",
+    "@storybook/addon-docs": "^10.2.8",
+    "@storybook/addon-onboarding": "^10.2.8",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18",
+    "playwright": "^1.58.2",
+    "@vitest/browser-playwright": "^4.0.18",
+    "@vitest/coverage-v8": "^4.0.18"
   }
 }
