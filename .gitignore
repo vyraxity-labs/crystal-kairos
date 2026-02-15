@@ -20,6 +20,9 @@
 # production
 /build
 
+# storybook
+/storybook-static
+
 # misc
 .DS_Store
 *.pem
@@ -42,5 +45,6 @@ next-env.d.ts
 
 /generated/prisma
 
+*.log
 *storybook.log
 storybook-static
