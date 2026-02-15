@@ -9,6 +9,8 @@ import {
   Assumptions,
   MembershipTier,
 } from '@/generated/prisma/client'
+import { sendEmail } from '@/lib/email'
+import { getRegistrationNotificationEmail } from '@/lib/email-templates'
 
 function generateMembershipNumber(): string {
   const prefix = 'CK'
@@ -141,6 +143,30 @@ export async function submitRegistration(formData: RegistrationFormData) {
 
       return newUser
     })
+
+    const membership = await prisma.membership.findFirst({
+      where: { userId: user.id },
+      select: { membershipNumber: true },
+    })
+
+    const adminEmail = process.env.ADMIN_EMAIL
+    if (adminEmail) {
+      try {
+        const { subject, html, text } = getRegistrationNotificationEmail({
+          name: user.name ?? formData.fullName,
+          email: user.email ?? formData.email,
+          membershipNumber: membership?.membershipNumber ?? undefined,
+        })
+        await sendEmail({
+          to: adminEmail,
+          subject,
+          html,
+          text,
+        })
+      } catch (emailError) {
+        console.error('Failed to send registration notification:', emailError)
+      }
+    }
 
     return { success: true, userId: user.id }
   } catch (error) {
