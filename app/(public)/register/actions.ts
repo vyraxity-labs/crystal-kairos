@@ -78,7 +78,7 @@ export async function submitRegistration(formData: RegistrationFormData) {
       }
     }
 
-    const user = await prisma.$transaction(async (tx) => {
+    const { user, membership } = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
         data: {
           email: formData.email,
@@ -128,7 +128,7 @@ export async function submitRegistration(formData: RegistrationFormData) {
           ? MembershipTier.GOLD_MEMBER
           : MembershipTier.MEMBER
 
-      await tx.membership.create({
+      const newMembership = await tx.membership.create({
         data: {
           userId: newUser.id,
           sourceOfIncome: [],
@@ -141,20 +141,15 @@ export async function submitRegistration(formData: RegistrationFormData) {
         },
       })
 
-      return newUser
-    })
-
-    const membership = await prisma.membership.findFirst({
-      where: { userId: user.id },
-      select: { membershipNumber: true },
+      return { user: newUser, membership: newMembership }
     })
 
     const adminEmail = process.env.ADMIN_EMAIL
     if (adminEmail) {
       try {
         const { subject, html, text } = getRegistrationNotificationEmail({
-          name: user.name ?? formData.fullName,
-          email: user.email ?? formData.email,
+          name: user.name,
+          email: user.email,
           membershipNumber: membership?.membershipNumber ?? undefined,
         })
         await sendEmail({

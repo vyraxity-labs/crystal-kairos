@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid request', details: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -25,23 +25,26 @@ export async function POST(request: NextRequest) {
     if (!adminEmail) {
       return NextResponse.json(
         { error: 'Admin email not configured' },
-        { status: 500 }
+        { status: 500 },
       )
     }
 
     const { name, email, subject, message } = parsed.data
 
+    const escape = (str: string) =>
+      str.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
     const html = `
       <h2>Contact Form Submission</h2>
-      <p><strong>From:</strong> ${name} &lt;${email}&gt;</p>
+      <p><strong>From:</strong> ${escape(name)} &lt;${escape(email)}&gt;</p>
       <p><strong>Subject:</strong> ${subject || '(No subject)'}</p>
       <hr />
-      <p>${message.replace(/\n/g, '<br />')}</p>
+      <p>${escape(message).replace(/\n/g, '<br />')}</p>
     `
 
     const text = `
 Contact Form Submission
-From: ${name} <${email}>
+From: ${escape(name)} <${escape(email)}>
 Subject: ${subject || '(No subject)'}
 
 ${message}
@@ -49,7 +52,7 @@ ${message}
 
     await sendEmail({
       to: adminEmail,
-      subject: subject || `Contact from ${name}`,
+      subject: subject || `Contact from ${escape(name)}`,
       text,
       html,
       replyTo: email,
@@ -63,7 +66,7 @@ ${message}
         error:
           error instanceof Error ? error.message : 'Failed to send message',
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
