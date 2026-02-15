@@ -10,7 +10,7 @@ type ButtonComponentProps = Omit<ButtonProps, 'component'> & {
 const Button = ({ href, children, ...props }: ButtonComponentProps) => {
   if (href) {
     return (
-      <MuiButton component={Link} href={href} {...(props as object)}>
+      <MuiButton component={Link} href={href} {...(props as any)}>
         {children}
       </MuiButton>
     )

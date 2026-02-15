@@ -24,13 +24,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
-  args: {
-    size: 'small',
-    showText: true,
-    alignment: 'horizontal',
-  },
-}
+export const Default: Story = {}
 
 export const Medium: Story = {
   args: {
