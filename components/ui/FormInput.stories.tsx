@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z, ZodType } from 'zod'
+import { z } from 'zod'
 import { action } from 'storybook/actions'
 import FormInput from './FormInput'
 import Button from './Button'
@@ -142,7 +142,6 @@ export const StandaloneSelect: Story = {
 }
 
 /** With React Hook Form + Zod validation */
-
 const loginSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -157,7 +156,7 @@ function LoginFormExample() {
     mode: 'onChange',
   })
 
-  const onSubmit: SubmitHandler<LoginForm> = async (formData) => {
+  const onSubmit: SubmitHandler<LoginForm> = (formData) => {
     action('formSubmit')(formData)
   }
 

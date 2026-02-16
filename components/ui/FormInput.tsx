@@ -153,7 +153,7 @@ function FormInputInner<T extends FieldValues>(
       rows={rows}
       select={select}
       value={value ?? ''}
-      onChange={onChange as TextFieldProps['onChange']}
+      onChange={onChange as any}
       onBlur={onBlur}
       inputRef={inputRef}
       error={!!error}
