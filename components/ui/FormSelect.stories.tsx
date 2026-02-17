@@ -48,11 +48,12 @@ export const StandaloneStringOptions: Story = {
     const [value, setValue] = useState<string | null>(null)
     return (
       <div className='w-80'>
-        <FormSelect
-          {...args}
+        <FormSelect<string>
+          label={args.label}
+          placeholder={args.placeholder}
           options={stringOptions}
           value={value}
-          onChange={(_, newValue) => setValue(newValue as string | null)}
+          onChange={(_, newValue) => setValue(newValue)}
         />
       </div>
     )
@@ -65,8 +66,6 @@ export const StandaloneObjectOptions: Story = {
     label: 'Country',
     placeholder: 'Choose a country',
     options: objectOptions,
-    getOptionLabel: (opt) =>
-      typeof opt === 'string' ? opt : (opt as { label: string }).label,
   },
   render: (args) => {
     const [value, setValue] = useState<{ value: string; label: string } | null>(
@@ -74,16 +73,13 @@ export const StandaloneObjectOptions: Story = {
     )
     return (
       <div className='w-80'>
-        <FormSelect
-          {...args}
+        <FormSelect<{ value: string; label: string }>
+          label={args.label}
+          placeholder={args.placeholder}
           options={objectOptions}
           value={value}
-          onChange={(_, newValue) =>
-            setValue(newValue as { value: string; label: string } | null)
-          }
-          getOptionLabel={(opt) =>
-            typeof opt === 'string' ? opt : (opt as { label: string }).label
-          }
+          onChange={(_, newValue) => setValue(newValue)}
+          getOptionLabel={(opt) => opt.label}
         />
       </div>
     )
@@ -103,11 +99,14 @@ export const StandaloneWithError: Story = {
     const [value, setValue] = useState<string | null>(null)
     return (
       <div className='w-80'>
-        <FormSelect
-          {...args}
+        <FormSelect<string>
+          label={args.label}
+          placeholder={args.placeholder}
+          error={args.error}
+          errorMessage={args.errorMessage}
           options={stringOptions}
           value={value}
-          onChange={(_, newValue) => setValue(newValue as string | null)}
+          onChange={(_, newValue) => setValue(newValue)}
         />
       </div>
     )
@@ -126,11 +125,13 @@ export const StandaloneLoading: Story = {
     const [value, setValue] = useState<string | null>(null)
     return (
       <div className='w-80'>
-        <FormSelect
-          {...args}
+        <FormSelect<string>
+          label={args.label}
+          placeholder={args.placeholder}
+          loading={args.loading}
           options={stringOptions}
           value={value}
-          onChange={(_, newValue) => setValue(newValue as string | null)}
+          onChange={(_, newValue) => setValue(newValue)}
         />
       </div>
     )
@@ -153,7 +154,7 @@ export const StandaloneMultiple: Story = {
           placeholder={args.placeholder}
           options={stringOptions}
           value={value}
-          onChange={(_, newValue) => setValue(newValue as string[])}
+          onChange={(_, newValue) => setValue(newValue)}
           props={{ multiple: true }}
         />
       </div>
@@ -177,7 +178,7 @@ export const StandaloneFreeSolo: Story = {
           placeholder={args.placeholder}
           options={stringOptions}
           value={value}
-          onChange={(_, newValue) => setValue(newValue as string | null)}
+          onChange={(_, newValue) => setValue(newValue)}
           props={{ freeSolo: true }}
         />
       </div>
@@ -190,7 +191,11 @@ const countryOptionsWithFlags = [
   { value: 'ng', label: 'Nigeria', flag: 'https://flagcdn.com/w40/ng.png' },
   { value: 'gh', label: 'Ghana', flag: 'https://flagcdn.com/w40/gh.png' },
   { value: 'ke', label: 'Kenya', flag: 'https://flagcdn.com/w40/ke.png' },
-  { value: 'za', label: 'South Africa', flag: 'https://flagcdn.com/w40/za.png' },
+  {
+    value: 'za',
+    label: 'South Africa',
+    flag: 'https://flagcdn.com/w40/za.png',
+  },
   { value: 'eg', label: 'Egypt', flag: 'https://flagcdn.com/w40/eg.png' },
 ]
 
@@ -201,27 +206,29 @@ export const StandaloneWithFlagImages: Story = {
     options: countryOptionsWithFlags,
   },
   render: (args) => {
-    const [value, setValue] = useState<
-      { value: string; label: string; flag: string } | null
-    >(null)
+    const [value, setValue] = useState<{
+      value: string
+      label: string
+      flag: string
+    } | null>(null)
     return (
       <div className='w-80'>
-        <FormSelect
-          {...args}
+        <FormSelect<{
+          value: string
+          label: string
+          flag: string
+        }>
+          label={args.label}
+          placeholder={args.placeholder}
           options={countryOptionsWithFlags}
           value={value}
-          onChange={(_, newValue) =>
-            setValue(newValue as { value: string; label: string; flag: string } | null)
-          }
-          getOptionLabel={(opt) =>
-            typeof opt === 'string' ? opt : (opt as { label: string }).label
-          }
+          onChange={(_, newValue) => setValue(newValue)}
+          getOptionLabel={(opt) => opt.label}
           renderOption={(props, option) => {
-            const opt = option as { value: string; label: string; flag: string }
             return (
               <li {...props}>
                 <img
-                  src={opt.flag}
+                  src={option.flag}
                   alt=''
                   style={{
                     width: 24,
@@ -231,7 +238,7 @@ export const StandaloneWithFlagImages: Story = {
                     objectFit: 'cover',
                   }}
                 />
-                <span>{opt.label}</span>
+                <span>{option.label}</span>
               </li>
             )
           }}
@@ -314,14 +321,14 @@ function ProfileFormExample() {
             options={objectOptions}
             value={field.value}
             onChange={(_, newValue) => field.onChange(newValue)}
-            getOptionLabel={(opt) =>
-              typeof opt === 'string' ? opt : (opt as { label: string }).label
-            }
+            getOptionLabel={(opt) => opt.label}
             error={!!fieldState.error}
             errorMessage={fieldState.error?.message}
-            props={{ onBlur: field.onBlur } as React.ComponentProps<
-              typeof FormSelect<{ value: string; label: string }>
-            >['props']}
+            props={
+              { onBlur: field.onBlur } as React.ComponentProps<
+                typeof FormSelect<{ value: string; label: string }>
+              >['props']
+            }
           />
         )}
       />
@@ -331,7 +338,7 @@ function ProfileFormExample() {
         name='role'
         render={({ field, fieldState }) => {
           const roleValue = field.value
-            ? roleOptions.find((o) => o.value === field.value) ?? null
+            ? (roleOptions.find((o) => o.value === field.value) ?? null)
             : null
           return (
             <FormSelect<{ value: string; label: string }>
@@ -348,9 +355,11 @@ function ProfileFormExample() {
               }
               error={!!fieldState.error}
               errorMessage={fieldState.error?.message}
-              props={{ onBlur: field.onBlur } as React.ComponentProps<
-                typeof FormSelect<{ value: string; label: string }>
-              >['props']}
+              props={
+                { onBlur: field.onBlur } as React.ComponentProps<
+                  typeof FormSelect<{ value: string; label: string }>
+                >['props']
+              }
             />
           )
         }}
