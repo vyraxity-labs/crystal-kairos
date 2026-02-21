@@ -17,7 +17,7 @@ const STEPS = [
 ]
 
 const RegistrationForm = () => {
-  const currentStep = useSelector((s: RootState) => s.registration.currentStep)
+  const { currentStep } = useSelector((s: RootState) => s.registration)
   const StepComponent = STEPS[currentStep]
 
   return <StepComponent />

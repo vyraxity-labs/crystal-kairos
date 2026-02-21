@@ -9,12 +9,23 @@ const RegisterSuccessPage = () => {
   const { t } = useTranslation('auth')
 
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center px-4' style={{ backgroundColor: 'var(--color-bg-main)' }}>
+    <div
+      className='min-h-screen flex flex-col items-center justify-center px-4'
+      style={{ backgroundColor: 'var(--color-bg-main)' }}
+    >
       <CheckCircleIcon sx={{ fontSize: 80, color: 'var(--color-primary)' }} />
-      <Typography variant='h4' fontWeight={700} sx={{ mt: 2, textAlign: 'center' }}>
+      <Typography
+        variant='h4'
+        fontWeight={700}
+        sx={{ mt: 2, textAlign: 'center' }}
+      >
         {t('success.title')}
       </Typography>
-      <Typography variant='body1' color='text.secondary' sx={{ mt: 1, textAlign: 'center', maxWidth: 400 }}>
+      <Typography
+        variant='body1'
+        color='text.secondary'
+        sx={{ mt: 1, textAlign: 'center', maxWidth: 400 }}
+      >
         {t('success.message')}
       </Typography>
       <Link

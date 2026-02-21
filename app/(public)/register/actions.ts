@@ -9,6 +9,8 @@ import {
   Assumptions,
   MembershipTier,
 } from '@/generated/prisma/client'
+import { sendEmail } from '@/lib/email'
+import { getRegistrationNotificationEmail } from '@/lib/email-templates'
 
 function generateMembershipNumber(): string {
   const prefix = 'CK'
@@ -76,7 +78,7 @@ export async function submitRegistration(formData: RegistrationFormData) {
       }
     }
 
-    const user = await prisma.$transaction(async (tx) => {
+    const { user, membership } = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
         data: {
           email: formData.email,
@@ -126,7 +128,7 @@ export async function submitRegistration(formData: RegistrationFormData) {
           ? MembershipTier.GOLD_MEMBER
           : MembershipTier.MEMBER
 
-      await tx.membership.create({
+      const newMembership = await tx.membership.create({
         data: {
           userId: newUser.id,
           sourceOfIncome: [],
@@ -139,8 +141,27 @@ export async function submitRegistration(formData: RegistrationFormData) {
         },
       })
 
-      return newUser
+      return { user: newUser, membership: newMembership }
     })
+
+    const adminEmail = process.env.ADMIN_EMAIL
+    if (adminEmail) {
+      try {
+        const { subject, html, text } = getRegistrationNotificationEmail({
+          name: user.name,
+          email: user.email,
+          membershipNumber: membership?.membershipNumber ?? undefined,
+        })
+        await sendEmail({
+          to: adminEmail,
+          subject,
+          html,
+          text,
+        })
+      } catch (emailError) {
+        console.error('Failed to send registration notification:', emailError)
+      }
+    }
 
     return { success: true, userId: user.id }
   } catch (error) {
