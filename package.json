@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && pnpm prisma generate && pnpm prisma migrate deploy",
+    "build": "next build && pnpm run prisma:generate && pnpm run prisma:migrate:deploy",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "pnpm prisma generate",
+    "postinstall": "pnpm run prisma:generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "prisma db seed",
