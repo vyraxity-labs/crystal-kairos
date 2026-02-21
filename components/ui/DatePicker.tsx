@@ -6,7 +6,6 @@ import {
 import { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import 'dayjs/locale/en'
-import 'dayjs/locale/pl'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import EventNoteIcon from '@mui/icons-material/EventNote'

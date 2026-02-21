@@ -42,11 +42,7 @@ export const Default: Story = {
     const [value, setValue] = useState<Date | null>(null)
     return (
       <div className='w-80'>
-        <DatePicker
-          {...args}
-          value={value}
-          onChange={setValue}
-        />
+        <DatePicker {...args} value={value} onChange={setValue} />
       </div>
     )
   },
@@ -61,11 +57,7 @@ export const WithValue: Story = {
     const [value, setValue] = useState<Date | null>(new Date(1990, 5, 15))
     return (
       <div className='w-80'>
-        <DatePicker
-          {...args}
-          value={value}
-          onChange={setValue}
-        />
+        <DatePicker {...args} value={value} onChange={setValue} />
       </div>
     )
   },
@@ -82,11 +74,7 @@ export const MonthYear: Story = {
     const [value, setValue] = useState<Date | null>(null)
     return (
       <div className='w-80'>
-        <DatePicker
-          {...args}
-          value={value}
-          onChange={setValue}
-        />
+        <DatePicker {...args} value={value} onChange={setValue} />
       </div>
     )
   },
@@ -103,11 +91,7 @@ export const YearOnly: Story = {
     const [value, setValue] = useState<Date | null>(null)
     return (
       <div className='w-80'>
-        <DatePicker
-          {...args}
-          value={value}
-          onChange={setValue}
-        />
+        <DatePicker {...args} value={value} onChange={setValue} />
       </div>
     )
   },
@@ -123,11 +107,7 @@ export const DisablePast: Story = {
     const [value, setValue] = useState<Date | null>(null)
     return (
       <div className='w-80'>
-        <DatePicker
-          {...args}
-          value={value}
-          onChange={setValue}
-        />
+        <DatePicker {...args} value={value} onChange={setValue} />
       </div>
     )
   },
@@ -143,11 +123,7 @@ export const DisableFuture: Story = {
     const [value, setValue] = useState<Date | null>(null)
     return (
       <div className='w-80'>
-        <DatePicker
-          {...args}
-          value={value}
-          onChange={setValue}
-        />
+        <DatePicker {...args} value={value} onChange={setValue} />
       </div>
     )
   },
@@ -164,11 +140,7 @@ export const WithDateRange: Story = {
     const [value, setValue] = useState<Date | null>(null)
     return (
       <div className='w-80'>
-        <DatePicker
-          {...args}
-          value={value}
-          onChange={setValue}
-        />
+        <DatePicker {...args} value={value} onChange={setValue} />
       </div>
     )
   },
@@ -185,11 +157,7 @@ export const WithError: Story = {
     const [value, setValue] = useState<Date | null>(null)
     return (
       <div className='w-80'>
-        <DatePicker
-          {...args}
-          value={value}
-          onChange={setValue}
-        />
+        <DatePicker {...args} value={value} onChange={setValue} />
       </div>
     )
   },
@@ -215,10 +183,7 @@ export const Disabled: Story = {
 /** With React Hook Form + Zod validation */
 const eventFormSchema = z.object({
   eventName: z.string().min(1, 'Event name is required'),
-  eventDate: z
-    .date()
-    .nullish()
-    .refine((val) => val != null, { message: 'Event date is required' }),
+  eventDate: z.date({ message: 'Event date is required' }),
   notes: z.string().optional(),
 })
 
