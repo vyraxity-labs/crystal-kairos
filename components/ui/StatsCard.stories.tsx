@@ -1,5 +1,5 @@
 import StatsCard from './StatsCard'
-import type { Meta, StoryObj } from '@storybook/nextjs-vite'
+import type { Meta, StoryObj } from '@storybook/react'
 import Groups2Icon from '@mui/icons-material/Groups2'
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
@@ -42,7 +42,7 @@ export const WithOtherInfo: Story = {
     number: '₦2.4M',
     Icon: AccountBalanceWalletIcon,
     otherInfo: (
-      <span className="text-sm text-green-600 mt-2">+12% from last month</span>
+      <span className='text-sm text-green-600 mt-2'>+12% from last month</span>
     ),
   },
 }
