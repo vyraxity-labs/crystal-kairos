@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite'
+import type { Meta, StoryObj } from '@storybook/react'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import Button from './Button'
 

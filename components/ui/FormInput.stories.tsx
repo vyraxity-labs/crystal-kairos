@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite'
+import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -39,7 +39,7 @@ export const StandaloneText: Story = {
     label: 'Full Name',
     placeholder: 'Enter your name',
   },
-  render: (args) => {
+  render: (args: Story['args']) => {
     const [value, setValue] = useState('')
     return (
       <div className='w-80'>
@@ -61,7 +61,7 @@ export const StandaloneWithError: Story = {
     type: 'email',
     error: 'Please enter a valid email address',
   },
-  render: (args) => (
+  render: (args: Story['args']) => (
     <div className='w-80'>
       <FormInput
         {...(args as Omit<typeof args, 'control' | 'name' | 'rules'>)}
@@ -79,7 +79,7 @@ export const StandalonePassword: Story = {
     type: 'password',
     placeholder: 'Enter your password',
   },
-  render: (args) => {
+  render: (args: Story['args']) => {
     const [value, setValue] = useState('')
     return (
       <div className='w-80'>
@@ -101,7 +101,7 @@ export const StandaloneWithAdornments: Story = {
     type: 'email',
     startAdornment: <EmailIcon />,
   },
-  render: (args) => {
+  render: (args: Story['args']) => {
     const [value, setValue] = useState('')
     return (
       <div className='w-80'>
@@ -127,7 +127,7 @@ export const StandaloneSelect: Story = {
       { value: 'ke', label: 'Kenya' },
     ],
   },
-  render: (args) => {
+  render: (args: Story['args']) => {
     const [value, setValue] = useState('')
     return (
       <div className='w-80'>
