@@ -9,7 +9,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import type { RootState } from '@/store'
 import { updateForm, nextStep, prevStep } from '@/store/registration.store'
-import { Gender } from '@/generated/prisma/client'
+import { Gender } from '@/types/registration.enums'
 
 const Step1PersonalInfo = () => {
   const { t } = useTranslation('auth')

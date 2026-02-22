@@ -15,7 +15,7 @@ import SendIcon from '@mui/icons-material/Send'
 import type { RootState } from '@/store'
 import { updateForm, prevStep, setStep } from '@/store/registration.store'
 import { submitRegistration } from '@/app/(public)/register/actions'
-import { MembershipInterest } from '@/generated/prisma/client'
+import { MembershipInterest } from '@/types/registration.enums'
 
 const INTEREST_LABELS: Record<MembershipInterest, string> = {
   [MembershipInterest.AJO]: 'E-Ajo (Thrift)',
@@ -46,7 +46,10 @@ const ReviewSection = ({
     <div className='flex justify-between items-start mb-3'>
       <div className='flex items-center gap-2'>
         <Icon sx={{ color: 'var(--color-primary)' }} />
-        <h3 className='font-bold' style={{ color: 'var(--color-text-primary)' }}>
+        <h3
+          className='font-bold'
+          style={{ color: 'var(--color-text-primary)' }}
+        >
           {title}
         </h3>
       </div>
@@ -65,10 +68,16 @@ const ReviewSection = ({
 
 const ReviewField = ({ label, value }: { label: string; value: string }) => (
   <div className='mb-2'>
-    <p className='text-xs uppercase' style={{ color: 'var(--color-text-muted)' }}>
+    <p
+      className='text-xs uppercase'
+      style={{ color: 'var(--color-text-muted)' }}
+    >
       {label}
     </p>
-    <p className='text-sm font-medium' style={{ color: 'var(--color-text-primary)' }}>
+    <p
+      className='text-sm font-medium'
+      style={{ color: 'var(--color-text-primary)' }}
+    >
       {value || '—'}
     </p>
   </div>
@@ -113,13 +122,34 @@ const Step5Review = () => {
         onEdit={() => dispatch(setStep(0))}
       >
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <ReviewField label={t('review.labels.full_name')} value={formData.fullName} />
-          <ReviewField label={t('review.labels.email')} value={formData.email} />
-          <ReviewField label={t('review.labels.phone')} value={formData.phoneNumber} />
-          <ReviewField label={t('review.labels.gender')} value={formData.gender} />
-          <ReviewField label={t('review.labels.date_of_birth')} value={formData.dateOfBirth} />
-          <ReviewField label={t('review.labels.occupation')} value={formData.occupation} />
-          <ReviewField label={t('review.labels.address')} value={formData.address} />
+          <ReviewField
+            label={t('review.labels.full_name')}
+            value={formData.fullName}
+          />
+          <ReviewField
+            label={t('review.labels.email')}
+            value={formData.email}
+          />
+          <ReviewField
+            label={t('review.labels.phone')}
+            value={formData.phoneNumber}
+          />
+          <ReviewField
+            label={t('review.labels.gender')}
+            value={formData.gender}
+          />
+          <ReviewField
+            label={t('review.labels.date_of_birth')}
+            value={formData.dateOfBirth}
+          />
+          <ReviewField
+            label={t('review.labels.occupation')}
+            value={formData.occupation}
+          />
+          <ReviewField
+            label={t('review.labels.address')}
+            value={formData.address}
+          />
         </div>
       </ReviewSection>
 
@@ -130,9 +160,18 @@ const Step5Review = () => {
         onEdit={() => dispatch(setStep(1))}
       >
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <ReviewField label={t('review.labels.bank_name')} value={formData.bankName} />
-          <ReviewField label={t('review.labels.account_number')} value={formData.accountNumber} />
-          <ReviewField label={t('review.labels.account_name')} value={formData.accountName} />
+          <ReviewField
+            label={t('review.labels.bank_name')}
+            value={formData.bankName}
+          />
+          <ReviewField
+            label={t('review.labels.account_number')}
+            value={formData.accountNumber}
+          />
+          <ReviewField
+            label={t('review.labels.account_name')}
+            value={formData.accountName}
+          />
         </div>
       </ReviewSection>
 
@@ -143,12 +182,24 @@ const Step5Review = () => {
         onEdit={() => dispatch(setStep(2))}
       >
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <ReviewField label={t('review.labels.kin_full_name')} value={formData.kinFullName} />
+          <ReviewField
+            label={t('review.labels.kin_full_name')}
+            value={formData.kinFullName}
+          />
           <ReviewField
             label={t('review.labels.relationship')}
-            value={formData.kinRelationship ? t(`next_of_kin.relationship_options.${formData.kinRelationship}`) : ''}
+            value={
+              formData.kinRelationship
+                ? t(
+                    `next_of_kin.relationship_options.${formData.kinRelationship}`,
+                  )
+                : ''
+            }
           />
-          <ReviewField label={t('review.labels.kin_phone')} value={formData.kinPhoneNumber} />
+          <ReviewField
+            label={t('review.labels.kin_phone')}
+            value={formData.kinPhoneNumber}
+          />
         </div>
       </ReviewSection>
 
@@ -174,7 +225,9 @@ const Step5Review = () => {
         </div>
         <ReviewField
           label={t('review.labels.how_heard')}
-          value={formData.referrerName ? `Referred by ${formData.referrerName}` : '—'}
+          value={
+            formData.referrerName ? `Referred by ${formData.referrerName}` : '—'
+          }
         />
       </ReviewSection>
 
@@ -199,12 +252,13 @@ const Step5Review = () => {
         />
       </div>
 
-      {error && (
-        <p className='text-red-600 text-sm mb-4'>{error}</p>
-      )}
+      {error && <p className='text-red-600 text-sm mb-4'>{error}</p>}
 
       <div className='flex flex-wrap justify-between gap-4'>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => dispatch(prevStep())}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => dispatch(prevStep())}
+        >
           {t('review.back_to_interests')}
         </Button>
         <div className='flex gap-2'>

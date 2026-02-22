@@ -17,9 +17,10 @@ const Step2BankDetails = () => {
   const dispatch = useDispatch()
   const formData = useSelector((s: RootState) => s.registration.formData)
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(updateForm({ [field]: e.target.value }))
-  }
+  const handleChange =
+    (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      dispatch(updateForm({ [field]: e.target.value }))
+    }
 
   return (
     <div
@@ -31,7 +32,10 @@ const Step2BankDetails = () => {
     >
       <div className='flex items-center gap-2 mb-6'>
         <AccountBalanceIcon sx={{ color: 'var(--color-primary)' }} />
-        <h2 className='text-xl font-bold' style={{ color: 'var(--color-text-primary)' }}>
+        <h2
+          className='text-xl font-bold'
+          style={{ color: 'var(--color-text-primary)' }}
+        >
           {t('bank_details.heading')}
         </h2>
       </div>
@@ -88,7 +92,10 @@ const Step2BankDetails = () => {
       </div>
 
       <div className='flex flex-wrap justify-between gap-4 mt-8'>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => dispatch(prevStep())}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => dispatch(prevStep())}
+        >
           {t('register.buttons.back')}
         </Button>
         <div className='flex gap-2'>
