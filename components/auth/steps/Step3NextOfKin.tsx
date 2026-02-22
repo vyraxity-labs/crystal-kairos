@@ -9,7 +9,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import type { RootState } from '@/store'
 import { updateForm, nextStep, prevStep } from '@/store/registration.store'
-import { Relationship } from '@/generated/prisma/client'
+import { Relationship } from '@/types/registration.enums'
 import { NIGERIAN_BANKS } from '../data'
 
 const RELATIONSHIP_OPTIONS: Relationship[] = [
@@ -30,9 +30,10 @@ const Step3NextOfKin = () => {
   const dispatch = useDispatch()
   const formData = useSelector((s: RootState) => s.registration.formData)
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(updateForm({ [field]: e.target.value }))
-  }
+  const handleChange =
+    (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      dispatch(updateForm({ [field]: e.target.value }))
+    }
 
   return (
     <div
@@ -44,7 +45,10 @@ const Step3NextOfKin = () => {
     >
       <div className='flex items-center gap-2 mb-6'>
         <PeopleIcon sx={{ color: 'var(--color-primary)' }} />
-        <h2 className='text-xl font-bold' style={{ color: 'var(--color-text-primary)' }}>
+        <h2
+          className='text-xl font-bold'
+          style={{ color: 'var(--color-text-primary)' }}
+        >
           {t('next_of_kin.heading')}
         </h2>
       </div>
@@ -62,11 +66,15 @@ const Step3NextOfKin = () => {
           label={t('next_of_kin.relationship')}
           value={formData.kinRelationship || ''}
           onChange={(e) =>
-            dispatch(updateForm({ kinRelationship: e.target.value as Relationship }))
+            dispatch(
+              updateForm({ kinRelationship: e.target.value as Relationship }),
+            )
           }
           fullWidth
         >
-          <MenuItem value=''>{t('next_of_kin.relationship_placeholder')}</MenuItem>
+          <MenuItem value=''>
+            {t('next_of_kin.relationship_placeholder')}
+          </MenuItem>
           {RELATIONSHIP_OPTIONS.map((rel) => (
             <MenuItem key={rel} value={rel}>
               {t(`next_of_kin.relationship_options.${rel}`)}
@@ -101,7 +109,10 @@ const Step3NextOfKin = () => {
 
       <div className='flex items-center gap-2 mt-8 mb-4'>
         <AccountBalanceIcon sx={{ color: 'var(--color-primary)' }} />
-        <h3 className='text-lg font-bold' style={{ color: 'var(--color-text-primary)' }}>
+        <h3
+          className='text-lg font-bold'
+          style={{ color: 'var(--color-text-primary)' }}
+        >
           {t('next_of_kin.bank_heading')}
         </h3>
       </div>
@@ -111,7 +122,9 @@ const Step3NextOfKin = () => {
           select
           label={t('next_of_kin.bank_name')}
           value={formData.kinBankName}
-          onChange={(e) => dispatch(updateForm({ kinBankName: e.target.value }))}
+          onChange={(e) =>
+            dispatch(updateForm({ kinBankName: e.target.value }))
+          }
           fullWidth
         >
           {NIGERIAN_BANKS.map((bank) => (
@@ -137,7 +150,10 @@ const Step3NextOfKin = () => {
       </div>
 
       <div className='flex flex-wrap justify-between gap-4 mt-8'>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => dispatch(prevStep())}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => dispatch(prevStep())}
+        >
           {t('register.buttons.back')}
         </Button>
         <div className='flex gap-2'>

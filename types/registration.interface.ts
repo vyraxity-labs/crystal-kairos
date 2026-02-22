@@ -3,7 +3,7 @@ import type {
   Relationship,
   MembershipInterest,
   Assumptions,
-} from '@/generated/prisma/client'
+} from '@/types/registration.enums'
 
 export interface RegistrationFormData {
   // Step 1: Personal

@@ -11,14 +11,19 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import type { RootState } from '@/store'
 import { updateForm, nextStep, prevStep } from '@/store/registration.store'
-import {
-  MembershipInterest,
-  Assumptions,
-} from '@/generated/prisma/client'
+import { MembershipInterest, Assumptions } from '@/types/registration.enums'
 
-const INTEREST_OPTIONS: { value: MembershipInterest; labelKey: string; subKey: string }[] = [
+const INTEREST_OPTIONS: {
+  value: MembershipInterest
+  labelKey: string
+  subKey: string
+}[] = [
   { value: MembershipInterest.AJO, labelKey: 'eajo', subKey: 'eajo_sub' },
-  { value: MembershipInterest.SAVINGS, labelKey: 'savings', subKey: 'savings_sub' },
+  {
+    value: MembershipInterest.SAVINGS,
+    labelKey: 'savings',
+    subKey: 'savings_sub',
+  },
   { value: MembershipInterest.LOAN, labelKey: 'loans', subKey: 'loans_sub' },
 ]
 
@@ -66,7 +71,10 @@ const Step4Interests = () => {
     >
       <div className='flex items-center gap-2 mb-6'>
         <InterestsIcon sx={{ color: 'var(--color-primary)' }} />
-        <h2 className='text-xl font-bold' style={{ color: 'var(--color-text-primary)' }}>
+        <h2
+          className='text-xl font-bold'
+          style={{ color: 'var(--color-text-primary)' }}
+        >
           {t('interests.heading')}
         </h2>
       </div>
@@ -74,11 +82,17 @@ const Step4Interests = () => {
       <div className='mb-8'>
         <div className='flex items-center gap-2 mb-2'>
           <AttachMoneyIcon sx={{ color: 'var(--color-accent)' }} />
-          <h3 className='font-semibold' style={{ color: 'var(--color-text-primary)' }}>
+          <h3
+            className='font-semibold'
+            style={{ color: 'var(--color-text-primary)' }}
+          >
             {t('interests.membership_heading')}
           </h3>
         </div>
-        <p className='text-sm mb-4' style={{ color: 'var(--color-text-secondary)' }}>
+        <p
+          className='text-sm mb-4'
+          style={{ color: 'var(--color-text-secondary)' }}
+        >
           {t('interests.membership_desc')}
         </p>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
@@ -116,10 +130,16 @@ const Step4Interests = () => {
                   )}
                 </div>
                 <div>
-                  <p className='font-semibold' style={{ color: 'var(--color-text-primary)' }}>
+                  <p
+                    className='font-semibold'
+                    style={{ color: 'var(--color-text-primary)' }}
+                  >
                     {t(`interests.${labelKey}`)}
                   </p>
-                  <p className='text-xs' style={{ color: 'var(--color-text-secondary)' }}>
+                  <p
+                    className='text-xs'
+                    style={{ color: 'var(--color-text-secondary)' }}
+                  >
                     {t(`interests.${subKey}`)}
                   </p>
                 </div>
@@ -132,7 +152,10 @@ const Step4Interests = () => {
       <div className='mb-8'>
         <div className='flex items-center gap-2 mb-2'>
           <PersonAddIcon sx={{ color: 'var(--color-accent)' }} />
-          <h3 className='font-semibold' style={{ color: 'var(--color-text-primary)' }}>
+          <h3
+            className='font-semibold'
+            style={{ color: 'var(--color-text-primary)' }}
+          >
             {t('interests.referral_heading')}
           </h3>
         </div>
@@ -141,14 +164,18 @@ const Step4Interests = () => {
             label={t('interests.referrer_name')}
             placeholder={t('interests.referrer_name_placeholder')}
             value={formData.referrerName}
-            onChange={(e) => dispatch(updateForm({ referrerName: e.target.value }))}
+            onChange={(e) =>
+              dispatch(updateForm({ referrerName: e.target.value }))
+            }
             fullWidth
           />
           <TextField
             label={t('interests.referrer_phone')}
             placeholder={t('interests.referrer_phone_placeholder')}
             value={formData.referrerPhone}
-            onChange={(e) => dispatch(updateForm({ referrerPhone: e.target.value }))}
+            onChange={(e) =>
+              dispatch(updateForm({ referrerPhone: e.target.value }))
+            }
             fullWidth
           />
         </div>
@@ -157,7 +184,10 @@ const Step4Interests = () => {
       <div className='mb-8'>
         <div className='flex items-center gap-2 mb-2'>
           <ChecklistIcon sx={{ color: 'var(--color-accent)' }} />
-          <h3 className='font-semibold' style={{ color: 'var(--color-text-primary)' }}>
+          <h3
+            className='font-semibold'
+            style={{ color: 'var(--color-text-primary)' }}
+          >
             {t('interests.assumptions_heading')}
           </h3>
         </div>
@@ -188,7 +218,10 @@ const Step4Interests = () => {
       </div>
 
       <div className='flex flex-wrap justify-between gap-4'>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => dispatch(prevStep())}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => dispatch(prevStep())}
+        >
           {t('register.buttons.back')}
         </Button>
         <div className='flex gap-2'>
