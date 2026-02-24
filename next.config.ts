@@ -1,7 +1,12 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["@prisma/client", "@prisma/client-runtime-utils", "@prisma/adapter-pg"],
-};
+  serverExternalPackages: [
+    '@prisma/client',
+    '@prisma/client-runtime-utils',
+    '@prisma/adapter-pg',
+    'pg',
+  ],
+}
 
-export default nextConfig;
+export default nextConfig
