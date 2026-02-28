@@ -2,9 +2,6 @@
 
 # dependencies
 /node_modules
-package-lock.json
-yarn.lock
-bun.lockb
 /.pnp
 .pnp.*
 .yarn/*
@@ -22,9 +19,6 @@ bun.lockb
 
 # production
 /build
-
-# storybook
-/storybook-static
 
 # misc
 .DS_Store
@@ -45,9 +39,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-/generated/prisma
-
-*.log
-*storybook.log
-storybook-static
