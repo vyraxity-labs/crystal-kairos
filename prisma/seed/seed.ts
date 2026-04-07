@@ -13,11 +13,10 @@ const main = async () => {
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
   .catch(async (error) => {
     console.error(error)
-    await prisma.$disconnect()
     process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
   })
