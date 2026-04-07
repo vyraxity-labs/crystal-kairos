@@ -1,3 +1,4 @@
+import Sample from '@/components/home/Sample'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
@@ -6,11 +7,7 @@ const HomePage = async () => {
 
   return (
     <div>
-      <h1>HomePage</h1>
-      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut, qui.</p>
-
-      <Link href='/login'>Login</Link>
-      <Link href='/admin'>Admin</Link>
+      <Sample />
 
       <div>
         {users.map((user) => {
