@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  OWNER
+  ADMIN
+  USER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+// ============================================
+// CORE USER MODELS
+// ============================================
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  username       String    @unique @default(uuid())
+  name           String
+  passwordHash   String? // Optional: null until user sets password
+  photoUrl       String?
+  role           UserRole  @default(USER)
+  emailVerified  DateTime? // For email verification
+  hasSetPassword Boolean   @default(false) // Track if user has activated account
+  lastLoginAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("users")
+}
