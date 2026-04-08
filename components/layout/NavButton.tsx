@@ -11,14 +11,17 @@ const NavButton = ({ href, label }: { href: string; label: string }) => {
   return (
     <Link href={href}>
       <Button
-        variant={['/register', '/login'].includes(href) ? 'default' : 'link'}
+        variant={
+          href === '/register'
+            ? 'default'
+            : href === '/login'
+              ? 'secondary'
+              : 'link'
+        }
         className={cn(
           'w-full cursor-pointer',
-          href === '/register'
-            ? 'bg-primary text-on-primary'
-            : href === '/login'
-              ? 'bg-secondary text-on-secondary hover:bg-secondary/80'
-              : 'bg-transparent',
+          href === '/register' && 'text-on-primary',
+          href === '/login' && 'text-on-secondary',
         )}
       >
         {t(label)}

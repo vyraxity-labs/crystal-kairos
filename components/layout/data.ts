@@ -91,3 +91,6 @@ export const support = [
     href: '/faq',
   },
 ]
+
+export const mapLink =
+  'https://www.google.com/maps/search/123,+financial+avenue,+victoria+island+lagos/@6.6834172,3.3559375,11z/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI2MDIxMS4wIKXMDSoASAFQAw%3D%3D'

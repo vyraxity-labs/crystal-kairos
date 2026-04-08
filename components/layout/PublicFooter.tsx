@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Logo from '../common/Logo'
-import { quickLinks, socials, support } from './data'
+import { mapLink, quickLinks, socials, support } from './data'
 import { Button } from '../ui/button'
 import { useTranslation } from 'react-i18next'
 import LinksList from './LinksList'
@@ -65,7 +65,7 @@ const PublicFooter = () => {
               <FooterContactSection
                 Icon={MapPin}
                 label={t('footer.contact_us.address_content')}
-                href='https://www.google.com/maps/search/123,+financial+avenue,+victoria+island+lagos/@6.6834172,3.3559375,11z/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI2MDIxMS4wIKXMDSoASAFQAw%3D%3D'
+                href={mapLink}
               />
             </section>
           </div>

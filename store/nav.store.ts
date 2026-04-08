@@ -9,8 +9,11 @@ const navSlice = createSlice({
   name: 'nav',
   initialState,
   reducers: {
-    setIsMobileNavOpen: (state, { payload }: { payload: boolean }) => {
-      state.isMobileNavOpen = payload
+    setIsMobileNavOpen: (
+      state,
+      action: import('@reduxjs/toolkit').PayloadAction<boolean>,
+    ) => {
+      state.isMobileNavOpen = action.payload
     },
   },
 })

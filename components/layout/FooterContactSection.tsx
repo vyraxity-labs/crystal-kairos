@@ -13,7 +13,7 @@ const FooterContactSection = ({
   return (
     <article className='flex gap-2 items-center text-muted-foreground'>
       <Icon />
-      <Link href={href} className='hover:underline text-sm'>
+      <Link href={href} className='hover:underline text-sm' target='_blank'>
         {label}
       </Link>
     </article>

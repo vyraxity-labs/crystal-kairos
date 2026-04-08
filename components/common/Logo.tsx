@@ -20,11 +20,11 @@ const Logo = ({
   const { t } = useTranslation('common')
 
   const logoSize = cn(
-    'w-8 aspect-square',
+    'aspect-square',
     size === 'small' ? 'w-8' : size === 'medium' ? 'w-16' : 'w-24',
   )
-  const textSize = cn(
-    size === 'small' ? '20px' : size === 'medium' ? '24px' : '32px',
+  const textSizeClass = cn(
+    size === 'small' ? 'text-xl' : size === 'medium' ? 'text-2xl' : 'text-3xl',
   )
   const alignmentClass = cn(
     alignment === 'horizontal' ? 'flex-row' : 'flex-col',
@@ -37,10 +37,7 @@ const Logo = ({
     >
       <Image src={logo} alt='Logo' className={cn(logoSize)} />
       {showText && (
-        <h2
-          className='text-primary font-semibold'
-          style={{ fontSize: textSize }}
-        >
+        <h2 className={cn('text-primary font-semibold', textSizeClass)}>
           {t('header.logo.app_name')}
         </h2>
       )}

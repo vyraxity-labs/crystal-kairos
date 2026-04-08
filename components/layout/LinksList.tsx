@@ -26,7 +26,6 @@ const LinksList = ({
               href={item.href}
               key={item.id}
               className='text-sm hover:text-primary'
-              target='_blank'
             >
               {t(item.label)}
             </Link>
