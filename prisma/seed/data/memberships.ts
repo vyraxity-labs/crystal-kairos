@@ -1,0 +1,73 @@
+import { Assumptions, MembershipTier } from '@/generated/prisma/enums'
+import { MembershipInterest, MembershipStatus } from '@/generated/prisma/enums'
+
+export const memberships = [
+  {
+    sourceOfIncome: ['Employment', 'Business'],
+    interests: [MembershipInterest.SAVINGS, MembershipInterest.LOAN],
+    referralName: 'Admin User',
+    referralPhoneNumber: '+2348000000000',
+    membershipNumber: 'CRK-2025-0001',
+    assumptions: [
+      Assumptions.HAS_SMART_PHONE,
+      Assumptions.HAS_INTEGRITY,
+      Assumptions.IS_TRUSTWORTHY,
+      Assumptions.HAS_INTERNET_ACCESS,
+      Assumptions.HAS_EMAIL,
+      Assumptions.HAS_WHATS_APP,
+    ],
+    tier: MembershipTier.GOLD_MEMBER,
+    status: MembershipStatus.APPROVED,
+  },
+  {
+    sourceOfIncome: ['Employment'],
+    interests: [MembershipInterest.E_AJO, MembershipInterest.LOAN],
+    referralName: 'John Doe',
+    referralPhoneNumber: '+2348012345678',
+    membershipNumber: 'CRK-2025-0002',
+    assumptions: [
+      Assumptions.HAS_SMART_PHONE,
+      Assumptions.HAS_INTEGRITY,
+      Assumptions.IS_TRUSTWORTHY,
+      Assumptions.HAS_INTERNET_ACCESS,
+      Assumptions.HAS_EMAIL,
+      Assumptions.HAS_WHATS_APP,
+    ],
+    tier: MembershipTier.SILVER_MEMBER,
+    status: MembershipStatus.REJECTED,
+  },
+  {
+    sourceOfIncome: ['Business'],
+    interests: [MembershipInterest.E_AJO, MembershipInterest.LOAN],
+    referralName: 'Jane Doe',
+    referralPhoneNumber: '+2348033333333',
+    membershipNumber: 'CRK-2025-0003',
+    assumptions: [
+      Assumptions.HAS_SMART_PHONE,
+      Assumptions.HAS_INTEGRITY,
+      Assumptions.IS_TRUSTWORTHY,
+      Assumptions.HAS_INTERNET_ACCESS,
+      Assumptions.HAS_EMAIL,
+      Assumptions.HAS_WHATS_APP,
+    ],
+    tier: MembershipTier.SILVER_MEMBER,
+    status: MembershipStatus.APPROVED,
+  },
+  {
+    sourceOfIncome: ['Business'],
+    interests: [MembershipInterest.E_AJO, MembershipInterest.LOAN],
+    referralName: 'Hermione Granger',
+    referralPhoneNumber: '+2348044444444',
+    membershipNumber: 'CRK-2025-0004',
+    assumptions: [
+      Assumptions.HAS_SMART_PHONE,
+      Assumptions.HAS_INTEGRITY,
+      Assumptions.IS_TRUSTWORTHY,
+      Assumptions.HAS_INTERNET_ACCESS,
+      Assumptions.HAS_EMAIL,
+      Assumptions.HAS_WHATS_APP,
+    ],
+    tier: MembershipTier.SILVER_MEMBER,
+    status: MembershipStatus.APPROVED,
+  },
+]

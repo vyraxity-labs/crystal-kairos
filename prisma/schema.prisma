@@ -22,6 +22,49 @@ enum Gender {
   FEMALE
 }
 
+enum Relationship {
+  SPOUSE
+  SIBLING
+  PARENT
+  CHILD
+  FRIEND
+  COLLEAGUE
+  NEIGHBOR
+  ACQUAINTANCE
+  RELATIVE
+  EMPLOYER
+  EMPLOYEE
+  OTHER
+}
+
+enum MembershipInterest {
+  E_AJO
+  SAVINGS
+  LOAN
+}
+
+enum Assumptions {
+  HAS_SMART_PHONE
+  HAS_INTEGRITY
+  IS_TRUSTWORTHY
+  HAS_INTERNET_ACCESS
+  HAS_EMAIL
+  HAS_WHATS_APP
+}
+
+enum MembershipStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED // For yearly renewal tracking
+}
+
+enum MembershipTier {
+  MEMBER // Loan only
+  SILVER_MEMBER // Ajo participant
+  GOLD_MEMBER // Savings participant
+}
+
 // ============================================
 // CORE USER MODELS
 // ============================================
@@ -40,8 +83,12 @@ model User {
   updatedAt      DateTime  @updatedAt
 
   // Relations
-  accounts Account[]
-  sessions Session[]
+  accounts     Account[]
+  sessions     Session[]
+  userInfo     UserInfo?
+  bankAccounts BankAccount[]
+  nextOfKin    NextOfKin?
+  membership   Membership?
 
   @@map("users")
 }
@@ -78,4 +125,76 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
+}
+
+model UserInfo {
+  id          String    @id @default(uuid())
+  address     String?
+  dateOfBirth DateTime?
+  gender      Gender?
+  occupation  String?
+  phoneNumber String?
+  userId      String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_info")
+}
+
+model BankAccount {
+  id            String   @id @default(uuid())
+  accountNumber String
+  accountName   String
+  bankName      String
+  userId        String
+  isPrimary     Boolean  @default(false) // Mark primary account
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("bank_accounts")
+}
+
+model NextOfKin {
+  id            String       @id @default(uuid())
+  name          String
+  phoneNumber   String
+  relationship  Relationship
+  bankName      String
+  accountNumber String
+  accountName   String
+  occupation    String
+  address       String
+  userId        String       @unique
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("next_of_kins")
+}
+
+model Membership {
+  id                  String               @id @default(uuid())
+  sourceOfIncome      String[]
+  interests           MembershipInterest[]
+  referralName        String?
+  referralPhoneNumber String?
+  membershipNumber    String?              @unique
+  assumptions         Assumptions[]
+  tier                MembershipTier       @default(MEMBER)
+  status              MembershipStatus     @default(PENDING)
+  approvedAt          DateTime?
+  approvedBy          String?
+  rejectionReason     String?
+  membershipFee       Decimal              @default(0) // Currently 0, future: 5000
+  renewalFee          Decimal              @default(0) // Currently 0, future: 2000
+  expiryDate          DateTime? // For yearly renewal
+  lastRenewalDate     DateTime?
+  userId              String               @unique
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("memberships")
 }
