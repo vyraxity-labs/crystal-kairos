@@ -1,6 +1,5 @@
 import Sample from '@/components/home/Sample'
 import { prisma } from '@/lib/prisma'
-import Link from 'next/link'
 
 const HomePage = async () => {
   const users = await prisma.user.findMany({})

@@ -1,4 +1,44 @@
 {
   "home": "Home Page",
-  "text": "This is a test home page text just to test if react i18 next is working. It will be removed later. Thanks. Gracias"
+  "text": "This is a test home page text just to test if react i18 next is working. It will be removed later. Thanks. Gracias",
+  "header": {
+    "logo": {
+      "app_name": "Crystal Kairos"
+    },
+    "nav_items": {
+      "get_a_loan": "Get A Loan",
+      "about_us": "About Us",
+      "join_a_savings": "Join A Savings",
+      "start_eajo": "Start EAjo",
+      "become_a_member": "Become A Member",
+      "login": "Login"
+    }
+  },
+  "footer": {
+    "app_slogan": "Redefining cooperative financial services for the digital age. Secure, transparent, and community-driven.",
+    "quick_links": {
+      "heading": "Quick Links",
+      "about_us": "About Us",
+      "about_eajo": "About Eajo",
+      "about_savings": "About Savings"
+    },
+    "support": {
+      "heading": "Support",
+      "help_center": "Help Center",
+      "privacy_policy": "Privacy Policy",
+      "terms_of_service": "Terms of Service",
+      "faq": "FAQ"
+    },
+    "contact_us": {
+      "heading": "Contact Us",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "address_content": "123, Financial Avenue, Victoria Island, Lagos",
+      "email_content": "info@crystalkairos.com",
+      "phone_content": "+23408123456789"
+    },
+    "secure": "Secure SSL encrypted",
+    "copyright": "{{year}} Crystal Kairos Ventures Cooperative Society. All rights reserved."
+  }
 }
