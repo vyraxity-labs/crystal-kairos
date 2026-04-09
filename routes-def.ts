@@ -1,0 +1,15 @@
+export const publicRoutes = [
+  '/login',
+  '/register',
+  '/',
+  '/unauthorized',
+  '/about',
+  '/loans',
+  '/savings',
+  '/eajo',
+  '/help-center',
+  '/privacy-policy',
+  '/terms-of-service',
+  '/contact-us',
+  '/faq',
+]
