@@ -10,20 +10,15 @@ export const proxy = auth((req) => {
 
   const isPublicRoute = publicRoutes.includes(pathname)
   const isAdminRoute = pathname.startsWith('/admin')
-  const isUserRoute = pathname.startsWith(`/${userId}`)
+  const isUserRoute = pathname.startsWith(`/dashboard/${userId}`)
   const isAdminUser = userRole === 'ADMIN' || userRole === 'OWNER'
 
-  // if (!isPublicRoute) {
-  //   if (!session) {
-  //     return NextResponse.redirect(new URL('/login', req.url))
-  //   }
-  // }
   // redirect to admin or user page if user is logged in
   if (pathname === '/login' && session) {
     if (isAdminUser) {
       return NextResponse.redirect(new URL('/admin', req.url))
     } else {
-      return NextResponse.redirect(new URL(`/${userId}`, req.url))
+      return NextResponse.redirect(new URL(`/dashboard/${userId}`, req.url))
     }
   }
 

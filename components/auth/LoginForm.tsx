@@ -60,7 +60,7 @@ const LoginForm = () => {
   useEffect(() => {
     if (session.data) {
       if (session.data.user.role === 'USER') {
-        router.replace(`/${session.data.user.id}`)
+        router.replace(`/dashboard/${session.data.user.id}`)
       } else {
         router.replace('/admin')
       }
