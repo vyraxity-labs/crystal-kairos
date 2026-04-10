@@ -4,6 +4,8 @@ import './globals.css'
 import { cn } from '@/lib/utils'
 import I18nProvider from '@/providers/I18nProvider'
 import StoreProvider from '@/providers/StoreProvider'
+import { SessionProvider } from 'next-auth/react'
+import { Toaster } from '@/components/ui/sonner'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' })
@@ -34,11 +36,17 @@ export default function RootLayout({
         inter.variable,
         manrope.variable,
       )}
+      suppressHydrationWarning
     >
       <body className='min-h-full flex flex-col'>
-        <StoreProvider>
-          <I18nProvider>{children}</I18nProvider>
-        </StoreProvider>
+        <SessionProvider>
+          <StoreProvider>
+            <I18nProvider>
+              {children}
+              <Toaster position='top-left' duration={5000} />
+            </I18nProvider>
+          </StoreProvider>
+        </SessionProvider>
       </body>
     </html>
   )

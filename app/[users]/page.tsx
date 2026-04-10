@@ -1,7 +1,7 @@
 import { auth } from '@/auth'
 import Logout from '@/components/admin/logout'
 
-const AdminDashboardPage = async () => {
+const UserPage = async () => {
   const session = await auth()
   return (
     <div>
@@ -12,4 +12,4 @@ const AdminDashboardPage = async () => {
   )
 }
 
-export default AdminDashboardPage
+export default UserPage
