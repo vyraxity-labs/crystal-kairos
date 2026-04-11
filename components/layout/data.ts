@@ -1,4 +1,11 @@
 import { FacebookIcon, InstagramIcon, TwitterIcon } from './Icons'
+import {
+  Banknote,
+  Handshake,
+  LayoutDashboard,
+  Users,
+  Wallet,
+} from 'lucide-react'
 
 export const navItems = [
   {
@@ -94,3 +101,36 @@ export const support = [
 
 export const mapLink =
   'https://www.google.com/maps/search/123,+financial+avenue,+victoria+island+lagos/@6.6834172,3.3559375,11z/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI2MDIxMS4wIKXMDSoASAFQAw%3D%3D'
+
+export const adminNavItems = [
+  {
+    id: 'dashboard',
+    label: 'layout.sidebar.menu-items.dashboard',
+    href: '/admin',
+    icon: LayoutDashboard,
+  },
+  {
+    id: 'members',
+    label: 'layout.sidebar.menu-items.members',
+    href: '/admin/members',
+    icon: Users,
+  },
+  {
+    id: 'loans',
+    label: 'layout.sidebar.menu-items.loans',
+    href: '/admin/loans',
+    icon: Banknote,
+  },
+  {
+    id: 'savings',
+    label: 'layout.sidebar.menu-items.savings',
+    href: '/admin/savings',
+    icon: Wallet,
+  },
+  {
+    id: 'eajo',
+    label: 'layout.sidebar.menu-items.eajo',
+    href: '/admin/eajo',
+    icon: Handshake,
+  },
+]

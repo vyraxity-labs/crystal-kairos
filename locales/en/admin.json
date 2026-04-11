@@ -1,0 +1,24 @@
+{
+  "layout": {
+    "sidebar": {
+      "menu-items": {
+        "dashboard": "Dashboard",
+        "members": "Members",
+        "loans": "Loans",
+        "savings": "Savings",
+        "eajo": "Eajo",
+        "settings": "Settings",
+        "profile": "Profile"
+      }
+    },
+    "mobile-bottom-bar": {
+      "add": {
+        "add": "Add",
+        "new-member": "New Member",
+        "new-saving": "New Saving",
+        "new-loan": "New Loan Record",
+        "new-eajo": "New Eajo Record"
+      }
+    }
+  }
+}
