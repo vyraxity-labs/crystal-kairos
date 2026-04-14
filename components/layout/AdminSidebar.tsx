@@ -52,7 +52,7 @@ const AdminSidebar = () => {
         <Link
           href='/admin/profile'
           className='p-3 bg-sidebar-accent flex gap-2 rounded-md'
-          title={session.data?.user.name as string}
+          title={session.data?.user?.name ?? ''}
         >
           <UserAvatar />
           <div
