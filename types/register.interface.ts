@@ -6,6 +6,12 @@ import {
   personalInfoSchema,
   reviewAndSubmitSchema,
 } from '@/schema/auth.schema'
+import {
+  Assumptions,
+  Gender,
+  MembershipInterest,
+  Relationship,
+} from '@/generated/prisma/enums'
 
 export interface InitialState {
   currentStep: number
@@ -38,7 +44,7 @@ export interface Step1State {
     email: string
     phoneNumber: string
     dateOfBirth: string
-    gender: string
+    gender: Gender
     address: string
     occupation: string
   }
@@ -58,7 +64,7 @@ export interface Step3State {
   data: {
     name: string
     phoneNumber: string
-    relationship: string
+    relationship: Relationship
     occupation: string
     address: string
     bankName: string
@@ -70,10 +76,10 @@ export interface Step3State {
 
 export interface Step4State {
   data: {
-    interests: string[]
+    interests: MembershipInterest[]
     referralName: string
     referralPhoneNumber: string
-    assumptions: string[]
+    assumptions: Assumptions[]
   }
   hasErrors: boolean
 }

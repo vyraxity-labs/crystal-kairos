@@ -41,6 +41,8 @@ import BankingDetails from './registration-steps/BankingDetails'
 import NextOfKin from './registration-steps/NextOfKin'
 import Interests from './registration-steps/Interests'
 import Review from './registration-steps/Review'
+import { register } from '@/models/auth'
+import { toast } from 'sonner'
 
 const RegistrationForm = () => {
   const { currentStep, stepsState, step1, step2, step3, step4, step5 } =
@@ -137,7 +139,9 @@ const RegistrationForm = () => {
     return temp
   }
 
-  const setStep = <TStep extends { data: Record<string, unknown>; hasErrors: boolean }>(
+  const setStep = <
+    TStep extends { data: Record<string, unknown>; hasErrors: boolean },
+  >(
     setStepAction: (v: TStep) => { payload: TStep; type: string },
     data: TStep['data'],
     currentStep: number,
@@ -154,7 +158,22 @@ const RegistrationForm = () => {
       if (currentStep < 5) {
         dispatch(setCurrentStep(currentStep + 1))
       } else {
-        console.log(step1.data, step2.data, step3.data, step4.data, step5.data)
+        // console.log(step1.data, step2.data, step3.data, step4.data, step5.data)
+        const response = await register(
+          step1.data,
+          step2.data,
+          step3.data,
+          step4.data,
+          step5.data,
+        )
+
+        if (!response.success || response.error) {
+          toast.error(response.error)
+        }
+
+        if (response.success) {
+          toast.success('Registration successful')
+        }
       }
       switch (currentStep) {
         case 1:

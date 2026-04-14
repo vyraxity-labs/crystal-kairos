@@ -1,4 +1,10 @@
 import { assumptionsData } from '@/components/auth/registration-steps/data'
+import {
+  Assumptions,
+  Gender,
+  MembershipInterest,
+  Relationship,
+} from '@/generated/prisma/enums'
 import * as z from 'zod'
 
 export const loginSchema = z.object({
@@ -11,7 +17,7 @@ export const personalInfoSchema = z.object({
   email: z.email('Invalid email address'),
   address: z.string().trim().min(1, 'Address is required'),
   dateOfBirth: z.date(),
-  gender: z.enum(['male', 'female']),
+  gender: z.enum(Object.values(Gender)),
   phoneNumber: z.string().trim().min(1, 'Phone number is required'),
   occupation: z.string().trim().min(1, 'Occupation is required'),
 })
@@ -28,7 +34,7 @@ export const bankInfoSchema = z.object({
 export const nextOfKinSchema = z.object({
   name: z.string().trim().min(1, 'Name is required'),
   phoneNumber: z.string().trim().min(1, 'Phone number is required'),
-  relationship: z.string().trim().min(1, 'Relationship is required'),
+  relationship: z.enum(Object.values(Relationship)),
   occupation: z.string().trim().min(1, 'Occupation is required'),
   address: z.string().trim().min(1, 'Address is required'),
   bankName: z.string().trim().min(1, 'Bank name is required'),
@@ -41,7 +47,7 @@ export const nextOfKinSchema = z.object({
 
 export const membershipInfoSchema = z.object({
   interests: z
-    .array(z.string().trim().min(1, 'Interest is required'))
+    .array(z.enum(Object.values(MembershipInterest) as [string, ...string[]]))
     .min(1, 'Select at least one interest'),
   referralName: z.string().trim().min(1, 'Referral name is required'),
   referralPhoneNumber: z
@@ -49,8 +55,8 @@ export const membershipInfoSchema = z.object({
     .trim()
     .min(1, 'Referral phone number is required'),
   assumptions: z
-    .array(z.string().trim().min(1, 'Assumption is required'))
-    .min(assumptionsData.length, 'All box must be checked'),
+    .array(z.enum(Object.values(Assumptions) as [string, ...string[]]))
+    .min(Object.values(Assumptions).length, 'All box must be checked'),
 })
 
 export const reviewAndSubmitSchema = z.object({

@@ -1,3 +1,4 @@
+import { Gender, Relationship } from '@/generated/prisma/enums'
 import {
   InitialState,
   Step1State,
@@ -16,7 +17,7 @@ const initialState: InitialState = {
       email: '',
       phoneNumber: '',
       dateOfBirth: new Date().toISOString(),
-      gender: 'male',
+      gender: Gender.MALE,
       address: '',
       occupation: '',
     },
@@ -34,7 +35,7 @@ const initialState: InitialState = {
     data: {
       name: '',
       phoneNumber: '',
-      relationship: '',
+      relationship: Relationship.FRIEND,
       occupation: '',
       address: '',
       bankName: '',

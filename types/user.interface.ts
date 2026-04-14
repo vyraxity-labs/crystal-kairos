@@ -1,0 +1,40 @@
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+}
+
+export enum UserRole {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+}
+
+export enum Relationship {
+  SPOUSE = 'SPOUSE',
+  SIBLING = 'SIBLING',
+  PARENT = 'PARENT',
+  CHILD = 'CHILD',
+  FRIEND = 'FRIEND',
+  COLLEAGUE = 'COLLEAGUE',
+  NEIGHBOR = 'NEIGHBOR',
+  ACQUAINTANCE = 'ACQUAINTANCE',
+  RELATIVE = 'RELATIVE',
+  EMPLOYER = 'EMPLOYER',
+  EMPLOYEE = 'EMPLOYEE',
+  OTHER = 'OTHER',
+}
+
+export enum MembershipInterest {
+  E_AJO = 'E_AJO',
+  SAVINGS = 'SAVINGS',
+  LOAN = 'LOAN',
+}
+
+export enum Assumptions {
+  HAS_SMART_PHONE = 'HAS_SMART_PHONE',
+  HAS_INTEGRITY = 'HAS_INTEGRITY',
+  IS_TRUSTWORTHY = 'IS_TRUSTWORTHY',
+  HAS_INTERNET_ACCESS = 'HAS_INTERNET_ACCESS',
+  HAS_EMAIL = 'HAS_EMAIL',
+  HAS_WHATS_APP = 'HAS_WHATS_APP',
+}

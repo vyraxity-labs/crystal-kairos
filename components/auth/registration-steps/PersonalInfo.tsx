@@ -32,6 +32,7 @@ import { CalendarIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Control, Controller, UseFormSetValue } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { genderData } from './data'
 
 function dateOfBirthToDate(value: unknown): Date | undefined {
   if (value == null || value === '') return undefined
@@ -143,12 +144,17 @@ const PersonalInfo = ({
                     />
                   </SelectTrigger>
                   <SelectContent position='popper' className='rounded-md'>
-                    <SelectItem value='male'>
-                      {t('register.form.personal_details.gender_male')}
-                    </SelectItem>
-                    <SelectItem value='female'>
+                    {genderData.map((gender) => {
+                      return (
+                        <SelectItem value={gender.value} key={gender.id}>
+                          {t(gender.label)}
+                        </SelectItem>
+                      )
+                    })}
+
+                    {/* <SelectItem value='female'>
                       {t('register.form.personal_details.gender_female')}
-                    </SelectItem>
+                    </SelectItem> */}
                   </SelectContent>
                 </Select>
                 {fieldState.invalid && (

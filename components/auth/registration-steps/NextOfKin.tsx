@@ -28,6 +28,7 @@ import {
   ComboboxItem,
   ComboboxList,
 } from '@/components/ui/combobox'
+import { relationshipData } from './data'
 
 const NextOfKin = ({
   control,
@@ -80,12 +81,16 @@ const NextOfKin = ({
                     />
                   </SelectTrigger>
                   <SelectContent position='popper' className='rounded-md'>
-                    <SelectItem value='siblings'>
-                      {t('register.form.next_of_kin.relationships.siblings')}
-                    </SelectItem>
-                    <SelectItem value='parent'>
-                      {t('register.form.next_of_kin.relationships.parent')}
-                    </SelectItem>
+                    {relationshipData.map((relationship) => {
+                      return (
+                        <SelectItem
+                          value={relationship.value}
+                          key={relationship.id}
+                        >
+                          {t(relationship.label)}
+                        </SelectItem>
+                      )
+                    })}
                   </SelectContent>
                 </Select>
                 {fieldState.invalid && (
@@ -149,7 +154,9 @@ const NextOfKin = ({
           render={({ field, fieldState }) => {
             return (
               <Field>
-                <FieldLabel>{t('register.form.next_of_kin.address')}</FieldLabel>
+                <FieldLabel>
+                  {t('register.form.next_of_kin.address')}
+                </FieldLabel>
                 <Textarea
                   {...field}
                   className='rounded-sm'
