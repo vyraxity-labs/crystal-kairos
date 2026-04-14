@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState: InitialState = {
   isMobileNavOpen: false,
+  sidebarIsCollapsed: false,
 }
 
 const navSlice = createSlice({
@@ -15,9 +16,15 @@ const navSlice = createSlice({
     ) => {
       state.isMobileNavOpen = action.payload
     },
+    setSidebarIsCollapsed: (
+      state,
+      action: import('@reduxjs/toolkit').PayloadAction<boolean>,
+    ) => {
+      state.sidebarIsCollapsed = action.payload
+    },
   },
 })
 
-export const { setIsMobileNavOpen } = navSlice.actions
+export const { setIsMobileNavOpen, setSidebarIsCollapsed } = navSlice.actions
 
 export default navSlice.reducer
