@@ -9,7 +9,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       <AdminSidebar />
       <div className='flex-1 flex flex-col overflow-auto'>
         <AdminHeader />
-        <div className='flex-1'>{children}</div>
+        <div className='flex-1 p-3'>{children}</div>
         <AdminMobileBottomBar />
       </div>
     </div>
