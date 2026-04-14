@@ -18,7 +18,7 @@ const AddPopUp = ({ trigger }: { trigger: ReactNode }) => {
     <DropdownMenu>
       <DropdownMenuTrigger className='w-full'>{trigger}</DropdownMenuTrigger>
 
-      <DropdownMenuContent className='w-16 rounded-md'>
+      <DropdownMenuContent className='rounded-md'>
         <AddMenuItem
           href='/admin/members/new'
           Icon={UserPlus}

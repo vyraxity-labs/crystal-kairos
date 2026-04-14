@@ -37,7 +37,7 @@ const AvatarMenu = () => {
               label={t('layout.sidebar.menu-items.profile')}
             />
             <AvatarMenuItem
-              href='/admin/Settings'
+              href='/admin/settings'
               label={t('layout.sidebar.menu-items.settings')}
             />
           </DropdownMenuGroup>
@@ -58,9 +58,9 @@ export default AvatarMenu
 const AvatarMenuItem = ({ href, label }: { href: string; label: string }) => {
   return (
     <DropdownMenuItem>
-      <Link href={href} className='w-full'>
-        <Button variant='ghost'>{label}</Button>
-      </Link>
+      <Button asChild variant='ghost' className='w-full justify-start'>
+        <Link href={href}>{label}</Link>
+      </Button>
     </DropdownMenuItem>
   )
 }

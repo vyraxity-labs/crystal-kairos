@@ -75,14 +75,15 @@ const AdminSidebar = () => {
       <Separator className='bg-tertiary' />
 
       <div className='p-3 flex flex-col gap-2'>
-        <Link
-          href='/admin/settings'
-          className='w-full flex py-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground rounded-md'
+        <Button
+          asChild
+          variant='ghost'
+          className='w-full justify-start py-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground rounded-md'
         >
-          <Button variant='ghost' className='hover:text-sidebar-foreground'>
+          <Link href='/admin/settings'>
             <Settings /> {t('layout.sidebar.menu-items.settings')}
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         <Logout />
       </div>
     </div>
