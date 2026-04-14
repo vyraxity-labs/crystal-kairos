@@ -9,12 +9,6 @@ import {
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '@/components/ui/input-group'
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -28,11 +22,12 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { RegistrationFormValues } from '@/types/register.interface'
-import { CalendarIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Control, Controller, UseFormSetValue } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { genderData } from './data'
+import { Button } from '@/components/ui/button'
+import { format } from 'date-fns'
 
 function dateOfBirthToDate(value: unknown): Date | undefined {
   if (value == null || value === '') return undefined
@@ -49,7 +44,7 @@ const PersonalInfo = ({
   control,
   onDateSelected,
 }: {
-  control: Control<RegistrationFormValues, any, RegistrationFormValues>
+  control: Control<RegistrationFormValues>
   onDateSelected: UseFormSetValue<RegistrationFormValues>
 }) => {
   const { t } = useTranslation('auth')
@@ -151,10 +146,6 @@ const PersonalInfo = ({
                         </SelectItem>
                       )
                     })}
-
-                    {/* <SelectItem value='female'>
-                      {t('register.form.personal_details.gender_female')}
-                    </SelectItem> */}
                   </SelectContent>
                 </Select>
                 {fieldState.invalid && (
@@ -201,41 +192,31 @@ const PersonalInfo = ({
                 <FieldLabel>
                   {t('register.form.personal_details.date_of_birth')}
                 </FieldLabel>
-                <InputGroup>
-                  <InputGroupInput
-                    {...field}
-                    className='rounded-sm'
-                    placeholder={t(
-                      'register.form.personal_details.date_of_birth',
-                    )}
-                    value={dob ? dob.toDateString() : ''}
-                  />
-                  <InputGroupAddon align='inline-end'>
-                    <Popover
-                      open={calendarIsOpen}
-                      onOpenChange={setCalendarIsOpen}
+                <Popover open={calendarIsOpen} onOpenChange={setCalendarIsOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant='outline'
+                      className='rounded-sm justify-start font-normal bg-input cursor-pointer'
                     >
-                      <PopoverTrigger asChild>
-                        <InputGroupButton>
-                          <CalendarIcon />
-                        </InputGroupButton>
-                      </PopoverTrigger>
+                      {dob
+                        ? format(dob, 'dd/MM/yyyy')
+                        : t('register.form.personal_details.date_of_birth')}
+                    </Button>
+                  </PopoverTrigger>
 
-                      <PopoverContent className='rounded-md'>
-                        <Calendar
-                          mode='single'
-                          selected={dob}
-                          defaultMonth={dob}
-                          captionLayout='dropdown'
-                          onSelect={(date) => {
-                            onDateSelected('dateOfBirth', date as Date)
-                            setCalendarIsOpen(false)
-                          }}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </InputGroupAddon>
-                </InputGroup>
+                  <PopoverContent className='rounded-md'>
+                    <Calendar
+                      mode='single'
+                      selected={dob}
+                      defaultMonth={dob}
+                      captionLayout='dropdown'
+                      onSelect={(date) => {
+                        onDateSelected('dateOfBirth', date as Date)
+                        setCalendarIsOpen(false)
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}

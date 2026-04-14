@@ -43,12 +43,16 @@ import Interests from './registration-steps/Interests'
 import Review from './registration-steps/Review'
 import { register } from '@/models/auth'
 import { toast } from 'sonner'
+import RegistrationFormWrapper from './RegistrationFormWrapper'
+import { useRouter } from 'next/navigation'
+import { REDIRECT_DELAY } from '@/lib/constants'
 
 const RegistrationForm = () => {
   const { currentStep, stepsState, step1, step2, step3, step4, step5 } =
     useSelector((store: RootState) => store.register)
   const { t } = useTranslation('auth')
   const dispatch = useDispatch()
+  const router = useRouter()
 
   const { stepInfo, currentSchema } = useMemo(() => {
     const stepInfo =
@@ -152,13 +156,59 @@ const RegistrationForm = () => {
     )
   }
 
+  const switchStepsValues = (formData: RegistrationFormValues) => {
+    switch (currentStep) {
+      case 1:
+        setStep(
+          setStep1,
+          getValues(formData, step1.data) as typeof step1.data,
+          currentStep,
+        )
+        break
+      case 2:
+        setStep(
+          setStep2,
+          getValues(formData, step2.data) as typeof step2.data,
+          currentStep,
+        )
+        break
+      case 3:
+        setStep(
+          setStep3,
+          getValues(formData, step3.data) as typeof step3.data,
+          currentStep,
+        )
+        break
+      case 4:
+        setStep(
+          setStep4,
+          getValues(formData, step4.data) as typeof step4.data,
+          currentStep,
+        )
+        break
+      case 5:
+        setStep(
+          setStep5,
+          getValues(formData, step5.data) as typeof step5.data,
+          currentStep,
+        )
+        break
+      default:
+        setStep(
+          setStep1,
+          getValues(formData, step1.data) as typeof step1.data,
+          currentStep,
+        )
+        break
+    }
+  }
+
   const onSubmit = async (formData: RegistrationFormValues) => {
-    // console.log(formData)
     if (isValid) {
+      switchStepsValues(formData)
       if (currentStep < 5) {
         dispatch(setCurrentStep(currentStep + 1))
       } else {
-        // console.log(step1.data, step2.data, step3.data, step4.data, step5.data)
         const response = await register(
           step1.data,
           step2.data,
@@ -173,59 +223,21 @@ const RegistrationForm = () => {
 
         if (response.success) {
           toast.success('Registration successful')
+          setTimeout(() => {
+            router.replace('/register/success')
+          }, REDIRECT_DELAY)
         }
-      }
-      switch (currentStep) {
-        case 1:
-          setStep(
-            setStep1,
-            getValues(formData, step1.data) as typeof step1.data,
-            currentStep,
-          )
-          break
-        case 2:
-          setStep(
-            setStep2,
-            getValues(formData, step2.data) as typeof step2.data,
-            currentStep,
-          )
-          break
-        case 3:
-          setStep(
-            setStep3,
-            getValues(formData, step3.data) as typeof step3.data,
-            currentStep,
-          )
-          break
-        case 4:
-          setStep(
-            setStep4,
-            getValues(formData, step4.data) as typeof step4.data,
-            currentStep,
-          )
-          break
-        case 5:
-          setStep(
-            setStep5,
-            getValues(formData, step5.data) as typeof step5.data,
-            currentStep,
-          )
-          break
-        default:
-          setStep(
-            setStep1,
-            getValues(formData, step1.data) as typeof step1.data,
-            currentStep,
-          )
-          break
       }
     }
   }
 
   return (
-    <Card className='rounded-md'>
+    <RegistrationFormWrapper currentStep={currentStep}>
       <CardHeader>
-        <CardTitle>{t(stepInfo.label)}</CardTitle>
+        <CardTitle className='flex gap-2'>
+          <stepInfo.icon />
+          <h3 className='font-semibold'>{t(stepInfo.label)}</h3>
+        </CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-8'>
         <CardContent>
@@ -261,7 +273,7 @@ const RegistrationForm = () => {
           </Button>
         </CardFooter>
       </form>
-    </Card>
+    </RegistrationFormWrapper>
   )
 }
 

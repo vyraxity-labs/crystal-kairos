@@ -15,7 +15,8 @@ import ReviewItem from './ReviewItem'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { format } from 'date-fns'
-import { Separator } from '@/components/ui/separator'
+import SummaryCard from './SummaryCard'
+import { interestsData } from './data'
 
 const Review = ({ control }: { control: Control<RegistrationFormValues> }) => {
   const { t } = useTranslation('auth')
@@ -23,71 +24,129 @@ const Review = ({ control }: { control: Control<RegistrationFormValues> }) => {
     (store: RootState) => store.register,
   )
 
+  const interestsLabels = interestsData
+    .filter((interest) => step4.data.interests.includes(interest.value))
+    .map((interest) => interest.label)
+
   return (
-    <div>
-      <div className='mb-8'>
-        <div className='mb-5'>
-          <h4>Personal Information</h4>
-          <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3'>
-            <ReviewItem field='Full Name' value={step1.data.name} />
-            <ReviewItem field='Email Address' value={step1.data.email} />
-            <ReviewItem field='Phone Number' value={step1.data.phoneNumber} />
+    <div className='mt-5'>
+      <div className='mb-8 flex flex-col gap-5'>
+        <SummaryCard title={t('register.steps_header.personal')} stepNumber={1}>
+          <div className='mb-5'>
+            <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3'>
+              <ReviewItem
+                field={t('register.form.personal_details.full_name')}
+                value={step1.data.name}
+              />
+              <ReviewItem
+                field={t('register.form.personal_details.email')}
+                value={step1.data.email}
+              />
+              <ReviewItem
+                field={t('register.form.personal_details.phone_number')}
+                value={step1.data.phoneNumber}
+              />
+            </div>
+            <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3'>
+              <ReviewItem
+                field={t('register.form.personal_details.gender')}
+                value={step1.data.gender}
+              />
+              <ReviewItem
+                field={t('register.form.personal_details.date_of_birth')}
+                value={format(step1.data.dateOfBirth, 'do MMMM yyyy')}
+              />
+              <ReviewItem
+                field={t('register.form.personal_details.occupation')}
+                value={step1.data.occupation}
+              />
+            </div>
+            <div>
+              <ReviewItem
+                field={t('register.form.personal_details.address')}
+                value={step1.data.address}
+              />
+            </div>
           </div>
-          <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3'>
-            <ReviewItem field='Gender' value={step1.data.gender} />
+        </SummaryCard>
+
+        <SummaryCard title={t('register.steps_header.banking')} stepNumber={2}>
+          <div className='mb-5'>
+            <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3'>
+              <ReviewItem
+                field={t('register.form.banking_details.bank_name')}
+                value={step2.data.bankName}
+              />
+              <ReviewItem
+                field={t('register.form.banking_details.account_number')}
+                value={step2.data.accountNumber}
+              />
+              <ReviewItem
+                field={t('register.form.banking_details.account_name')}
+                value={step2.data.accountName}
+              />
+            </div>
+          </div>
+        </SummaryCard>
+
+        <SummaryCard
+          title={t('register.steps_header.next_of_kin')}
+          stepNumber={3}
+        >
+          <div className='mb-5'>
+            <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3'>
+              <ReviewItem
+                field={t('register.form.next_of_kin.full_name')}
+                value={step3.data.name}
+              />
+              <ReviewItem
+                field={t('register.form.next_of_kin.relationship')}
+                value={step3.data.relationship}
+              />
+              <ReviewItem
+                field={t('register.form.next_of_kin.phone_number')}
+                value={step3.data.phoneNumber}
+              />
+            </div>
+            <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3'>
+              <ReviewItem
+                field={t('register.form.next_of_kin.bank_name')}
+                value={step3.data.bankName}
+              />
+              <ReviewItem
+                field={t('register.form.next_of_kin.account_number')}
+                value={step3.data.accountNumber}
+              />
+              <ReviewItem
+                field={t('register.form.next_of_kin.account_name')}
+                value={step3.data.accountName}
+              />
+            </div>
+          </div>
+        </SummaryCard>
+
+        <SummaryCard
+          title={t('register.steps_header.interests')}
+          stepNumber={4}
+        >
+          <div className='mb-5'>
             <ReviewItem
-              field='Date of Birth'
-              value={format(step1.data.dateOfBirth, 'do MMMM yyyy')}
+              field={t('register.form.interests.interests')}
+              value={interestsLabels}
             />
-            <ReviewItem field='Occupation' value={step1.data.occupation} />
+
+            <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3'>
+              <ReviewItem
+                field={t('register.form.interests.referral_name')}
+                value={step4.data.referralName}
+              />
+              <ReviewItem
+                field={t('register.form.interests.referral_phone_number')}
+                value={step4.data.referralPhoneNumber}
+              />
+            </div>
           </div>
-          <div>
-            <ReviewItem field='Address' value={step1.data.address} />
-          </div>
-        </div>
-
-        <Separator className='bg-outline-variant/30' />
-
-        <div className='mb-5 mt-5'>
-          <h4>Bank Details</h4>
-
-          <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3'>
-            <ReviewItem field='Bank Name' value={step2.data.bankName} />
-            <ReviewItem
-              field='Account Number'
-              value={step2.data.accountNumber}
-            />
-            <ReviewItem field='Account Name' value={step2.data.accountName} />
-          </div>
-        </div>
-
-        <Separator className='bg-outline-variant/30' />
-
-        <div className='mb-5 mt-5'>
-          <h4>Next of Kin</h4>
-
-          <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3'>
-            <ReviewItem field='Full Name' value={step3.data.name} />
-            <ReviewItem field='Email Address' value={step3.data.relationship} />
-            <ReviewItem field='Phone Number' value={step3.data.phoneNumber} />
-          </div>
-          <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3'>
-            <ReviewItem field='Bank Name' value={step3.data.bankName} />
-            <ReviewItem
-              field='Account Number'
-              value={step3.data.accountNumber}
-            />
-            <ReviewItem field='Account Name' value={step3.data.accountName} />
-          </div>
-        </div>
-
-        <Separator className='bg-outline-variant/30' />
-
-        <div className='mb-5 mt-5'>
-          <h4>Membership Interests</h4>
-
-          <ReviewItem field='' value={step4.data.interests} />
-        </div>
+        </SummaryCard>
       </div>
 
       <FieldGroup className='p-3 bg-surface-container-low'>
