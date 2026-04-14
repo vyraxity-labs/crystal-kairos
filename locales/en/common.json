@@ -40,5 +40,8 @@
     },
     "secure": "Secure SSL encrypted",
     "copyright": "{{year}} Crystal Kairos Ventures Cooperative Society. All rights reserved."
+  },
+  "buttons": {
+    "logout": "Logout"
   }
 }

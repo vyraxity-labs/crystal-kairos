@@ -1,5 +1,4 @@
 import { auth } from '@/auth'
-import Logout from '@/components/admin/logout'
 
 const AdminDashboardPage = async () => {
   const session = await auth()
@@ -7,7 +6,6 @@ const AdminDashboardPage = async () => {
     <div>
       <h2>{session?.user.name}</h2>
       <p>{session?.user.role}</p>
-      <Logout />
     </div>
   )
 }

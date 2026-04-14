@@ -1,5 +1,5 @@
 import { auth } from '@/auth'
-import Logout from '@/components/admin/logout'
+import Logout from '@/components/common/logout'
 
 const UserPage = async () => {
   const session = await auth()
