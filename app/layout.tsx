@@ -6,6 +6,7 @@ import I18nProvider from '@/providers/I18nProvider'
 import StoreProvider from '@/providers/StoreProvider'
 import { SessionProvider } from 'next-auth/react'
 import { Toaster } from '@/components/ui/sonner'
+import ThemeProvider from '@/providers/ThemeProvider'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' })
@@ -41,10 +42,12 @@ export default function RootLayout({
       <body className='min-h-full flex flex-col'>
         <SessionProvider>
           <StoreProvider>
-            <I18nProvider>
-              {children}
-              <Toaster position='top-left' duration={5000} />
-            </I18nProvider>
+            <ThemeProvider>
+              <I18nProvider>
+                {children}
+                <Toaster position='top-left' duration={5000} />
+              </I18nProvider>
+            </ThemeProvider>
           </StoreProvider>
         </SessionProvider>
       </body>
