@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '../ui/card'
 import { RootState } from '@/store'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { registerStepsHeaderData } from './data'
 import { useTranslation } from 'react-i18next'
 import { MoveLeft, MoveRight } from 'lucide-react'
@@ -53,6 +53,7 @@ const RegistrationForm = () => {
   const { t } = useTranslation('auth')
   const dispatch = useDispatch()
   const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
   const { stepInfo, currentSchema } = useMemo(() => {
     const stepInfo =
@@ -209,13 +210,19 @@ const RegistrationForm = () => {
       if (currentStep < 5) {
         dispatch(setCurrentStep(currentStep + 1))
       } else {
+        setLoading(true)
+        const finalStepData = getValues(
+          formData,
+          step5.data,
+        ) as typeof step5.data
         const response = await register(
           step1.data,
           step2.data,
           step3.data,
           step4.data,
-          step5.data,
+          finalStepData,
         )
+        setLoading(false)
 
         if (!response.success || response.error) {
           toast.error(response.error)
@@ -266,7 +273,9 @@ const RegistrationForm = () => {
           >
             {t(
               currentStep === 5
-                ? 'register.form.buttons.submit'
+                ? loading
+                  ? 'register.form.buttons.loading'
+                  : 'register.form.buttons.submit'
                 : 'register.form.buttons.continue',
             )}{' '}
             <MoveRight />
