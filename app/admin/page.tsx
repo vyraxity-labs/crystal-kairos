@@ -1,11 +1,22 @@
-import { auth } from '@/auth'
+import SummaryStats from '@/components/admin/SummaryStats'
+import {
+  getAllMembers,
+  getMembersLastMonth,
+  getPendingApprovals,
+} from '@/models/members/query'
 
 const AdminDashboardPage = async () => {
-  const session = await auth()
+  const members = (await getAllMembers()).data
+  const lastMonthMembers = (await getMembersLastMonth()).data
+  const pendingApprovals = (await getPendingApprovals()).data
+
   return (
     <div>
-      <h2>{session?.user.name}</h2>
-      <p>{session?.user.role}</p>
+      <SummaryStats
+        membersCount={members.length}
+        membersChange={members.length - lastMonthMembers.length}
+        pendingApprovalCount={pendingApprovals.length}
+      />
     </div>
   )
 }

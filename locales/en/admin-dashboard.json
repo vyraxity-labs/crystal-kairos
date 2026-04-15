@@ -1,0 +1,10 @@
+{
+  "summary_stats": {
+    "total_members": "Total Members",
+    "total_members_description": "The total number of members in the system",
+    "from_last_month": "from last month",
+    "pending_approvals": "Pending Approvals",
+    "pending_approvals_description": "The number of pending approvals",
+    "pending_approvals_action_required": "Action Required"
+  }
+}
