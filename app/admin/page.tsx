@@ -1,21 +1,28 @@
 import SummaryStats from '@/components/admin/SummaryStats'
 import {
-  getAllMembers,
-  getMembersLastMonth,
-  getPendingApprovals,
+  getLastMonthMembersCount,
+  getMembersCount,
+  getPendingApprovalsCount,
 } from '@/models/members/query'
 
 const AdminDashboardPage = async () => {
-  const members = (await getAllMembers()).data
-  const lastMonthMembers = (await getMembersLastMonth()).data
-  const pendingApprovals = (await getPendingApprovals()).data
+  const [
+    { data: membersCount },
+    { data: lastMonthMembersCount },
+    { data: pendingApprovalsCount },
+  ] = await Promise.all([
+    getMembersCount(),
+    getLastMonthMembersCount(),
+    getPendingApprovalsCount(),
+  ])
+  const membersChange = membersCount - lastMonthMembersCount
 
   return (
     <div>
       <SummaryStats
-        membersCount={members.length}
-        membersChange={members.length - lastMonthMembers.length}
-        pendingApprovalCount={pendingApprovals.length}
+        membersCount={membersCount}
+        membersChange={membersChange}
+        pendingApprovalCount={pendingApprovalsCount}
       />
     </div>
   )

@@ -42,8 +42,10 @@ const SummaryStats = ({
               <TrendingDown size={iconSize} />
             )}
             <p className='text-xs'>
-              {(membersChange * 100) / membersCount}%{' '}
-              {t('summary_stats.from_last_month')}
+              {membersCount > 0
+                ? ((membersChange * 100) / membersCount).toFixed(1)
+                : 0}
+              % {t('summary_stats.from_last_month')}
             </p>
           </Badge>
         }
