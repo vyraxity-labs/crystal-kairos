@@ -1,11 +1,29 @@
-import { auth } from '@/auth'
+import SummaryStats from '@/components/admin/SummaryStats'
+import {
+  getLastMonthMembersCount,
+  getMembersCount,
+  getPendingApprovalsCount,
+} from '@/models/members/query'
 
 const AdminDashboardPage = async () => {
-  const session = await auth()
+  const [
+    { data: membersCount },
+    { data: lastMonthMembersCount },
+    { data: pendingApprovalsCount },
+  ] = await Promise.all([
+    getMembersCount(),
+    getLastMonthMembersCount(),
+    getPendingApprovalsCount(),
+  ])
+  const membersChange = membersCount - lastMonthMembersCount
+
   return (
     <div>
-      <h2>{session?.user.name}</h2>
-      <p>{session?.user.role}</p>
+      <SummaryStats
+        membersCount={membersCount}
+        membersChange={membersChange}
+        pendingApprovalCount={pendingApprovalsCount}
+      />
     </div>
   )
 }

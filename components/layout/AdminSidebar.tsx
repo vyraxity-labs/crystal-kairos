@@ -27,14 +27,13 @@ const AdminSidebar = () => {
   return (
     <div
       className={cn(
-        'hidden md:flex md:flex-col bg-sidebar relative',
+        'hidden md:flex md:flex-col bg-sidebar relative dark:border-r-2',
         sidebarIsCollapsed ? 'w-20' : 'w-60',
       )}
     >
       <Button
         size='icon'
-        variant='outline'
-        className='absolute right-0 translate-x-[50%] top-2 bg-tertiary text-white border-surface-container-low'
+        className='absolute right-0 translate-x-[50%] top-2 bg-tertiary hover:bg-tertiary-dim text-white border-surface-container-low'
         onClick={() => dispatch(setSidebarIsCollapsed(!sidebarIsCollapsed))}
       >
         {sidebarIsCollapsed ? <ChevronRight /> : <ChevronLeft />}

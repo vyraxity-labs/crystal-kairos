@@ -14,7 +14,7 @@ const AdminMobileBottomBar = () => {
   const { t } = useTranslation('admin')
 
   return (
-    <div className='md:hidden bg-sidebar fixed w-full bottom-0'>
+    <div className='md:hidden bg-sidebar fixed w-full bottom-0 dark:border-t-2'>
       <div className='grid grid-cols-5'>
         {adminNavItems.map((item) => {
           const isActive = pathname === item.href
