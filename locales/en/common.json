@@ -43,5 +43,13 @@
   },
   "buttons": {
     "logout": "Logout"
+  },
+  "table": {
+    "pagination": {
+      "rows_per_page": "Rows per page",
+      "of": "of",
+      "next": "Next",
+      "previous": "Previous"
+    }
   }
 }

@@ -1,0 +1,25 @@
+{
+  "table": {
+    "header": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "actions": "Actions",
+      "status": "Status",
+      "date_joined": "Date Joined"
+    },
+    "body": {
+      "empty": "No members found"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    }
+  },
+  "buttons": {
+    "view": "View"
+  }
+}

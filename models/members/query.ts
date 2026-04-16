@@ -2,18 +2,53 @@
 
 import { MembershipStatus, UserRole } from '@/generated/prisma/enums'
 import { prisma } from '@/lib/prisma'
+import { AllMembersQueryParams } from '@/types/members.interface'
 
-export const getAllMembers = async () => {
+export const getAllMembers = async (filters: AllMembersQueryParams) => {
   try {
-    const members = await prisma.user.findMany({
-      where: {
-        role: UserRole.USER,
-      },
-    })
+    const {
+      page = 1,
+      pageSize = 5,
+      sortField = 'createdAt',
+      sortDirection = 'asc',
+    } = filters
 
-    return { success: true, data: members }
+    const [members, total] = await prisma.$transaction([
+      prisma.user.findMany({
+        where: {
+          role: UserRole.USER,
+        },
+        include: {
+          userInfo: true,
+          bankAccounts: true,
+          nextOfKin: true,
+          membership: true,
+        },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        orderBy: {
+          [sortField]: sortDirection,
+        },
+      }),
+      prisma.user.count({
+        where: {
+          role: UserRole.USER,
+        },
+      }),
+    ])
+
+    return {
+      success: true,
+      data: members,
+      meta: { total, page, pageSize, totalPages: Math.ceil(total / pageSize) },
+    }
   } catch (error) {
-    return { success: false, data: [], error: error as Error }
+    return {
+      success: false,
+      data: [],
+      error: error as Error,
+      meta: { total: 0, page: 1, pageSize: 5, totalPages: 1 },
+    }
   }
 }
 
