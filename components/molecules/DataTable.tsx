@@ -8,6 +8,7 @@ import {
   OnChangeFn,
   SortingState,
   useReactTable,
+  VisibilityState,
 } from '@tanstack/react-table'
 import {
   Table,
@@ -18,6 +19,16 @@ import {
   TableRow,
 } from '../ui/table'
 import { cn } from '@/lib/utils'
+import { ReactNode, useState } from 'react'
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
+import { Button } from '../ui/button'
+import { ChevronUp } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface TableProps<TData, TValues> {
   columns: ColumnDef<TData, TValues>[]
@@ -26,6 +37,7 @@ interface TableProps<TData, TValues> {
   emptyText: string
   sorting: SortingState
   onSortingChange: OnChangeFn<SortingState>
+  filterUI?: ReactNode
 }
 
 const DataTable = <TData, TValues>({
@@ -34,72 +46,114 @@ const DataTable = <TData, TValues>({
   loading,
   emptyText,
   sorting,
+  filterUI,
   onSortingChange,
 }: TableProps<TData, TValues>) => {
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = useState({})
+  const { t } = useTranslation('common')
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange,
     getSortedRowModel: getSortedRowModel(),
-    state: { sorting },
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
     manualSorting: true,
+    state: { sorting, columnVisibility, rowSelection },
   })
 
   return (
-    <div className='overflow-hidden rounded-md border'>
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => {
-            return (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            )
-          })}
-        </TableHeader>
+    <div>
+      <div className='flex mb-4 gap-2'>
+        {filterUI}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className='ml-auto rounded-sm cursor-pointer text-on-primary text-xs'>
+              {t('table.filters.column')} <ChevronUp />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end' className='rounded-md'>
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                    className='capitalize cursor-pointer hover:bg-surface-container-low rounded-sm'
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                )
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
-        <TableBody className={cn(loading ? 'opacity-50' : 'opacity-100')}>
-          {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row) => {
+      <div className='overflow-hidden rounded-md border'>
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => {
               return (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => {
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
                     return (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </TableHead>
                     )
                   })}
                 </TableRow>
               )
-            })
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className='h-24 text-center'>
-                {emptyText}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            })}
+          </TableHeader>
+
+          <TableBody className={cn(loading ? 'opacity-50' : 'opacity-100')}>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => {
+                return (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
+                  >
+                    {row.getVisibleCells().map((cell) => {
+                      return (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      )
+                    })}
+                  </TableRow>
+                )
+              })
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className='h-24 text-center'
+                >
+                  {emptyText}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }

@@ -12,6 +12,7 @@ export interface MemberTableColumns {
   status: MembershipStatus
   interests: MembershipInterest[]
   createdAt: Date
+  gender: Gender
 }
 
 export interface MembershipStatusFormatData {
@@ -22,13 +23,13 @@ export interface MembershipStatusFormatData {
 }
 
 export interface AllMembersQueryParams {
-  page?: number
-  pageSize?: number
+  page: number
+  pageSize: number
+  sortField: string
+  sortDirection: 'asc' | 'desc'
   search?: string
   createdFrom?: Date
   createdTo?: Date
+  status?: MembershipStatus
   gender?: Gender
-  membershipStatus?: MembershipStatus
-  sortField?: string
-  sortDirection?: 'asc' | 'desc'
 }

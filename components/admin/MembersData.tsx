@@ -1,15 +1,42 @@
 'use client'
 
-import { MembershipStatus } from '@/generated/prisma/enums'
+import { Gender, MembershipStatus } from '@/generated/prisma/enums'
 import { getAllMembers } from '@/models/members/query'
-import { MemberTableColumns } from '@/types/members.interface'
-import { useEffect, useState } from 'react'
+import {
+  AllMembersQueryParams,
+  MemberTableColumns,
+} from '@/types/members.interface'
+import { useEffect, useMemo, useState } from 'react'
 import { columns } from '../tables/membersColumns'
 import { useSearchParams } from 'next/navigation'
 import TablePagination from '../molecules/TablePagination'
 import DataTable from '../molecules/DataTable'
 import { useTranslation } from 'react-i18next'
 import { SortingState } from '@tanstack/react-table'
+import MembersFilterUI from './MembersFilterUI'
+
+const statusMap = (status: string) => {
+  switch (status) {
+    case 'pending':
+      return MembershipStatus.PENDING
+    case 'approved':
+      return MembershipStatus.APPROVED
+    case 'rejected':
+      return MembershipStatus.REJECTED
+    case 'expired':
+      return MembershipStatus.EXPIRED
+    default:
+      return MembershipStatus.PENDING
+  }
+}
+
+const FILTER_KEYS: (keyof AllMembersQueryParams)[] = [
+  'search',
+  'createdFrom',
+  'createdTo',
+  'status',
+  'gender',
+]
 
 const MembersData = () => {
   const params = useSearchParams()
@@ -29,20 +56,35 @@ const MembersData = () => {
     totalPages: 1,
   })
   const { t } = useTranslation('admin-members')
+  const rawStatus = params.get('status')
+  const [status, setStatus] = useState<MembershipStatus | null>(
+    rawStatus ? statusMap(rawStatus) : null,
+  )
   const [sorting, setSorting] = useState<SortingState>([])
+  const [search, setSearch] = useState('')
 
   const sortField = sorting[0]?.id ?? 'createdAt'
   const sortDirection = sorting[0]?.desc ? 'desc' : 'asc'
 
+  const filterOptions: AllMembersQueryParams = {
+    page,
+    pageSize: size,
+    sortField,
+    sortDirection,
+    status: status as MembershipStatus,
+    search,
+  }
+
+  const isFiltered = useMemo(
+    () => FILTER_KEYS.some((key) => filterOptions[key] !== undefined),
+    [filterOptions],
+  )
+  console.log('FILTER ==>', isFiltered)
+
   useEffect(() => {
     const getMembers = async () => {
       setLoading(true)
-      const { data: members, meta } = await getAllMembers({
-        page,
-        pageSize: size,
-        sortField,
-        sortDirection,
-      })
+      const { data: members, meta } = await getAllMembers(filterOptions)
       const membersData: MemberTableColumns[] = members.map((member) => {
         return {
           id: member.id,
@@ -52,6 +94,7 @@ const MembersData = () => {
           status: member.membership?.status ?? MembershipStatus.PENDING,
           interests: member.membership?.interests ?? [],
           createdAt: member.createdAt,
+          gender: member.userInfo?.gender ?? Gender.MALE,
         }
       })
 
@@ -61,7 +104,7 @@ const MembersData = () => {
     }
 
     getMembers()
-  }, [page, size, sortField, sortDirection])
+  }, [page, size, sortField, sortDirection, status, search])
 
   return (
     <div>
@@ -72,6 +115,13 @@ const MembersData = () => {
         emptyText={t('table.body.empty')}
         sorting={sorting}
         onSortingChange={setSorting}
+        filterUI={
+          <MembersFilterUI
+            search={search}
+            setSearch={setSearch}
+            isFiltered={isFiltered}
+          />
+        }
       />
       <TablePagination
         page={page}

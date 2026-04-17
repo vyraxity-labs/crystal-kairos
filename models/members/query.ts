@@ -1,5 +1,6 @@
 'use server'
 
+import { Prisma } from '@/generated/prisma/client'
 import { MembershipStatus, UserRole } from '@/generated/prisma/enums'
 import { prisma } from '@/lib/prisma'
 import { AllMembersQueryParams } from '@/types/members.interface'
@@ -11,13 +12,27 @@ export const getAllMembers = async (filters: AllMembersQueryParams) => {
       pageSize = 5,
       sortField = 'createdAt',
       sortDirection = 'asc',
+      status,
+      search,
+      createdFrom,
+      createdTo,
+      gender,
     } = filters
+
+    const where: Prisma.UserWhereInput = {
+      role: UserRole.USER,
+      ...(status ? { membership: { status } } : {}),
+      ...(search && {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+        ],
+      }),
+    }
 
     const [members, total] = await prisma.$transaction([
       prisma.user.findMany({
-        where: {
-          role: UserRole.USER,
-        },
+        where,
         include: {
           userInfo: true,
           bankAccounts: true,
@@ -31,9 +46,7 @@ export const getAllMembers = async (filters: AllMembersQueryParams) => {
         },
       }),
       prisma.user.count({
-        where: {
-          role: UserRole.USER,
-        },
+        where,
       }),
     ])
 

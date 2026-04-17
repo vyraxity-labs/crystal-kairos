@@ -7,7 +7,8 @@
       "role": "Role",
       "actions": "Actions",
       "status": "Status",
-      "date_joined": "Date Joined"
+      "date_joined": "Date Joined",
+      "gender": "Gender"
     },
     "body": {
       "empty": "No members found"
@@ -17,6 +18,12 @@
       "approved": "Approved",
       "rejected": "Rejected",
       "expired": "Expired"
+    },
+    "filters": {
+      "search": {
+        "placeholder": "Search by name or email"
+      },
+      "filter": "Filter"
     }
   },
   "buttons": {

@@ -50,6 +50,9 @@
       "of": "of",
       "next": "Next",
       "previous": "Previous"
+    },
+    "filters": {
+      "column": "Columns"
     }
   }
 }

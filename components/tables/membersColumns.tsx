@@ -8,8 +8,36 @@ import Link from 'next/link'
 import TranslatedContent from '../atoms/TranslatedContent'
 import ColumnSortRender from '../atoms/ColumnsSortRender'
 import { format } from 'date-fns'
+import { Gender } from '@/generated/prisma/enums'
+import { Checkbox } from '../ui/checkbox'
 
 export const columns: ColumnDef<MemberTableColumns>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => {
+      return (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label='Select all'
+        />
+      )
+    },
+    cell: ({ row }) => {
+      return (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label='Select row'
+        />
+      )
+    },
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: 'name',
     header: ({ column }) => (
@@ -19,6 +47,20 @@ export const columns: ColumnDef<MemberTableColumns>[] = [
         ns='admin-members'
       />
     ),
+  },
+  {
+    accessorKey: 'gender',
+    header: () => (
+      <TranslatedContent label='table.header.gender' ns='admin-members' />
+    ),
+    cell: ({ row }) => {
+      const value = row.getValue('gender') as Gender
+      return (
+        <span className='flex justify-center items-center text-xs'>
+          {value}
+        </span>
+      )
+    },
   },
   {
     accessorKey: 'email',

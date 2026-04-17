@@ -3,6 +3,7 @@ import { Column } from '@tanstack/react-table'
 import { Button } from '../ui/button'
 import TranslatedContent from './TranslatedContent'
 import { ArrowDown, ArrowUp } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const ColumnSortRender = ({
   column,
@@ -19,13 +20,13 @@ const ColumnSortRender = ({
       onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
     >
       <TranslatedContent label={label} ns={ns} />
-      {column.getIsSorted() ? (
-        column.getIsSorted() === 'desc' ? (
-          <ArrowDown color='green' />
-        ) : (
-          <ArrowUp color='green' />
-        )
-      ) : null}
+      <span
+        className={cn(
+          column.getIsSorted() ? 'text-success' : 'text-muted-foreground',
+        )}
+      >
+        {column.getIsSorted() === 'desc' ? <ArrowDown /> : <ArrowUp />}
+      </span>
     </Button>
   )
 }
