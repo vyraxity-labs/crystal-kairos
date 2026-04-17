@@ -1,0 +1,58 @@
+{
+  "table": {
+    "header": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "actions": "Actions",
+      "status": "Status",
+      "date_joined": "Date Joined",
+      "gender": "Gender"
+    },
+    "body": {
+      "empty": "No members found"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "filters": {
+      "search": {
+        "placeholder": "Search by name or email"
+      },
+      "filter": "Filter",
+      "gender": {
+        "label": "Gender",
+        "male": "Male",
+        "female": "Female",
+        "clear": "Clear"
+      },
+      "status": {
+        "label": "Status",
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "expired": "Expired",
+        "empty": "Select a status",
+        "clear": "Clear"
+      },
+      "date_joined": {
+        "label": "Date Joined",
+        "from_label": "From",
+        "from_empty": "Select a date",
+        "to_label": "To",
+        "to_empty": "Select a date",
+        "clear": "Clear"
+      },
+      "download_all": "Download All",
+      "download_selected": "Download Selected"
+    }
+  },
+  "buttons": {
+    "view": "View",
+    "clear_all": "Clear Filters"
+  }
+}

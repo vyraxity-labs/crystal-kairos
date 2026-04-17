@@ -1,19 +1,85 @@
 'use server'
 
+import { Prisma } from '@/generated/prisma/client'
 import { MembershipStatus, UserRole } from '@/generated/prisma/enums'
 import { prisma } from '@/lib/prisma'
+import { AllMembersQueryParams } from '@/types/members.interface'
 
-export const getAllMembers = async () => {
+export const getAllMembers = async (filters: AllMembersQueryParams) => {
   try {
-    const members = await prisma.user.findMany({
-      where: {
-        role: UserRole.USER,
-      },
-    })
+    const {
+      page = 1,
+      pageSize = 5,
+      sortField = 'createdAt',
+      sortDirection = 'asc',
+      status,
+      search,
+      createdFrom,
+      createdTo,
+      gender,
+    } = filters
 
-    return { success: true, data: members }
+    const startOfCreatedFrom = createdFrom
+      ? new Date(new Date(createdFrom).setHours(0, 0, 0, 0))
+      : undefined
+    const endOfCreatedTo = createdTo
+      ? new Date(new Date(createdTo).setHours(23, 59, 59, 999))
+      : undefined
+
+    const where: Prisma.UserWhereInput = {
+      role: UserRole.USER,
+      ...(status ? { membership: { status } } : {}),
+      ...(search && {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+        ],
+      }),
+      // Date range filter
+      ...((startOfCreatedFrom || endOfCreatedTo) && {
+        createdAt: {
+          ...(startOfCreatedFrom && { gte: startOfCreatedFrom }),
+          ...(endOfCreatedTo && { lte: endOfCreatedTo }),
+        },
+      }),
+      // Gender filter (lives in UserInfo)
+      ...(gender && {
+        userInfo: { gender },
+      }),
+    }
+
+    const [members, total] = await prisma.$transaction([
+      prisma.user.findMany({
+        where,
+        include: {
+          userInfo: true,
+          bankAccounts: true,
+          nextOfKin: true,
+          membership: true,
+        },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        orderBy: {
+          [sortField]: sortDirection,
+        },
+      }),
+      prisma.user.count({
+        where,
+      }),
+    ])
+
+    return {
+      success: true,
+      data: members,
+      meta: { total, page, pageSize, totalPages: Math.ceil(total / pageSize) },
+    }
   } catch (error) {
-    return { success: false, data: [], error: error as Error }
+    return {
+      success: false,
+      data: [],
+      error: error as Error,
+      meta: { total: 0, page: 1, pageSize: 5, totalPages: 1 },
+    }
   }
 }
 
