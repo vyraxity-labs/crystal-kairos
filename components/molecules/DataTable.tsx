@@ -6,6 +6,7 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   OnChangeFn,
+  RowSelectionState,
   SortingState,
   useReactTable,
   VisibilityState,
@@ -19,7 +20,7 @@ import {
   TableRow,
 } from '../ui/table'
 import { cn } from '@/lib/utils'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -38,6 +39,7 @@ interface TableProps<TData, TValues> {
   sorting: SortingState
   onSortingChange: OnChangeFn<SortingState>
   filterUI?: ReactNode
+  onSelectedRowsChange?: (rows: TData[]) => void
 }
 
 const DataTable = <TData, TValues>({
@@ -48,9 +50,10 @@ const DataTable = <TData, TValues>({
   sorting,
   filterUI,
   onSortingChange,
+  onSelectedRowsChange,
 }: TableProps<TData, TValues>) => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = useState({})
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const { t } = useTranslation('common')
 
   const table = useReactTable({
@@ -65,6 +68,14 @@ const DataTable = <TData, TValues>({
     state: { sorting, columnVisibility, rowSelection },
   })
 
+  useEffect(() => {
+    if (!onSelectedRowsChange) return
+    const selectedRows = table
+      .getSelectedRowModel()
+      .rows.map((row) => row.original)
+    onSelectedRowsChange(selectedRows)
+  }, [rowSelection, data, onSelectedRowsChange, table])
+
   return (
     <div>
       <div className='flex mb-4 gap-2'>
@@ -76,23 +87,50 @@ const DataTable = <TData, TValues>({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end' className='rounded-md'>
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
+            {(() => {
+              const hideAbleColumns = table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+              const areAllHideAbleColumnsVisible = hideAbleColumns.every(
+                (column) => column.getIsVisible(),
+              )
+
+              return (
+                <>
+                  {hideAbleColumns.map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                        className='capitalize cursor-pointer hover:bg-surface-container-low rounded-sm'
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    )
+                  })}
+                  {hideAbleColumns.length > 0 && (
+                    <div className='my-1 h-px bg-outline-variant' />
+                  )}
                   <DropdownMenuCheckboxItem
-                    key={column.id}
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                    className='capitalize cursor-pointer hover:bg-surface-container-low rounded-sm'
+                    checked={areAllHideAbleColumnsVisible}
+                    onCheckedChange={(value) => {
+                      const shouldShowAll = !!value
+                      hideAbleColumns.forEach((column) => {
+                        column.toggleVisibility(shouldShowAll)
+                      })
+                    }}
+                    className='capitalize cursor-pointer hover:bg-surface-container-low rounded-sm font-medium'
                   >
-                    {column.id}
+                    {areAllHideAbleColumnsVisible
+                      ? t('table.filters.hide_all_columns')
+                      : t('table.filters.show_all_columns')}
                   </DropdownMenuCheckboxItem>
-                )
-              })}
+                </>
+              )
+            })()}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -46,7 +46,9 @@
         "to_label": "To",
         "to_empty": "Select a date",
         "clear": "Clear"
-      }
+      },
+      "download_all": "Download All",
+      "download_selected": "Download Selected"
     }
   },
   "buttons": {

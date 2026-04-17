@@ -97,6 +97,9 @@ const MembersData = () => {
   )
   const [sorting, setSorting] = useState<SortingState>([])
   const [search, setSearch] = useState('')
+  const [selectedMembers, setSelectedMembers] = useState<MemberTableColumns[]>(
+    [],
+  )
   const [createdFrom, setCreatedFrom] = useState<Date | undefined>(
     rawCreatedFrom ? new Date(rawCreatedFrom) : undefined,
   )
@@ -169,6 +172,7 @@ const MembersData = () => {
         emptyText={t('table.body.empty')}
         sorting={sorting}
         onSortingChange={setSorting}
+        onSelectedRowsChange={setSelectedMembers}
         filterUI={
           <MembersFilterUI
             search={search}
@@ -182,9 +186,15 @@ const MembersData = () => {
             createdTo={createdTo}
             setCreatedFrom={setCreatedFrom}
             setCreatedTo={setCreatedTo}
+            selectedRows={selectedMembers}
           />
         }
       />
+      {selectedMembers.length > 0 && (
+        <p className='mt-2 text-sm text-muted-foreground'>
+          {selectedMembers.length} member(s) selected
+        </p>
+      )}
       <TablePagination
         page={page}
         totalPages={meta.totalPages}

@@ -2,7 +2,14 @@
 
 import { useTranslation } from 'react-i18next'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '../ui/input-group'
-import { CheckIcon, ListFilter, SearchIcon, X } from 'lucide-react'
+import {
+  CheckIcon,
+  CopyIcon,
+  DownloadIcon,
+  ListFilter,
+  SearchIcon,
+  X,
+} from 'lucide-react'
 import { Button } from '../ui/button'
 import useMediaQuery from '@/hooks/useMediaQuery'
 import { breakpoints } from '@/lib/breakpoints'
@@ -31,6 +38,7 @@ import { Field, FieldLabel } from '../ui/field'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { format } from 'date-fns'
 import { Calendar } from '../ui/calendar'
+import { MemberTableColumns } from '@/types/members.interface'
 
 const genderOptions = [
   {
@@ -80,6 +88,7 @@ const MembersFilterUI = ({
   createdTo,
   setCreatedFrom,
   setCreatedTo,
+  selectedRows,
 }: {
   search: string
   setSearch: (val: string) => void
@@ -92,6 +101,7 @@ const MembersFilterUI = ({
   createdTo: Date | undefined
   setCreatedFrom: (val: Date | undefined) => void
   setCreatedTo: (val: Date | undefined) => void
+  selectedRows: MemberTableColumns[]
 }) => {
   const { t } = useTranslation('admin-members')
   const md = useMediaQuery(breakpoints.md)
@@ -132,155 +142,181 @@ const MembersFilterUI = ({
         )}
       </InputGroup>
 
-      <DropdownMenu open={open} onOpenChange={setOpen}>
-        <DropdownMenuTrigger>
-          <Button
-            variant='outline'
-            size={md ? 'default' : 'icon'}
-            className='rounded-sm'
-            onClick={() => setOpen(true)}
+      <div className='flex gap-2'>
+        <Button
+          variant='outline'
+          className='rounded-sm'
+          title={
+            selectedRows.length === 0
+              ? t('table.filters.download_all')
+              : t('table.filters.download_selected')
+          }
+        >
+          <DownloadIcon />{' '}
+          <span
+            className={cn(
+              'hidden',
+              sidebarIsCollapsed ? 'md:block' : 'hidden lg:block',
+            )}
           >
-            <article className='relative text-success'>
-              <ListFilter />
-              {isFiltered && (
-                <span className='flex w-2 aspect-square bg-error rounded-full absolute top-0'></span>
-              )}
-            </article>
-            <span
-              className={cn(
-                'hidden',
-                sidebarIsCollapsed ? 'md:block' : 'hidden lg:block',
-              )}
+            {selectedRows.length === 0
+              ? t('table.filters.download_all')
+              : t('table.filters.download_selected')}
+          </span>
+        </Button>
+        <DropdownMenu open={open} onOpenChange={setOpen}>
+          <DropdownMenuTrigger>
+            <Button
+              variant='outline'
+              size={md ? 'default' : 'icon'}
+              className='rounded-sm'
+              onClick={() => setOpen(true)}
             >
-              {t('table.filters.filter')}
-            </span>
-          </Button>
-        </DropdownMenuTrigger>
+              <article className='relative text-success'>
+                <ListFilter />
+                {isFiltered && (
+                  <span className='flex w-2 aspect-square bg-error rounded-full absolute top-0'></span>
+                )}
+              </article>
+              <span
+                className={cn(
+                  'hidden',
+                  sidebarIsCollapsed ? 'md:block' : 'hidden lg:block',
+                )}
+              >
+                {t('table.filters.filter')}
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
 
-        <DropdownMenuContent className='rounded-md min-w-72'>
-          <DropdownMenuGroup>
-            <DropdownMenuLabel>
-              {t('table.filters.gender.label')}
-            </DropdownMenuLabel>
-            <div className='grid grid-cols-3 gap-1'>
-              {genderOptions.map((item) => {
-                return (
-                  <DropdownMenuItem
-                    className={cn(
-                      'flex justify-center rounded-sm py-1.5',
-                      gender === item.value
-                        ? 'bg-surface-container-high text-on-surface'
-                        : '',
-                    )}
-                    key={item.id}
-                    onClick={() => setGender(item.value)}
+          <DropdownMenuContent className='rounded-md min-w-72'>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>
+                {t('table.filters.gender.label')}
+              </DropdownMenuLabel>
+              <div className='grid grid-cols-3 gap-1'>
+                {genderOptions.map((item) => {
+                  return (
+                    <Button
+                      className={cn(
+                        'flex justify-center rounded-sm py-1.5',
+                        gender === item.value
+                          ? 'bg-surface-container-high text-on-surface'
+                          : '',
+                      )}
+                      key={item.id}
+                      onClick={() => setGender(item.value)}
+                      variant={gender === item.value ? 'outline' : 'ghost'}
+                    >
+                      {gender === item.value && <CheckIcon />}
+                      {t(item.label)}
+                    </Button>
+                  )
+                })}
+                {gender && (
+                  <Button
+                    variant='ghost'
+                    className='text-error'
+                    onClick={() => setGender(null)}
                   >
-                    {gender === item.value && <CheckIcon />}
-                    {t(item.label)}
-                  </DropdownMenuItem>
-                )
-              })}
-              {gender && (
+                    {t('table.filters.gender.clear')}
+                  </Button>
+                )}
+              </div>
+            </DropdownMenuGroup>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>
+                {t('table.filters.status.label')}
+              </DropdownMenuLabel>
+
+              <div className='flex items-center'>
+                <Select
+                  value={status || undefined}
+                  onValueChange={(value: MembershipStatus) => setStatus(value)}
+                >
+                  <SelectTrigger className='w-full rounded-sm'>
+                    <SelectValue
+                      placeholder={t('table.filters.status.empty')}
+                    />
+                  </SelectTrigger>
+                  <SelectContent className='rounded-md'>
+                    {statusOptions.map((item) => {
+                      return (
+                        <SelectItem key={item.id} value={item.value}>
+                          {t(item.label)}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+                {status && (
+                  <Button
+                    variant='ghost'
+                    className='text-error'
+                    onClick={() => setStatus(null)}
+                  >
+                    {t('table.filters.status.clear')}
+                  </Button>
+                )}
+              </div>
+            </DropdownMenuGroup>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>
+                {t('table.filters.date_joined.label')}
+              </DropdownMenuLabel>
+
+              <div className='flex items-center gap-3'>
+                <DateFilter
+                  date={createdFrom}
+                  label='table.filters.date_joined.from_label'
+                  empty='table.filters.date_joined.from_empty'
+                  setDate={setCreatedFrom}
+                  id='from-date'
+                  min={new Date('01-01-1970')}
+                  max={createdTo || new Date()}
+                />
+                <DateFilter
+                  date={createdTo}
+                  label='table.filters.date_joined.to_label'
+                  empty='table.filters.date_joined.to_empty'
+                  setDate={setCreatedTo}
+                  id='to-date'
+                  min={createdFrom || new Date('01-01-1970')}
+                  max={new Date()}
+                />
+              </div>
+              <article className='flex justify-end'>
                 <Button
                   variant='ghost'
                   className='text-error'
-                  onClick={() => setGender(null)}
+                  onClick={() => {
+                    setCreatedFrom(undefined)
+                    setCreatedTo(undefined)
+                  }}
                 >
-                  {t('table.filters.gender.clear')}
+                  {t('table.filters.date_joined.clear')}
                 </Button>
-              )}
-            </div>
-          </DropdownMenuGroup>
+              </article>
+            </DropdownMenuGroup>
 
-          <DropdownMenuSeparator />
+            <DropdownMenuSeparator />
 
-          <DropdownMenuGroup>
-            <DropdownMenuLabel>
-              {t('table.filters.status.label')}
-            </DropdownMenuLabel>
-
-            <div className='flex items-center'>
-              <Select
-                value={status || undefined}
-                onValueChange={(value: MembershipStatus) => setStatus(value)}
-              >
-                <SelectTrigger className='w-full rounded-sm'>
-                  <SelectValue placeholder={t('table.filters.status.empty')} />
-                </SelectTrigger>
-                <SelectContent className='rounded-md'>
-                  {statusOptions.map((item) => {
-                    return (
-                      <SelectItem key={item.id} value={item.value}>
-                        {t(item.label)}
-                      </SelectItem>
-                    )
-                  })}
-                </SelectContent>
-              </Select>
-              {status && (
-                <Button
-                  variant='ghost'
-                  className='text-error'
-                  onClick={() => setStatus(null)}
-                >
-                  {t('table.filters.status.clear')}
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={clearFilters}>
+                <Button variant='ghost' className='w-full text-error'>
+                  {t('buttons.clear_all')}
                 </Button>
-              )}
-            </div>
-          </DropdownMenuGroup>
-
-          <DropdownMenuSeparator />
-
-          <DropdownMenuGroup>
-            <DropdownMenuLabel>
-              {t('table.filters.date_joined.label')}
-            </DropdownMenuLabel>
-
-            <div className='flex items-center gap-3'>
-              <DateFilter
-                date={createdFrom}
-                label='table.filters.date_joined.from_label'
-                empty='table.filters.date_joined.from_empty'
-                setDate={setCreatedFrom}
-                id='from-date'
-                min={new Date('01-01-1970')}
-                max={createdTo || new Date()}
-              />
-              <DateFilter
-                date={createdTo}
-                label='table.filters.date_joined.to_label'
-                empty='table.filters.date_joined.to_empty'
-                setDate={setCreatedTo}
-                id='to-date'
-                min={createdFrom || new Date('01-01-1970')}
-                max={new Date()}
-              />
-            </div>
-            <article className='flex justify-end'>
-              <Button
-                variant='ghost'
-                className='text-error'
-                onClick={() => {
-                  setCreatedFrom(undefined)
-                  setCreatedTo(undefined)
-                }}
-              >
-                {t('table.filters.date_joined.clear')}
-              </Button>
-            </article>
-          </DropdownMenuGroup>
-
-          <DropdownMenuSeparator />
-
-          <DropdownMenuGroup>
-            <DropdownMenuItem onClick={clearFilters}>
-              <Button variant='ghost' className='w-full text-error'>
-                {t('buttons.clear_all')}
-              </Button>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   )
 }
