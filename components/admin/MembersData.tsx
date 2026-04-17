@@ -16,7 +16,8 @@ import { SortingState } from '@tanstack/react-table'
 import MembersFilterUI from './MembersFilterUI'
 
 const statusMap = (status: string) => {
-  switch (status) {
+  const iStatus = status.toLowerCase()
+  switch (iStatus) {
     case 'pending':
       return MembershipStatus.PENDING
     case 'approved':
@@ -30,6 +31,18 @@ const statusMap = (status: string) => {
   }
 }
 
+const genderMap = (gender: string) => {
+  const iGender = gender.toLowerCase()
+  switch (iGender) {
+    case 'male':
+      return Gender.MALE
+    case 'female':
+      return Gender.FEMALE
+    default:
+      return Gender.MALE
+  }
+}
+
 const FILTER_KEYS: (keyof AllMembersQueryParams)[] = [
   'search',
   'createdFrom',
@@ -37,6 +50,22 @@ const FILTER_KEYS: (keyof AllMembersQueryParams)[] = [
   'status',
   'gender',
 ]
+
+const hasActiveFilterValue = (
+  key: keyof AllMembersQueryParams,
+  value: AllMembersQueryParams[keyof AllMembersQueryParams],
+) => {
+  if (value === undefined || value === null) return false
+
+  if (key === 'search')
+    return typeof value === 'string' && value.trim().length > 0
+
+  if (key === 'createdFrom' || key === 'createdTo') {
+    return value instanceof Date && !Number.isNaN(value.getTime())
+  }
+
+  return true
+}
 
 const MembersData = () => {
   const params = useSearchParams()
@@ -57,11 +86,23 @@ const MembersData = () => {
   })
   const { t } = useTranslation('admin-members')
   const rawStatus = params.get('status')
+  const rawGender = params.get('gender')
+  const rawCreatedFrom = params.get('createdFrom')
+  const rawCreatedTo = params.get('createdTo')
   const [status, setStatus] = useState<MembershipStatus | null>(
     rawStatus ? statusMap(rawStatus) : null,
   )
+  const [gender, setGender] = useState<Gender | null>(
+    rawGender ? genderMap(rawGender) : null,
+  )
   const [sorting, setSorting] = useState<SortingState>([])
   const [search, setSearch] = useState('')
+  const [createdFrom, setCreatedFrom] = useState<Date | undefined>(
+    rawCreatedFrom ? new Date(rawCreatedFrom) : undefined,
+  )
+  const [createdTo, setCreatedTo] = useState<Date | undefined>(
+    rawCreatedTo ? new Date(rawCreatedTo) : undefined,
+  )
 
   const sortField = sorting[0]?.id ?? 'createdAt'
   const sortDirection = sorting[0]?.desc ? 'desc' : 'asc'
@@ -73,13 +114,16 @@ const MembersData = () => {
     sortDirection,
     status: status as MembershipStatus,
     search,
+    gender: gender ?? undefined,
+    createdFrom,
+    createdTo,
   }
 
-  const isFiltered = useMemo(
-    () => FILTER_KEYS.some((key) => filterOptions[key] !== undefined),
-    [filterOptions],
-  )
-  console.log('FILTER ==>', isFiltered)
+  const isFiltered = useMemo(() => {
+    return FILTER_KEYS.some((key) =>
+      hasActiveFilterValue(key, filterOptions[key]),
+    )
+  }, [filterOptions])
 
   useEffect(() => {
     const getMembers = async () => {
@@ -104,7 +148,17 @@ const MembersData = () => {
     }
 
     getMembers()
-  }, [page, size, sortField, sortDirection, status, search])
+  }, [
+    page,
+    size,
+    sortField,
+    sortDirection,
+    status,
+    search,
+    gender,
+    createdFrom,
+    createdTo,
+  ])
 
   return (
     <div>
@@ -120,6 +174,14 @@ const MembersData = () => {
             search={search}
             setSearch={setSearch}
             isFiltered={isFiltered}
+            gender={gender}
+            setGender={setGender}
+            status={status}
+            setStatus={setStatus}
+            createdFrom={createdFrom}
+            createdTo={createdTo}
+            setCreatedFrom={setCreatedFrom}
+            setCreatedTo={setCreatedTo}
           />
         }
       />

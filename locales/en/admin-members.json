@@ -23,10 +23,34 @@
       "search": {
         "placeholder": "Search by name or email"
       },
-      "filter": "Filter"
+      "filter": "Filter",
+      "gender": {
+        "label": "Gender",
+        "male": "Male",
+        "female": "Female",
+        "clear": "Clear"
+      },
+      "status": {
+        "label": "Status",
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "expired": "Expired",
+        "empty": "Select a status",
+        "clear": "Clear"
+      },
+      "date_joined": {
+        "label": "Date Joined",
+        "from_label": "From",
+        "from_empty": "Select a date",
+        "to_label": "To",
+        "to_empty": "Select a date",
+        "clear": "Clear"
+      }
     }
   },
   "buttons": {
-    "view": "View"
+    "view": "View",
+    "clear_all": "Clear Filters"
   }
 }

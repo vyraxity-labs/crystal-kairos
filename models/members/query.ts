@@ -28,6 +28,17 @@ export const getAllMembers = async (filters: AllMembersQueryParams) => {
           { email: { contains: search, mode: 'insensitive' } },
         ],
       }),
+      // Date range filter
+      ...((createdFrom || createdTo) && {
+        createdAt: {
+          ...(createdFrom && { gte: createdFrom }),
+          ...(createdTo && { lte: createdTo }),
+        },
+      }),
+      // Gender filter (lives in UserInfo)
+      ...(gender && {
+        userInfo: { gender },
+      }),
     }
 
     const [members, total] = await prisma.$transaction([
