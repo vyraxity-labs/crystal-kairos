@@ -15,32 +15,24 @@ import { useTranslation } from 'react-i18next'
 import { SortingState } from '@tanstack/react-table'
 import MembersFilterUI from './MembersFilterUI'
 
-const statusMap = (status: string) => {
-  const iStatus = status.toLowerCase()
-  switch (iStatus) {
-    case 'pending':
-      return MembershipStatus.PENDING
-    case 'approved':
-      return MembershipStatus.APPROVED
-    case 'rejected':
-      return MembershipStatus.REJECTED
-    case 'expired':
-      return MembershipStatus.EXPIRED
-    default:
-      return MembershipStatus.PENDING
-  }
+const statusEnumMap: Record<string, MembershipStatus> = {
+  pending: MembershipStatus.PENDING,
+  approved: MembershipStatus.APPROVED,
+  rejected: MembershipStatus.REJECTED,
+  expired: MembershipStatus.EXPIRED,
 }
 
-const genderMap = (gender: string) => {
-  const iGender = gender.toLowerCase()
-  switch (iGender) {
-    case 'male':
-      return Gender.MALE
-    case 'female':
-      return Gender.FEMALE
-    default:
-      return Gender.MALE
-  }
+const statusMap = (status: string): MembershipStatus => {
+  return statusEnumMap[status.toLowerCase()] ?? MembershipStatus.PENDING
+}
+
+const genderEnumMap: Record<string, Gender> = {
+  male: Gender.MALE,
+  female: Gender.FEMALE,
+}
+
+const genderMap = (gender: string): Gender => {
+  return genderEnumMap[gender.toLowerCase()] ?? Gender.MALE
 }
 
 const FILTER_KEYS: (keyof AllMembersQueryParams)[] = [
@@ -110,17 +102,30 @@ const MembersData = () => {
   const sortField = sorting[0]?.id ?? 'createdAt'
   const sortDirection = sorting[0]?.desc ? 'desc' : 'asc'
 
-  const filterOptions: AllMembersQueryParams = {
-    page,
-    pageSize: size,
-    sortField,
-    sortDirection,
-    status: status as MembershipStatus,
-    search,
-    gender: gender ?? undefined,
-    createdFrom,
-    createdTo,
-  }
+  const filterOptions: AllMembersQueryParams = useMemo(
+    () => ({
+      page,
+      pageSize: size,
+      sortField,
+      sortDirection,
+      status: status as MembershipStatus,
+      search,
+      gender: gender ?? undefined,
+      createdFrom,
+      createdTo,
+    }),
+    [
+      page,
+      size,
+      sortField,
+      sortDirection,
+      status,
+      search,
+      gender,
+      createdFrom,
+      createdTo,
+    ],
+  )
 
   const isFiltered = useMemo(() => {
     return FILTER_KEYS.some((key) =>
@@ -151,17 +156,7 @@ const MembersData = () => {
     }
 
     getMembers()
-  }, [
-    page,
-    size,
-    sortField,
-    sortDirection,
-    status,
-    search,
-    gender,
-    createdFrom,
-    createdTo,
-  ])
+  }, [filterOptions])
 
   return (
     <div>

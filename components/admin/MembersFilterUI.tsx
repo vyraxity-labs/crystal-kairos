@@ -170,14 +170,13 @@ const MembersFilterUI = ({
               variant='outline'
               size={md ? 'default' : 'icon'}
               className='rounded-sm'
-              onClick={() => setOpen(true)}
             >
-              <article className='relative text-success'>
+              <div className='relative text-success'>
                 <ListFilter />
                 {isFiltered && (
                   <span className='flex w-2 aspect-square bg-error rounded-full absolute top-0'></span>
                 )}
-              </article>
+              </div>
               <span
                 className={cn(
                   'hidden',
@@ -291,7 +290,7 @@ const MembersFilterUI = ({
                   max={new Date()}
                 />
               </div>
-              <article className='flex justify-end'>
+              <div className='flex justify-end'>
                 <Button
                   variant='ghost'
                   className='text-error'
@@ -302,7 +301,7 @@ const MembersFilterUI = ({
                 >
                   {t('table.filters.date_joined.clear')}
                 </Button>
-              </article>
+              </div>
             </DropdownMenuGroup>
 
             <DropdownMenuSeparator />

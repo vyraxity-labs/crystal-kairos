@@ -57,7 +57,10 @@ export const columns: ColumnDef<MemberTableColumns>[] = [
       const value = row.getValue('gender') as Gender
       return (
         <span className='flex justify-center items-center text-xs'>
-          {value}
+          <TranslatedContent
+            ns='admin-members'
+            label={`table.filters.gender.${value.toLowerCase()}`}
+          />
         </span>
       )
     },

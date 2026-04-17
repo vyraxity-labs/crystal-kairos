@@ -19,11 +19,11 @@ export const getAllMembers = async (filters: AllMembersQueryParams) => {
       gender,
     } = filters
 
-    const endOfCreatedFrom = createdFrom
-      ? new Date(createdFrom.setHours(23, 59, 59, 999))
+    const startOfCreatedFrom = createdFrom
+      ? new Date(new Date(createdFrom).setHours(0, 0, 0, 0))
       : undefined
     const endOfCreatedTo = createdTo
-      ? new Date(createdTo.setHours(23, 59, 59, 999))
+      ? new Date(new Date(createdTo).setHours(23, 59, 59, 999))
       : undefined
 
     const where: Prisma.UserWhereInput = {
@@ -36,10 +36,10 @@ export const getAllMembers = async (filters: AllMembersQueryParams) => {
         ],
       }),
       // Date range filter
-      ...((createdFrom || createdTo) && {
+      ...((startOfCreatedFrom || endOfCreatedTo) && {
         createdAt: {
-          ...(createdFrom && { gte: endOfCreatedFrom }),
-          ...(createdTo && { lte: endOfCreatedTo }),
+          ...(startOfCreatedFrom && { gte: startOfCreatedFrom }),
+          ...(endOfCreatedTo && { lte: endOfCreatedTo }),
         },
       }),
       // Gender filter (lives in UserInfo)

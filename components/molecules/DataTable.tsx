@@ -74,7 +74,7 @@ const DataTable = <TData, TValues>({
       .getSelectedRowModel()
       .rows.map((row) => row.original)
     onSelectedRowsChange(selectedRows)
-  }, [rowSelection, data, onSelectedRowsChange, table])
+  }, [rowSelection, data, onSelectedRowsChange])
 
   return (
     <div>
