@@ -1,6 +1,6 @@
 'use client'
 
-import { ComponentType, ReactNode, SVGProps } from 'react'
+import { ComponentType, ReactElement, SVGProps } from 'react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,12 +11,12 @@ import { BookPlus, PackagePlus, TicketPlus, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 
-const AddPopUp = ({ trigger }: { trigger: ReactNode }) => {
+const AddPopUp = ({ trigger }: { trigger: ReactElement }) => {
   const { t } = useTranslation('admin')
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className='w-full'>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
 
       <DropdownMenuContent className='rounded-md'>
         <AddMenuItem

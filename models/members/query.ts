@@ -51,11 +51,23 @@ export const getAllMembers = async (filters: AllMembersQueryParams) => {
     const [members, total] = await prisma.$transaction([
       prisma.user.findMany({
         where,
-        include: {
-          userInfo: true,
-          bankAccounts: true,
-          nextOfKin: true,
-          membership: true,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          createdAt: true,
+          userInfo: {
+            select: {
+              phoneNumber: true,
+              gender: true,
+            },
+          },
+          membership: {
+            select: {
+              status: true,
+              interests: true,
+            },
+          },
         },
         skip: (page - 1) * pageSize,
         take: pageSize,

@@ -165,7 +165,7 @@ const MembersFilterUI = ({
           </span>
         </Button>
         <DropdownMenu open={open} onOpenChange={setOpen}>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>
             <Button
               variant='outline'
               size={md ? 'default' : 'icon'}
