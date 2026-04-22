@@ -1,15 +1,18 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { getRequiredEnv } from '@/lib/env'
 import { render } from 'react-email'
 import { MemberRegisteredEmail } from '../templates/system/member-registered'
-import { use } from 'react'
 import { format } from 'date-fns'
 import { sendEmail } from '../channels/email.channel'
 import { NotificationEventType, UserRole } from '@/generated/prisma/enums'
-import MemberRegisteredAdminEmail from '@/emails/member-registered-admin'
+import MemberRegisteredAdminEmail from '../templates/system/member-registered-admin'
 
 export const onMemberRegistered = async (userId: string) => {
+  const appUrl = getRequiredEnv('NEXT_PUBLIC_APP_URL')
+  const adminEmail = getRequiredEnv('ADMIN_EMAIL')
+
   const user = await prisma.user.findUnique({
     where: {
       id: userId,
@@ -22,7 +25,7 @@ export const onMemberRegistered = async (userId: string) => {
     MemberRegisteredEmail({
       memberName: user.name,
       applicationDate: format(new Date(), 'MMMM d, yyyy'),
-      appUrl: process.env.NEXT_PUBLIC_APP_URL as string,
+      appUrl,
     }),
   )
 
@@ -39,7 +42,7 @@ export const onMemberRegistered = async (userId: string) => {
     MemberRegisteredAdminEmail({
       name: user.name,
       email: user.email,
-      url: `${process.env.NEXT_PUBLIC_APP_URL}/admin/members`,
+      url: `${appUrl}/admin/members`,
     }),
   )
 
@@ -50,10 +53,10 @@ export const onMemberRegistered = async (userId: string) => {
   })
 
   await sendEmail({
-    to: process.env.ADMIN_EMAIL!,
+    to: adminEmail,
     subject: 'New Member Registered - Crystal Kairos',
     html: adminHtml,
     type: NotificationEventType.MEMBER_REGISTERED,
-    recipientId: owner?.id || '1',
+    recipientId: owner?.id || user.id,
   })
 }

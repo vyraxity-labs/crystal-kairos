@@ -106,7 +106,11 @@ export const register = async (
     })
 
     if (user) {
-      await onMemberRegistered(user.id)
+      try {
+        await onMemberRegistered(user.id)
+      } catch (error) {
+        console.error('Registration notification failed:', error)
+      }
     }
 
     return { success: true, message: 'Registration successful', user }

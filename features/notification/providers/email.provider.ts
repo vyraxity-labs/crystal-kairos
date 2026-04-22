@@ -1,5 +1,6 @@
 import { BrevoClient } from '@getbrevo/brevo'
+import { getRequiredEnv } from '@/lib/env'
 
 export const brevo = new BrevoClient({
-  apiKey: process.env.BREVO_API_KEY as string,
+  apiKey: getRequiredEnv('BREVO_API_KEY'),
 })
