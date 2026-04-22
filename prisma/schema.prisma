@@ -65,22 +65,50 @@ enum MembershipTier {
   GOLD_MEMBER // Savings participant
 }
 
+enum NotificationChannel {
+  EMAIL
+  IN_APP
+  PUSH
+  SMS
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  READ
+}
+
+enum NotificationEventType {
+  // System-triggered
+  MEMBER_REGISTERED
+  MEMBERSHIP_APPROVED
+  MEMBERSHIP_REJECTED
+  MEMBERSHIP_EXPIRED
+  PASSWORD_SET
+  // Admin-triggered
+  CUSTOM
+}
+
 // ============================================
 // CORE USER MODELS
 // ============================================
 model User {
-  id             String    @id @default(uuid())
-  email          String    @unique
-  username       String    @unique @default(uuid())
-  name           String
-  passwordHash   String? // Optional: null until user sets password
-  photoUrl       String?
-  role           UserRole  @default(USER)
-  emailVerified  DateTime? // For email verification
-  hasSetPassword Boolean   @default(false) // Track if user has activated account
-  lastLoginAt    DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id                     String         @id @default(uuid())
+  email                  String         @unique
+  username               String         @unique @default(uuid())
+  name                   String
+  passwordHash           String? // Optional: null until user sets password
+  photoUrl               String?
+  role                   UserRole       @default(USER)
+  emailVerified          DateTime? // For email verification
+  hasSetPassword         Boolean        @default(false) // Track if user has activated account
+  lastLoginAt            DateTime?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  receivedNotifications  Notification[] @relation("ReceivedNotifications")
+  triggeredNotifications Notification[] @relation("TriggeredNotifications")
 
   // Relations
   accounts     Account[]
@@ -197,4 +225,55 @@ model Membership {
   user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("memberships")
+}
+
+model NotificationTemplate {
+  id          String   @id @default(uuid())
+  name        String   @unique // e.g. "welcome_email"
+  subject     String
+  htmlBody    String // HTML with {{variable}} placeholders
+  variables   String[] // list of variable names e.g. ["memberName", "date"]
+  description String?
+  isSystem    Boolean  @default(false) // system templates can't be deleted
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  notifications Notification[]
+
+  @@map("notification_templates")
+}
+
+model Notification {
+  id      String                @id @default(uuid())
+  type    NotificationEventType
+  channel NotificationChannel
+  status  NotificationStatus    @default(PENDING)
+
+  // Who sent it
+  triggeredBy String? // userId of admin, null = system
+
+  // Who receives it
+  recipientId String // userId
+
+  // Content
+  subject    String?
+  body       String // final rendered HTML or text
+  templateId String?
+  variables  Json? // snapshot of variables used
+
+  // Metadata
+  externalId  String? // e.g. Resend message ID
+  errorMsg    String?
+  readAt      DateTime?
+  sentAt      DateTime?
+  deliveredAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipient User                  @relation("ReceivedNotifications", fields: [recipientId], references: [id])
+  triggerer User?                 @relation("TriggeredNotifications", fields: [triggeredBy], references: [id])
+  template  NotificationTemplate? @relation(fields: [templateId], references: [id])
+
+  @@map("notifications")
 }
