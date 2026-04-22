@@ -1,6 +1,7 @@
 'use server'
 
 import { assumptionsData } from '@/components/auth/registration-steps/data'
+import { onMemberRegistered } from '@/features/notification/triggers/member.triggers'
 import { prisma } from '@/lib/prisma'
 import {
   bankInfoSchema,
@@ -26,9 +27,12 @@ export const register = async (
 ) => {
   try {
     // Validations
-    personalInfoSchema.parse(personalInfo)
-    bankInfoSchema.parse(bankInfo)
-    nextOfKinSchema.parse(nextOfKin)
+    const parsedPersonalInfo = personalInfoSchema.parse({
+      ...personalInfo,
+      dateOfBirth: new Date(personalInfo.dateOfBirth),
+    })
+    const parsedBankInfo = bankInfoSchema.parse(bankInfo)
+    const parsedNextOfKin = nextOfKinSchema.parse(nextOfKin)
     membershipInfoSchema.parse(membershipInfo)
     reviewAndSubmitSchema.parse(reviewAndSubmit)
 
@@ -49,42 +53,42 @@ export const register = async (
     const { user } = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
         data: {
-          email: personalInfo.email,
-          name: personalInfo.name,
+          email: parsedPersonalInfo.email,
+          name: parsedPersonalInfo.name,
         },
       })
 
       await tx.userInfo.create({
         data: {
           userId: newUser.id,
-          address: personalInfo.address,
-          dateOfBirth: personalInfo.dateOfBirth,
-          gender: personalInfo.gender,
-          occupation: personalInfo.occupation,
-          phoneNumber: personalInfo.phoneNumber,
+          address: parsedPersonalInfo.address,
+          dateOfBirth: parsedPersonalInfo.dateOfBirth,
+          gender: parsedPersonalInfo.gender,
+          occupation: parsedPersonalInfo.occupation,
+          phoneNumber: parsedPersonalInfo.phoneNumber,
         },
       })
 
       await tx.bankAccount.create({
         data: {
           userId: newUser.id,
-          bankName: bankInfo.bankName,
-          accountNumber: bankInfo.accountNumber,
-          accountName: bankInfo.accountName,
+          bankName: parsedBankInfo.bankName,
+          accountNumber: parsedBankInfo.accountNumber,
+          accountName: parsedBankInfo.accountName,
         },
       })
 
       await tx.nextOfKin.create({
         data: {
           userId: newUser.id,
-          name: nextOfKin.name,
-          phoneNumber: nextOfKin.phoneNumber,
-          relationship: nextOfKin.relationship,
-          occupation: nextOfKin.occupation,
-          address: nextOfKin.address,
-          bankName: nextOfKin.bankName,
-          accountNumber: nextOfKin.accountNumber,
-          accountName: nextOfKin.accountName,
+          name: parsedNextOfKin.name,
+          phoneNumber: parsedNextOfKin.phoneNumber,
+          relationship: parsedNextOfKin.relationship,
+          occupation: parsedNextOfKin.occupation,
+          address: parsedNextOfKin.address,
+          bankName: parsedNextOfKin.bankName,
+          accountNumber: parsedNextOfKin.accountNumber,
+          accountName: parsedNextOfKin.accountName,
         },
       })
 
@@ -100,6 +104,10 @@ export const register = async (
 
       return { user: newUser }
     })
+
+    if (user) {
+      await onMemberRegistered(user.id)
+    }
 
     return { success: true, message: 'Registration successful', user }
   } catch (error) {
