@@ -1,3 +1,4 @@
+import { auth } from '@/auth'
 import Details from '@/components/admin/members/Details'
 import DetailsHeader from '@/components/admin/members/DetailsHeader'
 import { Button } from '@/components/ui/button'
@@ -12,6 +13,11 @@ const MemberDetailsPage = async ({
 }) => {
   const { memberId } = await params
   const memberDetails = (await getMemberById(memberId)).data
+  const session = await auth()
+
+  if (!session) return null
+
+  const adminId = session.user.id
 
   if (!memberDetails) {
     return (
@@ -56,7 +62,10 @@ const MemberDetailsPage = async ({
           phoneNumber: nextOfKin?.phoneNumber,
           relationship: nextOfKin?.relationship,
         }}
-        userId={memberDetails.id}
+        rejectionReason={memberDetails.membership?.rejectionReason || ''}
+        isRejected={
+          memberDetails.membership?.status === MembershipStatus.REJECTED
+        }
       />
     </div>
   )

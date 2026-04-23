@@ -1,9 +1,11 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { Prisma } from '@/generated/prisma/client'
 import { MembershipStatus, UserRole } from '@/generated/prisma/enums'
 import { prisma } from '@/lib/prisma'
 import { AllMembersQueryParams } from '@/types/members.interface'
+import { generateMembershipNumber } from '@/lib/membership-number'
 
 export const getAllMembers = async (filters: AllMembersQueryParams) => {
   try {
@@ -183,12 +185,41 @@ export const getMemberById = async (memberId: string) => {
   }
 }
 
-export const approveMember = async (userId: string) => {
+export const approveMember = async (userId: string, adminId: string) => {
+  try {
+    const membershipNumber = generateMembershipNumber()
+    const member = await prisma.membership.update({
+      where: { userId },
+      data: {
+        status: MembershipStatus.APPROVED,
+        approvedAt: new Date(),
+        approvedBy: adminId,
+        membershipNumber,
+      },
+    })
+    revalidatePath('/admin/members')
+    revalidatePath(`/admin/members/${userId}`)
+    return { success: true, data: member }
+  } catch (error) {
+    return { success: false, data: null, error: error as Error }
+  }
+}
+
+export const rejectMember = async (
+  userId: string,
+  adminId: string,
+  reason: string,
+) => {
   try {
     const member = await prisma.membership.update({
       where: { userId },
-      data: { status: MembershipStatus.APPROVED },
+      data: {
+        status: MembershipStatus.REJECTED,
+        rejectionReason: reason,
+      },
     })
+    revalidatePath('/admin/members')
+    revalidatePath(`/admin/members/${userId}`)
     return { success: true, data: member }
   } catch (error) {
     return { success: false, data: null, error: error as Error }

@@ -4,13 +4,18 @@ import BreadCrumb from '@/components/molecules/BreadCrumb'
 import StatusChip from '@/components/molecules/StatusChip'
 import { Button } from '@/components/ui/button'
 import { MembershipStatus } from '@/generated/prisma/enums'
-import { CopyIcon } from 'lucide-react'
+import { CheckCheck, ClipboardIcon, CopyCheck, CopyIcon } from 'lucide-react'
 import { breadcrumbData } from './data'
 import { cn } from '@/lib/utils'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { useTranslation } from 'react-i18next'
 import ApproveMemberDialog from './ApproveMemberDialog'
+import { useSession } from 'next-auth/react'
+import RejectMembershipDialog from './RejectMembershipDialog'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { COPIED_TIMEOUT } from '@/lib/constants'
 
 interface Props {
   name: string
@@ -22,6 +27,21 @@ interface Props {
 const DetailsHeader = ({ name, membershipNumber, status, userId }: Props) => {
   const { sidebarIsCollapsed } = useSelector((store: RootState) => store.nav)
   const { t } = useTranslation('admin-members')
+  const session = useSession()
+  const [isCopied, setIsCopied] = useState(false)
+
+  const handleCopy = () => {
+    if (membershipNumber) {
+      navigator.clipboard.writeText(membershipNumber)
+
+      setIsCopied(true)
+      toast.success(t('details.header.copied_to_clipboard'))
+
+      setTimeout(() => {
+        setIsCopied(false)
+      }, COPIED_TIMEOUT)
+    }
+  }
 
   return (
     <div className='mb-6'>
@@ -41,24 +61,40 @@ const DetailsHeader = ({ name, membershipNumber, status, userId }: Props) => {
       >
         <section className='flex items-center gap-2 mb-2'>
           <span className='flex text-xs text-muted-foreground'>
-            MembershipID:{' '}
+            {t('details.header.membership_number')}:{' '}
             {membershipNumber || t('details.header.not_yet_assigned')}
           </span>
           {membershipNumber && (
-            <Button variant='ghost' size='icon-sm'>
-              <CopyIcon />
+            <Button
+              variant='ghost'
+              size='icon-sm'
+              onClick={handleCopy}
+              className={cn(
+                isCopied
+                  ? 'text-success hover:text-success'
+                  : 'text-foreground',
+              )}
+              title={t('details.header.copy')}
+            >
+              {isCopied ? <CheckCheck /> : <ClipboardIcon />}
             </Button>
           )}
 
           <StatusChip status={status} />
         </section>
 
-        {status === MembershipStatus.PENDING && (
+        {status === MembershipStatus.PENDING && session && session.data && (
           <section className='flex gap-2'>
-            <Button variant='destructive' className='rounded-sm'>
-              Reject Membership
-            </Button>
-            <ApproveMemberDialog userId={userId} name={name} />
+            <RejectMembershipDialog
+              userId={userId}
+              name={name}
+              adminId={session.data.user.id}
+            />
+            <ApproveMemberDialog
+              userId={userId}
+              name={name}
+              adminId={session.data.user.id}
+            />
           </section>
         )}
       </div>

@@ -14,27 +14,37 @@ import {
 import { approveMember } from '@/models/members/query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 const ApproveMemberDialog = ({
   userId,
   name,
+  adminId,
 }: {
   userId: string
   name: string
+  adminId: string
 }) => {
   const { t } = useTranslation('admin-members')
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
 
   const approve = () => {
     toast.promise(
       async () => {
-        setLoading(true)
-        const response = await approveMember(userId)
-        setLoading(false)
-        setOpen(false)
-        return response.success
+        try {
+          setLoading(true)
+          const response = await approveMember(userId, adminId)
+          if (response.success) {
+            setOpen(false)
+            router.refresh()
+          }
+          return response.success
+        } finally {
+          setLoading(false)
+        }
       },
       {
         loading: t('details.dialogs.toasts.approve_loading'),
@@ -67,11 +77,11 @@ const ApproveMemberDialog = ({
                 className='rounded-sm'
                 disabled={loading}
               >
-                Cancel
+                {t('details.dialogs.approve.cancel')}
               </Button>
             </DialogClose>
             <Button className='rounded-sm' onClick={approve} disabled={loading}>
-              Approve
+              {t('details.dialogs.approve.approve')}
             </Button>
           </div>
         </DialogFooter>

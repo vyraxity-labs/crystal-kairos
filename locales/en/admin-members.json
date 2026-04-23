@@ -64,7 +64,10 @@
       },
       "not_yet_assigned": "Not Yet Assigned",
       "approve_membership": "Approve Membership",
-      "reject_membership": "Reject Membership"
+      "reject_membership": "Reject Membership",
+      "membership_number": "Membership ID",
+      "copy": "Copy Membership ID",
+      "copied_to_clipboard": "Membership ID copied to clipboard"
     },
     "personal_info": {
       "title": "Personal Info",
@@ -103,11 +106,22 @@
       "address": "Address",
       "relationship": "Relationship"
     },
+    "rejection": {
+      "title": "Rejection Reason"
+    },
     "dialogs": {
       "approve": {
         "title": "Approve Membership",
         "description": "Are you sure you want to approve {{name}}'s membership?",
         "approve": "Approve",
+        "cancel": "Cancel"
+      },
+      "reject": {
+        "title": "Reject Membership",
+        "description": "Are you sure you want to reject {{name}}'s membership?",
+        "label": "Rejection Reason",
+        "placeholder": "Enter the reason for rejecting the membership",
+        "reject": "Reject",
         "cancel": "Cancel"
       },
       "toasts": {
