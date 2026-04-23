@@ -39,9 +39,10 @@ const MemberDetailsPage = async ({
         membershipNumber={memberDetails.membership?.membershipNumber ?? null}
         status={memberDetails.membership?.status ?? MembershipStatus.PENDING}
         userId={memberDetails.id}
+        adminId={adminId}
       />
       <Details
-        personalIfo={{
+        personalInfo={{
           name: memberDetails.name,
           email: memberDetails.email,
           address: memberDetails.userInfo?.address,

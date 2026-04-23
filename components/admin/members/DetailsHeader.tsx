@@ -4,14 +4,13 @@ import BreadCrumb from '@/components/molecules/BreadCrumb'
 import StatusChip from '@/components/molecules/StatusChip'
 import { Button } from '@/components/ui/button'
 import { MembershipStatus } from '@/generated/prisma/enums'
-import { CheckCheck, ClipboardIcon, CopyCheck, CopyIcon } from 'lucide-react'
+import { CheckCheck, ClipboardIcon } from 'lucide-react'
 import { breadcrumbData } from './data'
 import { cn } from '@/lib/utils'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { useTranslation } from 'react-i18next'
 import ApproveMemberDialog from './ApproveMemberDialog'
-import { useSession } from 'next-auth/react'
 import RejectMembershipDialog from './RejectMembershipDialog'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -22,12 +21,18 @@ interface Props {
   membershipNumber: string | null
   status: MembershipStatus
   userId: string
+  adminId: string
 }
 
-const DetailsHeader = ({ name, membershipNumber, status, userId }: Props) => {
+const DetailsHeader = ({
+  name,
+  membershipNumber,
+  status,
+  userId,
+  adminId,
+}: Props) => {
   const { sidebarIsCollapsed } = useSelector((store: RootState) => store.nav)
   const { t } = useTranslation('admin-members')
-  const session = useSession()
   const [isCopied, setIsCopied] = useState(false)
 
   const handleCopy = () => {
@@ -83,17 +88,17 @@ const DetailsHeader = ({ name, membershipNumber, status, userId }: Props) => {
           <StatusChip status={status} />
         </section>
 
-        {status === MembershipStatus.PENDING && session && session.data && (
+        {status === MembershipStatus.PENDING && (
           <section className='flex gap-2'>
             <RejectMembershipDialog
               userId={userId}
               name={name}
-              adminId={session.data.user.id}
+              adminId={adminId}
             />
             <ApproveMemberDialog
               userId={userId}
               name={name}
-              adminId={session.data.user.id}
+              adminId={adminId}
             />
           </section>
         )}

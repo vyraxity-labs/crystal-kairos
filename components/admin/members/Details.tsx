@@ -7,14 +7,14 @@ import NextOfKinInfo from './NextOfKinInfo'
 import Rejection from './Rejection'
 
 const Details = ({
-  personalIfo,
+  personalInfo,
   bankInfo,
   tier,
   nextOfKinInfo,
   rejectionReason,
   isRejected,
 }: {
-  personalIfo: MemberDetails['personalInfo']
+  personalInfo: MemberDetails['personalInfo']
   bankInfo: MemberDetails['bankInfo'][]
   tier: MembershipTier
   nextOfKinInfo: MemberDetails['nextOfKinInfo']
@@ -24,7 +24,7 @@ const Details = ({
   return (
     <div className='grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]'>
       <div className='flex flex-col gap-8'>
-        <PersonalInfo data={personalIfo} />
+        <PersonalInfo data={personalInfo} />
         <BankInfo data={bankInfo} />
       </div>
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:flex lg:flex-col'>

@@ -59,6 +59,7 @@ const RejectMembershipDialog = ({
         try {
           setLoading(true)
           const response = await rejectMember(userId, adminId, formData.reason)
+          if (!response.success) throw new Error('Rejection failed failed')
           if (response.success) {
             setOpen(false)
             router.refresh()
@@ -132,7 +133,6 @@ const RejectMembershipDialog = ({
               </DialogClose>
               <Button
                 className='rounded-sm bg-error text-on-error hover:bg-error/80'
-                // onClick={approve}
                 disabled={loading}
               >
                 {t('details.dialogs.reject.reject')}

@@ -24,7 +24,7 @@ const BreadCrumb = ({ data }: { data: Data[] }) => {
         {data.map((item, index) => {
           const isLast = data.length - 1 === index
           return (
-            <BreadcrumbItem>
+            <BreadcrumbItem key={index}>
               {item.href ? (
                 <BreadcrumbLink href={item.href}>
                   {t(item.label)}

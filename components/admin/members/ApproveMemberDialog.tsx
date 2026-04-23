@@ -34,14 +34,13 @@ const ApproveMemberDialog = ({
   const approve = () => {
     toast.promise(
       async () => {
+        setLoading(true)
         try {
-          setLoading(true)
           const response = await approveMember(userId, adminId)
-          if (response.success) {
-            setOpen(false)
-            router.refresh()
-          }
-          return response.success
+          if (!response.success) throw new Error('Approval failed')
+          setOpen(false)
+          router.refresh()
+          return response.data
         } finally {
           setLoading(false)
         }

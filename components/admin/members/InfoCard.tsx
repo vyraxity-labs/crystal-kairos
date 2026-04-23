@@ -24,12 +24,9 @@ const InfoCard = ({
     >
       <CardHeader className='flex items-center'>
         {Icon && (
-          <Button
-            className='bg-primary/10 text-primary rounded-sm cursor-default hover:text-primary'
-            variant='ghost'
-          >
+          <div className='bg-primary/10 text-primary rounded-sm p-2 flex items-center justify-center'>
             <Icon size={20} />
-          </Button>
+          </div>
         )}
         <CardTitle
           className={cn(
