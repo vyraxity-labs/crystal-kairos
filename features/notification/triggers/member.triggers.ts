@@ -8,6 +8,8 @@ import { format } from 'date-fns'
 import { sendEmail } from '../channels/email.channel'
 import { NotificationEventType, UserRole } from '@/generated/prisma/enums'
 import MemberRegisteredAdminEmail from '../templates/system/member-registered-admin'
+import MembershipRejectedEmail from '../templates/system/membership-rejected'
+import MembershipApprovedEmail from '../templates/system/membership-approved'
 
 export const onMemberRegistered = async (userId: string) => {
   const appUrl = getRequiredEnv('NEXT_PUBLIC_APP_URL')
@@ -58,5 +60,65 @@ export const onMemberRegistered = async (userId: string) => {
     html: adminHtml,
     type: NotificationEventType.MEMBER_REGISTERED,
     recipientId: owner?.id || user.id,
+  })
+}
+
+export const onMembershipRejected = async (userId: string, reason: string) => {
+  const appUrl = getRequiredEnv('NEXT_PUBLIC_APP_URL')
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  })
+  if (!user) return
+
+  const html = await render(
+    MembershipRejectedEmail({
+      reason,
+      supportUrl: `${appUrl}/support`,
+      reviewUrl: `${appUrl}/membership/review`,
+    }),
+  )
+
+  await sendEmail({
+    to: user.email,
+    subject: 'Your Application Has Been Rejected – Crystal Kairos',
+    html,
+    type: NotificationEventType.MEMBERSHIP_REJECTED,
+    recipientId: user.id,
+  })
+}
+
+export const onMembershipApproved = async (
+  userId: string,
+  membershipNumber: string,
+  tier: string,
+) => {
+  const appUrl = getRequiredEnv('NEXT_PUBLIC_APP_URL')
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  })
+  if (!user) return
+
+  const html = await render(
+    MembershipApprovedEmail({
+      setPasswordUrl: `${appUrl}/auth/set-password`,
+      name: user.name,
+      email: user.email,
+      membershipNumber,
+      tier,
+    }),
+  )
+
+  await sendEmail({
+    to: user.email,
+    subject: 'Your Application Has Been Approved – Crystal Kairos',
+    html,
+    type: NotificationEventType.MEMBERSHIP_APPROVED,
+    recipientId: user.id,
   })
 }

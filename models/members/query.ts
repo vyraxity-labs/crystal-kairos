@@ -6,6 +6,10 @@ import { MembershipStatus, UserRole } from '@/generated/prisma/enums'
 import { prisma } from '@/lib/prisma'
 import { AllMembersQueryParams } from '@/types/members.interface'
 import { generateMembershipNumber } from '@/lib/membership-number'
+import {
+  onMembershipApproved,
+  onMembershipRejected,
+} from '@/features/notification/triggers/member.triggers'
 
 export const getAllMembers = async (filters: AllMembersQueryParams) => {
   try {
@@ -199,6 +203,12 @@ export const approveMember = async (userId: string, adminId: string) => {
     })
     revalidatePath('/admin/members')
     revalidatePath(`/admin/members/${userId}`)
+
+    try {
+      await onMembershipApproved(userId, membershipNumber, member.tier)
+    } catch (error) {
+      console.error('Membership approved notification failed:', error)
+    }
     return { success: true, data: member }
   } catch (error) {
     return { success: false, data: null, error: error as Error }
@@ -220,6 +230,12 @@ export const rejectMember = async (
     })
     revalidatePath('/admin/members')
     revalidatePath(`/admin/members/${userId}`)
+
+    try {
+      await onMembershipRejected(userId, reason)
+    } catch (error) {
+      console.error('Membership rejected notification failed:', error)
+    }
     return { success: true, data: member }
   } catch (error) {
     return { success: false, data: null, error: error as Error }
