@@ -2,6 +2,7 @@ import {
   Gender,
   MembershipInterest,
   MembershipStatus,
+  Relationship,
 } from '@/generated/prisma/enums'
 
 export interface MemberTableColumns {
@@ -32,4 +33,33 @@ export interface AllMembersQueryParams {
   createdTo?: Date
   status?: MembershipStatus
   gender?: Gender
+}
+
+export interface MemberDetails {
+  personalInfo: {
+    name: string
+    email: string
+    phone?: string | null
+    address?: string | null
+    dateOfBirth?: Date | null
+    occupation?: string | null
+    gender?: Gender | null
+  }
+  bankInfo: {
+    bankName: string
+    accountNumber: string
+    accountName: string
+    isPrimary: boolean
+    id: string
+  }
+  nextOfKinInfo: {
+    name: string | undefined
+    address: string | undefined
+    occupation: string | undefined
+    phoneNumber: string | undefined
+    accountNumber: string | undefined
+    accountName: string | undefined
+    bankName: string | undefined
+    relationship: Relationship | undefined
+  }
 }

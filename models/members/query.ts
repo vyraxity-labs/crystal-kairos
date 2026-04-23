@@ -1,9 +1,11 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { Prisma } from '@/generated/prisma/client'
 import { MembershipStatus, UserRole } from '@/generated/prisma/enums'
 import { prisma } from '@/lib/prisma'
 import { AllMembersQueryParams } from '@/types/members.interface'
+import { generateMembershipNumber } from '@/lib/membership-number'
 
 export const getAllMembers = async (filters: AllMembersQueryParams) => {
   try {
@@ -163,5 +165,63 @@ export const getPendingApprovalsCount = async () => {
     return { success: true, data: pendingApprovalsCount }
   } catch (error) {
     return { success: false, data: 0, error: error as Error }
+  }
+}
+
+export const getMemberById = async (memberId: string) => {
+  try {
+    const member = await prisma.user.findUnique({
+      where: { id: memberId },
+      include: {
+        userInfo: true,
+        membership: true,
+        bankAccounts: true,
+        nextOfKin: true,
+      },
+    })
+    return { success: true, data: member }
+  } catch (error) {
+    return { success: false, data: null, error: error as Error }
+  }
+}
+
+export const approveMember = async (userId: string, adminId: string) => {
+  try {
+    const membershipNumber = generateMembershipNumber()
+    const member = await prisma.membership.update({
+      where: { userId },
+      data: {
+        status: MembershipStatus.APPROVED,
+        approvedAt: new Date(),
+        approvedBy: adminId,
+        membershipNumber,
+      },
+    })
+    revalidatePath('/admin/members')
+    revalidatePath(`/admin/members/${userId}`)
+    return { success: true, data: member }
+  } catch (error) {
+    return { success: false, data: null, error: error as Error }
+  }
+}
+
+export const rejectMember = async (
+  userId: string,
+  adminId: string,
+  reason: string,
+) => {
+  try {
+    const member = await prisma.membership.update({
+      where: { userId },
+      data: {
+        status: MembershipStatus.REJECTED,
+        rejectionReason: reason,
+      },
+    })
+    revalidatePath('/admin/members')
+    revalidatePath(`/admin/members/${userId}`)
+    return { success: true, data: member }
+  } catch (error) {
+    return { success: false, data: null, error: error as Error }
   }
 }

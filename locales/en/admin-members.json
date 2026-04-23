@@ -54,5 +54,85 @@
   "buttons": {
     "view": "View",
     "clear_all": "Clear Filters"
-  }
+  },
+  "details": {
+    "header": {
+      "breadcrumbs": {
+        "dashboard": "Dashboard",
+        "members": "Members",
+        "details": "Details"
+      },
+      "not_yet_assigned": "Not Yet Assigned",
+      "approve_membership": "Approve Membership",
+      "reject_membership": "Reject Membership",
+      "membership_number": "Membership ID",
+      "copy": "Copy Membership ID",
+      "copied_to_clipboard": "Membership ID copied to clipboard"
+    },
+    "personal_info": {
+      "title": "Personal Info",
+      "full_legal_name": "Full Legal Name",
+      "email": "Email",
+      "phone": "Phone",
+      "gender": "Gender",
+      "date_of_birth": "Date of Birth",
+      "occupation": "Occupation",
+      "address": "Address"
+    },
+    "bank_info": {
+      "title": "Bank Info",
+      "bank_name": "Bank Name",
+      "account_number": "Account Number",
+      "account_name": "Account Name",
+      "is_primary": "Primary"
+    },
+    "tier_info": {
+      "title": "Tier",
+      "member": "Member",
+      "silver_member": "Silver Member",
+      "gold_member": "Gold Member",
+      "member_description": "Member description",
+      "silver_member_description": "Silver member description",
+      "gold_member_description": "Gold member description"
+    },
+    "next_of_kin_info": {
+      "title": "Next of Kin",
+      "name": "Name",
+      "phone_number": "Phone Number",
+      "occupation": "Occupation",
+      "account_number": "Account Number",
+      "account_name": "Account Name",
+      "bank_name": "Bank Name",
+      "address": "Address",
+      "relationship": "Relationship"
+    },
+    "rejection": {
+      "title": "Rejection Reason"
+    },
+    "dialogs": {
+      "approve": {
+        "title": "Approve Membership",
+        "description": "Are you sure you want to approve {{name}}'s membership?",
+        "approve": "Approve",
+        "cancel": "Cancel"
+      },
+      "reject": {
+        "title": "Reject Membership",
+        "description": "Are you sure you want to reject {{name}}'s membership?",
+        "label": "Rejection Reason",
+        "placeholder": "Enter the reason for rejecting the membership",
+        "reject": "Reject",
+        "cancel": "Cancel"
+      },
+      "toasts": {
+        "approve_error": "Failed to approve membership",
+        "approve_success": "Membership approved successfully",
+        "approve_loading": "Approving, Please wait...",
+        "reject_error": "Failed to reject membership",
+        "reject_success": "Membership rejected successfully",
+        "reject_loading": "Rejecting, Please wait..."
+      }
+    }
+  },
+  "n_a": "N/A"
 }
