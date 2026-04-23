@@ -165,3 +165,32 @@ export const getPendingApprovalsCount = async () => {
     return { success: false, data: 0, error: error as Error }
   }
 }
+
+export const getMemberById = async (memberId: string) => {
+  try {
+    const member = await prisma.user.findUnique({
+      where: { id: memberId },
+      include: {
+        userInfo: true,
+        membership: true,
+        bankAccounts: true,
+        nextOfKin: true,
+      },
+    })
+    return { success: true, data: member }
+  } catch (error) {
+    return { success: false, data: null, error: error as Error }
+  }
+}
+
+export const approveMember = async (userId: string) => {
+  try {
+    const member = await prisma.membership.update({
+      where: { userId },
+      data: { status: MembershipStatus.APPROVED },
+    })
+    return { success: true, data: member }
+  } catch (error) {
+    return { success: false, data: null, error: error as Error }
+  }
+}
