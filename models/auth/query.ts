@@ -2,6 +2,7 @@
 
 import { assumptionsData } from '@/components/auth/registration-steps/data'
 import { onMemberRegistered } from '@/features/notification/triggers/member.triggers'
+import { getRequiredEnv } from '@/lib/env'
 import { prisma } from '@/lib/prisma'
 import {
   bankInfoSchema,
@@ -9,6 +10,8 @@ import {
   personalInfoSchema,
   membershipInfoSchema,
   reviewAndSubmitSchema,
+  setPasswordSchema,
+  SetPasswordFormSchema,
 } from '@/schema/auth.schema'
 import {
   Step1State,
@@ -17,6 +20,8 @@ import {
   Step4State,
   Step5State,
 } from '@/types/register.interface'
+import axios from 'axios'
+import { hash } from 'bcryptjs'
 
 export const register = async (
   personalInfo: Step1State['data'],
@@ -119,5 +124,56 @@ export const register = async (
       success: false,
       error: error instanceof Error ? error.message : 'Invalid data',
     }
+  }
+}
+
+export const verifyPasswordSetToken = async (token: string) => {
+  try {
+    const baseUrl = getRequiredEnv('NEXT_PUBLIC_APP_URL')
+    const { data } = await axios.get(`${baseUrl}/api/sign-user?token=${token}`)
+
+    if (data.data.userEmail) {
+      const user = await prisma.user.findUnique({
+        where: { email: data.data.userEmail },
+      })
+      if (user && user.hasSetPassword) {
+        return {
+          success: false,
+          error: 'Password set',
+          redirect: '/login',
+        }
+      }
+    }
+
+    return {
+      success: true,
+      data: data.data as { userEmail: string; userId: string },
+    }
+  } catch (error) {
+    return { success: false, data: null, error: error as Error }
+  }
+}
+
+export const setPassword = async (formData: SetPasswordFormSchema) => {
+  try {
+    // Validations
+    setPasswordSchema.parse(formData)
+    const user = await prisma.user.findUnique({
+      where: { email: formData.email },
+    })
+    if (!user) {
+      return {
+        success: false,
+        error: 'No account found with this email address.',
+      }
+    }
+    const hashedPassword = await hash(formData.password, 10)
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash: hashedPassword, hasSetPassword: true },
+    })
+    return { success: true, data: user }
+  } catch (error) {
+    return { success: false, data: null, error: error as Error }
   }
 }

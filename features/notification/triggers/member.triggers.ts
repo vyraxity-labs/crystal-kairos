@@ -94,8 +94,11 @@ export const onMembershipApproved = async (
   userId: string,
   membershipNumber: string,
   tier: string,
+  token: string,
 ) => {
   const appUrl = getRequiredEnv('NEXT_PUBLIC_APP_URL')
+
+  const passwordUrl = `${appUrl}/set-password?token=${token}`
 
   const user = await prisma.user.findUnique({
     where: {
@@ -106,7 +109,7 @@ export const onMembershipApproved = async (
 
   const html = await render(
     MembershipApprovedEmail({
-      setPasswordUrl: `${appUrl}/auth/set-password`,
+      setPasswordUrl: passwordUrl,
       name: user.name,
       email: user.email,
       membershipNumber,

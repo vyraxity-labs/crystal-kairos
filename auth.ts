@@ -2,11 +2,15 @@ import NextAuth, { CredentialsSignin } from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from './lib/prisma'
 import Credentials from 'next-auth/providers/credentials'
-import { UserRole } from './generated/prisma/enums'
+import { MembershipStatus, UserRole } from './generated/prisma/enums'
 import bcrypt from 'bcryptjs'
 
 class InvalidCredentialsError extends CredentialsSignin {
   code = 'invalid_credentials'
+}
+
+class AccountNotActivatedError extends CredentialsSignin {
+  code = 'account_not_activated'
 }
 
 class PasswordNotSetError extends CredentialsSignin {
@@ -36,10 +40,17 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           where: {
             email: credentials.email as string,
           },
+          include: {
+            membership: true,
+          },
         })
 
         if (!user) {
           throw new UserNotFoundError()
+        }
+
+        if (user.membership?.status === MembershipStatus.PENDING) {
+          throw new AccountNotActivatedError()
         }
 
         if (!user.hasSetPassword || !user.passwordHash) {

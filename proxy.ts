@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from './auth'
-import { publicRoutes } from './routes-def'
+import { loggedInRestrictedRoutes, publicRoutes } from './routes-def'
 
 export const proxy = auth((req) => {
   const pathname = req.nextUrl.pathname
@@ -14,7 +14,7 @@ export const proxy = auth((req) => {
   const isAdminUser = userRole === 'ADMIN' || userRole === 'OWNER'
 
   // redirect to admin or user page if user is logged in
-  if (pathname === '/login' && session) {
+  if (loggedInRestrictedRoutes.includes(pathname) && session) {
     if (isAdminUser) {
       return NextResponse.redirect(new URL('/admin', req.url))
     } else {

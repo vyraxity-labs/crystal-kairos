@@ -22,6 +22,7 @@ interface Props {
   status: MembershipStatus
   userId: string
   adminId: string
+  userEmail: string
 }
 
 const DetailsHeader = ({
@@ -30,6 +31,7 @@ const DetailsHeader = ({
   status,
   userId,
   adminId,
+  userEmail,
 }: Props) => {
   const { sidebarIsCollapsed } = useSelector((store: RootState) => store.nav)
   const { t } = useTranslation('admin-members')
@@ -99,6 +101,7 @@ const DetailsHeader = ({
               userId={userId}
               name={name}
               adminId={adminId}
+              userEmail={userEmail}
             />
           </section>
         )}

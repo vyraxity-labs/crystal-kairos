@@ -10,6 +10,8 @@ import {
   onMembershipApproved,
   onMembershipRejected,
 } from '@/features/notification/triggers/member.triggers'
+import axios from 'axios'
+import { getRequiredEnv } from '@/lib/env'
 
 export const getAllMembers = async (filters: AllMembersQueryParams) => {
   try {
@@ -189,7 +191,11 @@ export const getMemberById = async (memberId: string) => {
   }
 }
 
-export const approveMember = async (userId: string, adminId: string) => {
+export const approveMember = async (
+  userId: string,
+  adminId: string,
+  userEmail: string,
+) => {
   try {
     const membershipNumber = generateMembershipNumber()
     const member = await prisma.membership.update({
@@ -205,11 +211,30 @@ export const approveMember = async (userId: string, adminId: string) => {
     revalidatePath(`/admin/members/${userId}`)
 
     try {
-      await onMembershipApproved(userId, membershipNumber, member.tier)
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL
+      if (!baseUrl) {
+        return {
+          success: false,
+          data: null,
+          error: new Error('API URL is not set'),
+        }
+      }
+      const { data } = await axios.post(`${baseUrl}/api/sign-user`, {
+        userId,
+        userEmail,
+      })
+
+      await onMembershipApproved(
+        userId,
+        membershipNumber,
+        member.tier,
+        data.token,
+      )
     } catch (error) {
       console.error('Membership approved notification failed:', error)
     }
-    return { success: true, data: member }
+
+    return { success: true, member }
   } catch (error) {
     return { success: false, data: null, error: error as Error }
   }
