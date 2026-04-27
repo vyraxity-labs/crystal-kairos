@@ -1,0 +1,48 @@
+import {
+  SavingsFrequency,
+  SavingsMaturity,
+  SavingsStatus,
+  SavingsType,
+} from '@/generated/prisma/enums'
+
+export const savings = [
+  {
+    savingsType: SavingsType.REGULAR,
+    targetAmount: 100000,
+    frequency: SavingsFrequency.MONTHLY,
+    maturity: SavingsMaturity.TWELVE_MONTHS,
+    interestRate: 0.05,
+    currentBalance: 0,
+    accruedInterest: 0,
+    totalDeposited: 0,
+    expectedMaturityAmount: 100000,
+    isAnonymousRequest: false,
+    status: SavingsStatus.PENDING,
+  },
+  {
+    savingsType: SavingsType.FIXED,
+    targetAmount: 100000,
+    frequency: SavingsFrequency.MONTHLY,
+    maturity: SavingsMaturity.TWELVE_MONTHS,
+    interestRate: 0.05,
+    currentBalance: 0,
+    accruedInterest: 0,
+    totalDeposited: 0,
+    expectedMaturityAmount: 100000,
+    isAnonymousRequest: false,
+    status: SavingsStatus.PENDING,
+  },
+  {
+    savingsType: SavingsType.REGULAR,
+    targetAmount: 100000,
+    frequency: SavingsFrequency.MONTHLY,
+    maturity: SavingsMaturity.TWELVE_MONTHS,
+    interestRate: 0.05,
+    currentBalance: 0,
+    accruedInterest: 0,
+    totalDeposited: 0,
+    expectedMaturityAmount: 100000,
+    isAnonymousRequest: false,
+    status: SavingsStatus.PENDING,
+  },
+]
