@@ -41,7 +41,7 @@ const Sidebar = ({ role, data }: { role: UserRole; data: Data[] }) => {
   const values = useMemo(() => {
     let dashboardLink = ''
     if (role === UserRole.USER) {
-      dashboardLink = `/dashboard/${session.data?.user.id}`
+      session.data?.user.id ? `/dashboard/${session.data.user.id}` : ''
     } else {
       dashboardLink = '/admin'
     }
@@ -102,7 +102,7 @@ const Sidebar = ({ role, data }: { role: UserRole; data: Data[] }) => {
 
           return (
             <Link
-              href={item.href}
+              href={`${values.dashboardLink}${item.href}`}
               key={item.id}
               className={cn(
                 'flex gap-2 items-center p-3 text-sidebar-foreground rounded-md hover:bg-sidebar-accent',

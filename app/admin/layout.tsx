@@ -1,5 +1,3 @@
-'use client'
-
 import Header from '@/components/layout/Header'
 import MobileBottomBar from '@/components/layout/MobileBottomBar'
 import AdminSidebar from '@/components/layout/AdminSidebar'
