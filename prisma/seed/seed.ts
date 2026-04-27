@@ -5,6 +5,9 @@ import { UserRole } from '@/generated/prisma/enums'
 import { seedBankAccounts } from './scripts/bank-accounts.seed'
 import { seedNextOfKins } from './scripts/next-of-kin.seed'
 import { seedMemberships } from './scripts/membership.seed'
+import { seedEajo } from './scripts/e-ajo.seed'
+import { seedSavings } from './scripts/savings.seed'
+import { seedLoans } from './scripts/loans.seed'
 
 const main = async () => {
   console.log('🌱 Seeding database...')
@@ -29,6 +32,39 @@ const main = async () => {
   await seedNextOfKins(userIds)
 
   await seedMemberships(userIds)
+
+  const usersWithBankAccounts = await prisma.user.findMany({
+    where: { role: UserRole.USER },
+    select: { id: true, name: true, bankAccounts: true },
+  })
+
+  await seedSavings(
+    usersWithBankAccounts.map((user) => ({
+      id: user.id,
+      name: user.name,
+      bankName: user.bankAccounts[0].bankName,
+      accountNumber: user.bankAccounts[0].accountNumber,
+      accountName: user.bankAccounts[0].accountName,
+    })),
+  )
+  await seedEajo(
+    usersWithBankAccounts.map((user) => ({
+      id: user.id,
+      name: user.name,
+      bankName: user.bankAccounts[0].bankName,
+      accountNumber: user.bankAccounts[0].accountNumber,
+      accountName: user.bankAccounts[0].accountName,
+    })),
+  )
+  await seedLoans(
+    usersWithBankAccounts.map((user) => ({
+      id: user.id,
+      name: user.name,
+      bankName: user.bankAccounts[0].bankName,
+      accountNumber: user.bankAccounts[0].accountNumber,
+      accountName: user.bankAccounts[0].accountName,
+    })),
+  )
 
   console.log('✅ Seeding completed successfully.')
 }
