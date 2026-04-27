@@ -40,6 +40,7 @@ const MemberDetailsPage = async ({
         status={memberDetails.membership?.status ?? MembershipStatus.PENDING}
         userId={memberDetails.id}
         adminId={adminId}
+        userEmail={memberDetails.email}
       />
       <Details
         personalInfo={{

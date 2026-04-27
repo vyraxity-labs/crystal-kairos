@@ -6,6 +6,13 @@ import { MembershipStatus, UserRole } from '@/generated/prisma/enums'
 import { prisma } from '@/lib/prisma'
 import { AllMembersQueryParams } from '@/types/members.interface'
 import { generateMembershipNumber } from '@/lib/membership-number'
+import {
+  onMembershipApproved,
+  onMembershipRejected,
+} from '@/features/notification/triggers/member.triggers'
+import axios from 'axios'
+import { getRequiredEnv } from '@/lib/env'
+import { signUser } from '../auth/query'
 
 export const getAllMembers = async (filters: AllMembersQueryParams) => {
   try {
@@ -185,7 +192,11 @@ export const getMemberById = async (memberId: string) => {
   }
 }
 
-export const approveMember = async (userId: string, adminId: string) => {
+export const approveMember = async (
+  userId: string,
+  adminId: string,
+  userEmail: string,
+) => {
   try {
     const membershipNumber = generateMembershipNumber()
     const member = await prisma.membership.update({
@@ -199,6 +210,30 @@ export const approveMember = async (userId: string, adminId: string) => {
     })
     revalidatePath('/admin/members')
     revalidatePath(`/admin/members/${userId}`)
+
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL
+      if (!baseUrl) {
+        return {
+          success: false,
+          data: null,
+          error: new Error('API URL is not set'),
+        }
+      }
+      const data = await signUser(userId, userEmail)
+
+      if (data.token) {
+        await onMembershipApproved(
+          userId,
+          membershipNumber,
+          member.tier,
+          data.token,
+        )
+      }
+    } catch (error) {
+      console.error('Membership approved notification failed:', error)
+    }
+
     return { success: true, data: member }
   } catch (error) {
     return { success: false, data: null, error: error as Error }
@@ -220,6 +255,12 @@ export const rejectMember = async (
     })
     revalidatePath('/admin/members')
     revalidatePath(`/admin/members/${userId}`)
+
+    try {
+      await onMembershipRejected(userId, reason)
+    } catch (error) {
+      console.error('Membership rejected notification failed:', error)
+    }
     return { success: true, data: member }
   } catch (error) {
     return { success: false, data: null, error: error as Error }

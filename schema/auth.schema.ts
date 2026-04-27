@@ -1,4 +1,3 @@
-import { assumptionsData } from '@/components/auth/registration-steps/data'
 import {
   Assumptions,
   Gender,
@@ -64,3 +63,16 @@ export const reviewAndSubmitSchema = z.object({
     message: 'You must accept the terms and conditions',
   }),
 })
+
+export const setPasswordSchema = z
+  .object({
+    email: z.string().trim().min(1, 'Email is required'),
+    password: z.string().trim().min(1, 'Password is required'),
+    confirmPassword: z.string().trim().min(1, 'Confirm password is required'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
+
+export type SetPasswordFormSchema = z.infer<typeof setPasswordSchema>

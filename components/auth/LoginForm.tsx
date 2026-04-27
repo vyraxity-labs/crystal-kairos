@@ -21,6 +21,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   user_not_found: 'login.errors.user_not_found',
   password_not_set: 'login.errors.password_not_set',
   invalid_credentials: 'login.errors.invalid_credentials',
+  account_not_activated: 'login.errors.account_not_activated',
   default: 'login.errors.default',
 }
 

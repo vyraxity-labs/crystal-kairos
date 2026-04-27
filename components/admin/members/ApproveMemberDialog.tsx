@@ -21,10 +21,12 @@ const ApproveMemberDialog = ({
   userId,
   name,
   adminId,
+  userEmail,
 }: {
   userId: string
   name: string
   adminId: string
+  userEmail: string
 }) => {
   const { t } = useTranslation('admin-members')
   const router = useRouter()
@@ -36,7 +38,7 @@ const ApproveMemberDialog = ({
       async () => {
         setLoading(true)
         try {
-          const response = await approveMember(userId, adminId)
+          const response = await approveMember(userId, adminId, userEmail)
           if (!response.success) throw new Error('Approval failed')
           setOpen(false)
           router.refresh()
