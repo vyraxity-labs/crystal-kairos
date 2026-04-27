@@ -3,7 +3,7 @@ import { Bell } from 'lucide-react'
 import { Button } from '../ui/button'
 import ThemeToggle from '../common/ThemeToggle'
 
-const AdminHeader = () => {
+const Header = () => {
   return (
     <div className='border-b border-outline-variant'>
       <div className='w-[90%] mx-auto py-2 flex justify-end'>
@@ -19,4 +19,4 @@ const AdminHeader = () => {
   )
 }
 
-export default AdminHeader
+export default Header
