@@ -22,6 +22,7 @@ import {
 } from '@/types/register.interface'
 import axios from 'axios'
 import { hash } from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 export const register = async (
   personalInfo: Step1State['data'],
@@ -127,14 +128,51 @@ export const register = async (
   }
 }
 
+export const signUser = async (userId: string, userEmail: string) => {
+  try {
+    const secret = getRequiredEnv('JWT_SECRET')
+    const expiresIn = getRequiredEnv(
+      'JWT_EXPIRATION',
+    ) as jwt.SignOptions['expiresIn']
+    if (!secret || !expiresIn) {
+      return { success: false, error: 'Missing JWT configuration' }
+    }
+    const token = jwt.sign({ userId, userEmail }, secret, { expiresIn })
+
+    return { success: true, token }
+  } catch (error) {
+    return { success: false, error: error as Error }
+  }
+}
+
+export const verifyToken = async (token: string) => {
+  try {
+    const decoded = jwt.verify(token, getRequiredEnv('JWT_SECRET'))
+    if (!decoded) {
+      return { success: false, error: 'Invalid token' }
+    }
+    return {
+      success: true,
+      data: decoded as { userId: string; userEmail: string },
+    }
+  } catch (error) {
+    return { success: false, error: error as Error }
+  }
+}
+
 export const verifyPasswordSetToken = async (token: string) => {
   try {
-    const baseUrl = getRequiredEnv('NEXT_PUBLIC_APP_URL')
-    const { data } = await axios.get(`${baseUrl}/api/sign-user?token=${token}`)
+    const response = await verifyToken(token)
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.error,
+      }
+    }
 
-    if (data.data.userEmail) {
+    if (response.success && response.data?.userEmail) {
       const user = await prisma.user.findUnique({
-        where: { email: data.data.userEmail },
+        where: { email: response.data.userEmail },
       })
       if (user && user.hasSetPassword) {
         return {
@@ -147,17 +185,39 @@ export const verifyPasswordSetToken = async (token: string) => {
 
     return {
       success: true,
-      data: data.data as { userEmail: string; userId: string },
+      data: response.data as { userEmail: string; userId: string },
     }
   } catch (error) {
     return { success: false, data: null, error: error as Error }
   }
 }
 
-export const setPassword = async (formData: SetPasswordFormSchema) => {
+export const setPassword = async (
+  formData: SetPasswordFormSchema,
+  token: string,
+) => {
   try {
     // Validations
     setPasswordSchema.parse(formData)
+
+    // verify token
+    const response = await verifyToken(token)
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.error,
+      }
+    }
+
+    if (response.data) {
+      if (response.data.userEmail !== formData.email) {
+        return {
+          success: false,
+          error: 'Invalid email address',
+        }
+      }
+    }
+
     const user = await prisma.user.findUnique({
       where: { email: formData.email },
     })

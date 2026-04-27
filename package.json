@@ -11,6 +11,7 @@
     "db:reset": "prisma migrate reset && prisma db seed",
     "db:seed": "prisma db seed",
     "db:clear": "prisma migrate reset",
+    "db:view": "prisma studio",
     "email:dev": "email dev"
   },
   "dependencies": {

@@ -32,7 +32,7 @@ const SetPasswordPage = async ({
 
   return (
     <div className='h-full flex-1 flex justify-center items-center'>
-      <SetPasswordForm email={data.data.userEmail} />
+      <SetPasswordForm email={data.data.userEmail} token={token} />
     </div>
   )
 }

@@ -24,7 +24,13 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { REDIRECT_DELAY } from '@/lib/constants'
 
-const SetPasswordForm = ({ email }: { email: string }) => {
+const SetPasswordForm = ({
+  email,
+  token,
+}: {
+  email: string
+  token: string
+}) => {
   const { t } = useTranslation('auth')
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -40,7 +46,9 @@ const SetPasswordForm = ({ email }: { email: string }) => {
   })
 
   const onSubmit = async (formData: SetPasswordFormSchema) => {
-    const response = await setPassword(formData)
+    setIsLoading(true)
+    const response = await setPassword(formData, token)
+    setIsLoading(false)
 
     if (response.error) {
       toast.error(response.error.toString())
@@ -164,7 +172,7 @@ const SetPasswordForm = ({ email }: { email: string }) => {
               }}
             />
 
-            <Button className='w-full rounded-sm my-5'>
+            <Button className='w-full rounded-sm my-5' disabled={isLoading}>
               {isLoading
                 ? t('set_password.form.buttons.loading')
                 : t('set_password.form.buttons.submit')}

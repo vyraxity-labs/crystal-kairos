@@ -12,6 +12,7 @@ import {
 } from '@/features/notification/triggers/member.triggers'
 import axios from 'axios'
 import { getRequiredEnv } from '@/lib/env'
+import { signUser } from '../auth/query'
 
 export const getAllMembers = async (filters: AllMembersQueryParams) => {
   try {
@@ -219,22 +220,21 @@ export const approveMember = async (
           error: new Error('API URL is not set'),
         }
       }
-      const { data } = await axios.post(`${baseUrl}/api/sign-user`, {
-        userId,
-        userEmail,
-      })
+      const data = await signUser(userId, userEmail)
 
-      await onMembershipApproved(
-        userId,
-        membershipNumber,
-        member.tier,
-        data.token,
-      )
+      if (data.token) {
+        await onMembershipApproved(
+          userId,
+          membershipNumber,
+          member.tier,
+          data.token,
+        )
+      }
     } catch (error) {
       console.error('Membership approved notification failed:', error)
     }
 
-    return { success: true, member }
+    return { success: true, data: member }
   } catch (error) {
     return { success: false, data: null, error: error as Error }
   }
