@@ -106,31 +106,58 @@ export const adminNavItems = [
   {
     id: 'dashboard',
     label: 'layout.sidebar.menu-items.dashboard',
-    href: '/admin',
+    href: '',
     icon: LayoutDashboard,
   },
   {
     id: 'members',
     label: 'layout.sidebar.menu-items.members',
-    href: '/admin/members',
+    href: '/members',
     icon: Users,
   },
   {
     id: 'loans',
     label: 'layout.sidebar.menu-items.loans',
-    href: '/admin/loans',
+    href: '/loans',
     icon: Banknote,
   },
   {
     id: 'savings',
     label: 'layout.sidebar.menu-items.savings',
-    href: '/admin/savings',
+    href: '/savings',
     icon: Wallet,
   },
   {
     id: 'eajo',
     label: 'layout.sidebar.menu-items.eajo',
-    href: '/admin/eajo',
+    href: '/eajo',
+    icon: Handshake,
+  },
+]
+
+export const userNavItems = [
+  {
+    id: 'dashboard',
+    label: 'layout.sidebar.menu-items.dashboard',
+    href: '',
+    icon: LayoutDashboard,
+  },
+  {
+    id: 'savings',
+    label: 'layout.sidebar.menu-items.my_savings',
+    href: '/savings',
+    icon: Wallet,
+  },
+  {
+    id: 'loans',
+    label: 'layout.sidebar.menu-items.loans',
+    href: '/loans',
+    icon: Banknote,
+  },
+  {
+    id: 'eajo',
+    label: 'layout.sidebar.menu-items.eajo',
+    href: '/eajo',
     icon: Handshake,
   },
 ]

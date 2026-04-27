@@ -13,9 +13,26 @@ import Logout from './logout'
 import Link from 'next/link'
 import UserAvatar from './UserAvatar'
 import { useTranslation } from 'react-i18next'
+import { useSession } from 'next-auth/react'
+import { useMemo } from 'react'
+import { UserRole } from '@/generated/prisma/enums'
 
 const AvatarMenu = () => {
   const { t } = useTranslation('admin')
+  const session = useSession()
+
+  const values = useMemo(() => {
+    let dashboardLink = ''
+    if (session.data) {
+      if (session.data.user.role === UserRole.USER) {
+        dashboardLink = `/dashboard/${session.data?.user.id}`
+      } else {
+        dashboardLink = '/admin'
+      }
+    }
+
+    return { dashboardLink }
+  }, [session])
 
   return (
     <div className='md:hidden'>
@@ -33,11 +50,11 @@ const AvatarMenu = () => {
         <DropdownMenuContent className='w-32 rounded-md'>
           <DropdownMenuGroup>
             <AvatarMenuItem
-              href='/admin/profile'
+              href={`${values.dashboardLink}/profile`}
               label={t('layout.sidebar.menu-items.profile')}
             />
             <AvatarMenuItem
-              href='/admin/settings'
+              href={`${values.dashboardLink}/settings`}
               label={t('layout.sidebar.menu-items.settings')}
             />
           </DropdownMenuGroup>

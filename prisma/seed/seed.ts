@@ -34,7 +34,7 @@ const main = async () => {
   await seedMemberships(userIds)
 
   const usersWithBankAccounts = await prisma.user.findMany({
-    where: { role: UserRole.USER },
+    where: { role: UserRole.USER, bankAccounts: { some: {} } },
     select: { id: true, name: true, bankAccounts: true },
   })
 
