@@ -10,9 +10,8 @@ import {
   onMembershipApproved,
   onMembershipRejected,
 } from '@/features/notification/triggers/member.triggers'
-import axios from 'axios'
-import { getRequiredEnv } from '@/lib/env'
 import { signUser } from '../auth/query'
+import { MembersLoansQueryParams } from '@/types/loans.interface'
 
 export const getAllMembers = async (filters: AllMembersQueryParams) => {
   try {
@@ -264,5 +263,107 @@ export const rejectMember = async (
     return { success: true, data: member }
   } catch (error) {
     return { success: false, data: null, error: error as Error }
+  }
+}
+
+export const getLoanRecords = async (
+  userId: string,
+  filters: MembersLoansQueryParams,
+) => {
+  const {
+    page = 1,
+    pageSize = 5,
+    sortField = 'createdAt',
+    sortDirection = 'asc',
+    search,
+    createdFrom,
+    createdTo,
+    status,
+  } = filters
+
+  const allowedSortFields = ['createdAt', 'approvedAmount', 'status']
+  const activeSortField = allowedSortFields.includes(sortField)
+    ? sortField
+    : 'createdAt'
+
+  const startOfCreatedFrom = createdFrom
+    ? new Date(new Date(createdFrom).setHours(0, 0, 0, 0))
+    : undefined
+  const endOfCreatedTo = createdTo
+    ? new Date(new Date(createdTo).setHours(23, 59, 59, 999))
+    : undefined
+
+  try {
+    const where: Prisma.LoanWhereInput = {
+      ...(status && { status }),
+      // Date range filter
+      ...((startOfCreatedFrom || endOfCreatedTo) && {
+        createdAt: {
+          ...(startOfCreatedFrom && { gte: startOfCreatedFrom }),
+          ...(endOfCreatedTo && { lte: endOfCreatedTo }),
+        },
+      }),
+      userId,
+    }
+
+    const [loanRecords, total] = await prisma.$transaction([
+      prisma.loan.findMany({
+        where,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        orderBy: {
+          [activeSortField]: sortDirection,
+        },
+      }),
+      prisma.loan.count({
+        where,
+      }),
+    ])
+
+    return {
+      success: true,
+      data: loanRecords,
+      meta: { total, page, pageSize, totalPages: Math.ceil(total / pageSize) },
+    }
+  } catch (error) {
+    return {
+      success: false,
+      data: [],
+      error: error as Error,
+      meta: { total: 0, page: 1, pageSize: 5, totalPages: 1 },
+    }
+  }
+}
+
+export const getSavingsRecords = async (userId: string) => {
+  try {
+    const savingsRecords = await prisma.savings.findMany({
+      where: { userId },
+    })
+    return { success: true, data: savingsRecords }
+  } catch (error) {
+    return { success: false, data: [], error: error as Error }
+  }
+}
+
+export const getEarningRecords = async (userId: string) => {
+  try {
+    const earningRecords = await prisma.eAjo.findMany({
+      where: { userId },
+    })
+    return { success: true, data: earningRecords }
+  } catch (error) {
+    return { success: false, data: [], error: error as Error }
+  }
+}
+
+export const getEAjoRecordsCount = async (userId: string) => {
+  try {
+    const eajoRecordsCount = await prisma.eAjo.count({
+      where: { userId },
+    })
+    return { success: true, data: eajoRecordsCount }
+  } catch (error) {
+    return { success: false, data: 0, error: error as Error }
   }
 }
