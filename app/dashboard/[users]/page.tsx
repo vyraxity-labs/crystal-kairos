@@ -20,21 +20,24 @@ const UserPage = async () => {
 
   const userId = session.user.id
 
-  const savings = (await getSavingsRecords(userId)).data
-  const eAjoCount = (await getEAjoRecordsCount(userId)).data
-  const overdueLoans = (
-    await getLoanRecords(userId, { status: LoanStatus.OVERDUE })
-  ).data
+  const [savingsResult, eAjoCountResult, overdueLoansResult] =
+    await Promise.all([
+      getSavingsRecords(userId),
+      getEAjoRecordsCount(userId),
+      getLoanRecords(userId, { status: LoanStatus.OVERDUE }),
+    ])
+
+  const savings = savingsResult.data
+  const eAjoCount = eAjoCountResult.data
+  const overdueLoans = overdueLoansResult.data
 
   const savingsAmount = savings.reduce((acc, curr) => {
-    acc += Number(curr.totalDeposited)
-
+    acc += Number(curr.totalDeposited ?? 0)
     return acc
   }, 0)
 
   const overDueLoansSum = overdueLoans.reduce((acc, curr) => {
-    acc += Number(curr.approvedAmount)
-
+    acc += Number(curr.approvedAmount ?? 0)
     return acc
   }, 0)
 

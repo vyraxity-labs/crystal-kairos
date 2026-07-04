@@ -7,6 +7,7 @@ import { Badge } from '../ui/badge'
 import { membershipTierData } from '../admin/members/data'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { Skeleton } from '../ui/skeleton'
 
 const MemberInfoCard = ({ userId }: { userId: string }) => {
   const [memberInfo, setMemberInfo] = useState<{
@@ -18,12 +19,20 @@ const MemberInfoCard = ({ userId }: { userId: string }) => {
   const { t } = useTranslation('admin-members')
   const { t: tM } = useTranslation('members-dashboard')
 
-  const { label, icon: Icon, bgColor } = membershipTierData[memberInfo.tier]
+  const tierData = membershipTierData[memberInfo.tier] || {
+    label: 'Member',
+    icon: () => null,
+    bgColor: 'bg-gray-500',
+  }
+  const { label, icon: Icon, bgColor } = tierData
 
   useEffect(() => {
+    let active = true
+
     const getMemberInfo = async () => {
       setIsLoading(true)
       const response = await getMemberById(userId)
+      if (!active) return
       setIsLoading(false)
 
       if (response.success && response.data) {
@@ -36,6 +45,10 @@ const MemberInfoCard = ({ userId }: { userId: string }) => {
     }
 
     getMemberInfo()
+
+    return () => {
+      active = false
+    }
   }, [userId])
 
   return (
@@ -52,22 +65,42 @@ const MemberInfoCard = ({ userId }: { userId: string }) => {
     >
       <div className='flex flex-col justify-between h-full'>
         <div className='flex justify-between items-start'>
-          <section>
+          <section className='w-full'>
             <span className='uppercase text-xs'>{tM('main_card.title')}</span>
-            <h3 className='text-2xl font-semibold'>{memberInfo.name}</h3>
+            {isLoading ? (
+              <div className='flex flex-col gap-2 w-2/3'>
+                <Skeleton className='h-8 w-full' />
+              </div>
+            ) : (
+              <h3 className='text-2xl font-semibold'>{memberInfo.name}</h3>
+            )}
           </section>
 
           <Badge className={cn('p-3', bgColor)}>
-            <Icon /> <span>{t(label)}</span>
+            {isLoading ? (
+              <Skeleton className='h-4 w-24' />
+            ) : (
+              <>
+                <Icon /> <span>{t(label)}</span>
+              </>
+            )}
           </Badge>
         </div>
 
         <div className='flex justify-between items-end'>
-          <section>
+          <section className='w-full'>
             <span className='uppercase text-xs'>
               {tM('main_card.member_id')}
             </span>
-            <h3 className='text-xl font-bold'>{memberInfo.membershipNumber}</h3>
+            {isLoading ? (
+              <div className='flex flex-col gap-2 w-1/2'>
+                <Skeleton className='h-8 w-full' />
+              </div>
+            ) : (
+              <h3 className='text-xl font-bold'>
+                {memberInfo.membershipNumber}
+              </h3>
+            )}
           </section>
 
           <div className='w-10 aspect-square bg-black flex justify-center items-center uppercase text-xs'>

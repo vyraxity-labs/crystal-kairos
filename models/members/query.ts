@@ -281,6 +281,11 @@ export const getLoanRecords = async (
     status,
   } = filters
 
+  const allowedSortFields = ['createdAt', 'approvedAmount', 'status']
+  const activeSortField = allowedSortFields.includes(sortField)
+    ? sortField
+    : 'createdAt'
+
   const startOfCreatedFrom = createdFrom
     ? new Date(new Date(createdFrom).setHours(0, 0, 0, 0))
     : undefined
@@ -307,7 +312,7 @@ export const getLoanRecords = async (
         skip: (page - 1) * pageSize,
         take: pageSize,
         orderBy: {
-          [sortField]: sortDirection,
+          [activeSortField]: sortDirection,
         },
       }),
       prisma.loan.count({
