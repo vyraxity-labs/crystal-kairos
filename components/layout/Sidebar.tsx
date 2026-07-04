@@ -41,7 +41,9 @@ const Sidebar = ({ role, data }: { role: UserRole; data: Data[] }) => {
   const values = useMemo(() => {
     let dashboardLink = ''
     if (role === UserRole.USER) {
-      session.data?.user.id ? `/dashboard/${session.data.user.id}` : ''
+      dashboardLink = session.data?.user.id
+        ? `/dashboard/${session.data.user.id}`
+        : ''
     } else {
       dashboardLink = '/admin'
     }

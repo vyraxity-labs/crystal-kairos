@@ -1,0 +1,34 @@
+{
+  "main_card": {
+    "title": "cooperative member",
+    "member_id": "Member ID",
+    "links": {
+      "savings": {
+        "title": "Start Savings",
+        "description": "Join a new savings plan today"
+      },
+      "loans": {
+        "title": "Apply for a Loan",
+        "description": "Apply for a new loan today"
+      }
+    }
+  },
+  "activity_summary": {
+    "card": {
+      "savings": {
+        "title": "Total Savings",
+        "currency_symbol": "₦",
+        "no_savings": "You have not saved anything yet"
+      },
+      "loans": {
+        "title": "Outstanding Loans",
+        "no_outstanding_loans": "You have no outstanding loans"
+      },
+      "e_ajo": {
+        "title": "Active A-Jao",
+        "suffix": "plan(s)",
+        "no_a_ajo": "No active A-Jao plan"
+      }
+    }
+  }
+}
