@@ -66,7 +66,64 @@ const main = async () => {
     })),
   )
 
+  await seedAjoFeeConfigs()
+
   console.log('✅ Seeding completed successfully.')
+}
+
+const seedAjoFeeConfigs = async () => {
+  console.log('🌱 Seeding Ajo fee configurations...')
+
+  const configs = [
+    // 4-Month
+    { durationMonths: 4, pickPosition: 1, feePercentage: 10.0 },
+    { durationMonths: 4, pickPosition: 2, feePercentage: 7.0 },
+    { durationMonths: 4, pickPosition: 3, feePercentage: 4.0 },
+    { durationMonths: 4, pickPosition: 4, feePercentage: 1.0 },
+
+    // 6-Month
+    { durationMonths: 6, pickPosition: 1, feePercentage: 10.0 },
+    { durationMonths: 6, pickPosition: 2, feePercentage: 8.0 },
+    { durationMonths: 6, pickPosition: 3, feePercentage: 6.0 },
+    { durationMonths: 6, pickPosition: 4, feePercentage: 4.0 },
+    { durationMonths: 6, pickPosition: 5, feePercentage: 2.0 },
+    { durationMonths: 6, pickPosition: 6, feePercentage: 1.0 },
+
+    // 12-Month
+    { durationMonths: 12, pickPosition: 1, feePercentage: 20.0 },
+    { durationMonths: 12, pickPosition: 2, feePercentage: 18.0 },
+    { durationMonths: 12, pickPosition: 3, feePercentage: 16.0 },
+    { durationMonths: 12, pickPosition: 4, feePercentage: 14.0 },
+    { durationMonths: 12, pickPosition: 5, feePercentage: 12.0 },
+    { durationMonths: 12, pickPosition: 6, feePercentage: 10.0 },
+    { durationMonths: 12, pickPosition: 7, feePercentage: 8.0 },
+    { durationMonths: 12, pickPosition: 8, feePercentage: 6.0 },
+    { durationMonths: 12, pickPosition: 9, feePercentage: 4.0 },
+    { durationMonths: 12, pickPosition: 10, feePercentage: 2.0 },
+    { durationMonths: 12, pickPosition: 11, feePercentage: 1.0 },
+    { durationMonths: 12, pickPosition: 12, feePercentage: 1.0 },
+  ]
+
+  for (const config of configs) {
+    await prisma.ajoFeeConfig.upsert({
+      where: {
+        durationMonths_pickPosition: {
+          durationMonths: config.durationMonths,
+          pickPosition: config.pickPosition,
+        },
+      },
+      update: {
+        feePercentage: config.feePercentage,
+      },
+      create: {
+        durationMonths: config.durationMonths,
+        pickPosition: config.pickPosition,
+        feePercentage: config.feePercentage,
+      },
+    })
+  }
+
+  console.log('✅ Ajo fee configurations seeded successfully.')
 }
 
 main()

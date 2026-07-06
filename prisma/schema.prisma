@@ -189,20 +189,18 @@ model User {
   triggeredNotifications Notification[] @relation("TriggeredNotifications")
 
   // Relations
-  accounts            Account[]
-  sessions            Session[]
-  userInfo            UserInfo?
-  bankAccounts        BankAccount[]
-  nextOfKin           NextOfKin?
-  membership          Membership?
-  eAjo                EAjo[]
-  eAjoTransactions    EAjoTransaction[]    @relation("TransactionRecorder")
-  eAjoPayouts         EAjoPayout[]         @relation("PayoutRecorder")
-  savings             Savings[]
-  savingsTransactions SavingsTransaction[] @relation("TransactionRecorder")
-  savingsWithdrawals  SavingsWithdrawal[]  @relation("WithdrawalProcessor")
-  loans               Loan[]
-  loanRepayments      LoanRepayment[]      @relation("RepaymentRecorder")
+  accounts              Account[]
+  sessions              Session[]
+  userInfo              UserInfo?
+  bankAccounts          BankAccount[]
+  nextOfKin             NextOfKin?
+  membership            Membership?
+  eAjo                  EAjo[]
+  savings               Savings[]
+  loans                 Loan[]
+  transactions          Transaction[] @relation("TransactionOwner")
+  transactionsRecorded  Transaction[] @relation("TransactionRecorder")
+  transactionsProcessed Transaction[] @relation("TransactionProcessor")
 
   @@map("users")
 }
@@ -257,15 +255,16 @@ model UserInfo {
 }
 
 model BankAccount {
-  id            String   @id @default(uuid())
+  id            String        @id @default(uuid())
   accountNumber String
   accountName   String
   bankName      String
   userId        String
-  isPrimary     Boolean  @default(false) // Mark primary account
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isPrimary     Boolean       @default(false) // Mark primary account
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
 
   @@map("bank_accounts")
 }
@@ -399,56 +398,91 @@ model EAjo {
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
 
-  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions EAjoTransaction[]
-  payout       EAjoPayout?
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
 
   @@index([userId])
   @@index([status])
   @@map("e_ajo")
 }
 
-model EAjoTransaction {
-  id              String          @id @default(uuid())
-  eAjoId          String
-  amount          Decimal
-  transactionType TransactionType
-  recordedBy      String
-  transactionDate DateTime
-  recordedAt      DateTime        @default(now())
-  paymentMethod   String?
-  notes           String?
-  receiptUrl      String?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  eAjo     EAjo @relation(fields: [eAjoId], references: [id], onDelete: Cascade)
-  recorder User @relation("TransactionRecorder", fields: [recordedBy], references: [id])
-
-  @@index([eAjoId])
-  @@index([transactionDate])
-  @@map("e_ajo_transactions")
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  DISBURSED
+  FAILED
 }
 
-model EAjoPayout {
-  id            String   @id @default(uuid())
-  eAjoId        String   @unique
-  grossAmount   Decimal // Total expected (contributionAmount * totalParticipants)
-  feeAmount     Decimal // Fee deducted
-  netAmount     Decimal // Amount actually paid out
-  payoutDate    DateTime
-  processedBy   String
-  bankName      String
-  accountNumber String
-  accountName   String
-  notes         String?
-  receiptUrl    String?
-  createdAt     DateTime @default(now())
+enum TransactionCategory {
+  AJO_CONTRIBUTION
+  AJO_PAYOUT
+  SAVINGS_DEPOSIT
+  SAVINGS_WITHDRAWAL
+  LOAN_DISBURSEMENT
+  LOAN_REPAYMENT
+  WALLET_TOPUP
+  WALLET_WITHDRAWAL
+  INTEREST
+  PENALTY
+  FEE
+}
 
-  eAjo      EAjo @relation(fields: [eAjoId], references: [id], onDelete: Cascade)
-  processor User @relation("PayoutRecorder", fields: [processedBy], references: [id])
+model AjoFeeConfig {
+  id             String   @id @default(uuid())
+  durationMonths Int // 4, 6, 12
+  pickPosition   Int // 1 to N
+  feePercentage  Decimal  @db.Decimal(5, 2)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  @@map("e_ajo_payouts")
+  @@unique([durationMonths, pickPosition])
+  @@map("ajo_fee_configs")
+}
+
+model Transaction {
+  id       String              @id @default(uuid())
+  userId   String
+  amount   Decimal             @db.Decimal(15, 2)
+  category TransactionCategory
+  type     TransactionType
+  status   TransactionStatus   @default(PENDING)
+
+  // Reference IDs to specific packages
+  eAjoId    String?
+  savingsId String?
+  loanId    String?
+
+  // Offline/Manual payment tracking
+  receiptUrl      String?
+  rejectionReason String?
+  referenceNumber String?
+  notes           String?
+
+  // Account routing (for money-out)
+  bankAccountId String?
+
+  // Audit metadata
+  recordedBy  String // User ID who uploaded/recorded (usually owner or admin)
+  processedBy String? // User ID of admin who approved/confirmed/disbursed
+
+  transactionDate DateTime  @default(now())
+  processedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user        User         @relation("TransactionOwner", fields: [userId], references: [id], onDelete: Cascade)
+  recorder    User         @relation("TransactionRecorder", fields: [recordedBy], references: [id])
+  processor   User?        @relation("TransactionProcessor", fields: [processedBy], references: [id])
+  eAjo        EAjo?        @relation(fields: [eAjoId], references: [id], onDelete: SetNull)
+  savings     Savings?     @relation(fields: [savingsId], references: [id], onDelete: SetNull)
+  loan        Loan?        @relation(fields: [loanId], references: [id], onDelete: SetNull)
+  bankAccount BankAccount? @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+  @@map("transactions")
 }
 
 // ============================================
@@ -481,58 +515,15 @@ model Savings {
   createdAt              DateTime         @default(now())
   updatedAt              DateTime         @updatedAt
 
-  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions SavingsTransaction[]
-  withdrawal   SavingsWithdrawal?
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
 
   @@index([userId])
   @@index([status])
   @@map("savings")
 }
 
-model SavingsTransaction {
-  id              String          @id @default(uuid())
-  savingsId       String
-  amount          Decimal
-  transactionType TransactionType
-  recordedBy      String
-  transactionDate DateTime
-  recordedAt      DateTime        @default(now())
-  paymentMethod   String?
-  notes           String?
-  receiptUrl      String?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  savings  Savings @relation(fields: [savingsId], references: [id], onDelete: Cascade)
-  recorder User    @relation("TransactionRecorder", fields: [recordedBy], references: [id])
-
-  @@index([savingsId])
-  @@index([transactionDate])
-  @@map("savings_transactions")
-}
-
-model SavingsWithdrawal {
-  id                String   @id @default(uuid())
-  savingsId         String   @unique
-  principalAmount   Decimal // Total deposited
-  interestAmount    Decimal // Interest earned (0 if early withdrawal)
-  totalAmount       Decimal // Principal + Interest
-  isEarlyWithdrawal Boolean  @default(false)
-  withdrawnAt       DateTime
-  processedBy       String
-  bankName          String
-  accountNumber     String
-  accountName       String
-  notes             String?
-  receiptUrl        String?
-  createdAt         DateTime @default(now())
-
-  savings   Savings @relation(fields: [savingsId], references: [id], onDelete: Cascade)
-  processor User    @relation("WithdrawalProcessor", fields: [processedBy], references: [id])
-
-  @@map("savings_withdrawals")
-}
+// Deprecated savings transactions removed
 
 // ============================================
 // LOAN MODELS
@@ -570,9 +561,9 @@ model Loan {
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
 
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   // guarantor  User?            @relation("LoanGuarantor", fields: [guarantorId], references: [id])
-  repayments LoanRepayment[]
+  transactions Transaction[]
 
   @@index([userId])
   @@index([guarantorId])
@@ -580,29 +571,4 @@ model Loan {
   @@map("loans")
 }
 
-model LoanRepayment {
-  id             String    @id @default(uuid())
-  loanId         String
-  amount         Decimal
-  penaltyAmount  Decimal   @default(0)
-  totalPaid      Decimal // amount + penaltyAmount
-  recordedBy     String
-  paymentDate    DateTime
-  dueDate        DateTime?
-  recordedAt     DateTime  @default(now())
-  paymentMethod  String?
-  isEarlyPayment Boolean   @default(false) // For discount eligibility
-  hasDiscount    Boolean   @default(false)
-  discountAmount Decimal   @default(0)
-  notes          String?
-  receiptUrl     String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  loan     Loan @relation(fields: [loanId], references: [id], onDelete: Cascade)
-  recorder User @relation("RepaymentRecorder", fields: [recordedBy], references: [id])
-
-  @@index([loanId])
-  @@index([paymentDate])
-  @@map("loan_repayments")
-}
+// Deprecated loan repayments removed
