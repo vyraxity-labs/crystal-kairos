@@ -18,26 +18,24 @@ interface NextOfKinInput {
   accountName: string
 }
 
+const getSessionHelper = async () => {
+  try {
+    return await auth()
+  } catch (e) {
+    if (process.env.MOCK_SESSION_USER) {
+      return JSON.parse(process.env.MOCK_SESSION_USER)
+    }
+    throw e
+  }
+}
+
 export const updateNextOfKinAction = async (
   userId: string,
   data: NextOfKinInput,
 ) => {
   try {
     // 1. Authenticate and check permissions
-    let session
-    try {
-      session = await auth()
-    } catch (e) {
-      if (process.env.MOCK_SESSION_USER) {
-        session = JSON.parse(process.env.MOCK_SESSION_USER)
-      } else {
-        return {
-          success: false,
-          error: e instanceof Error ? e.message : 'Auth Error',
-        }
-      }
-    }
-
+    const session = await getSessionHelper()
     if (!session || !session.user) {
       return { success: false, error: 'Unauthorized' }
     }
@@ -91,6 +89,191 @@ export const updateNextOfKinAction = async (
       success: false,
       error:
         error instanceof Error ? error.message : 'Failed to update next of kin',
+    }
+  }
+}
+
+interface BankAccountInput {
+  bankName: string
+  accountNumber: string
+  accountName: string
+}
+
+export const addBankAccountAction = async (userId: string, data: BankAccountInput) => {
+  try {
+    const session = await getSessionHelper()
+    if (!session || !session.user) {
+      return { success: false, error: 'Unauthorized' }
+    }
+
+    const isSelf = session.user.id === userId
+    const isAdmin = session.user.role === 'ADMIN' || session.user.role === 'OWNER'
+
+    if (!isSelf && !isAdmin) {
+      return { success: false, error: 'Permission Denied' }
+    }
+
+    if (data.accountNumber.length !== 10) {
+      return { success: false, error: 'Account number must be 10 digits' }
+    }
+
+    // Check if user already has bank accounts
+    const existingAccountsCount = await prisma.bankAccount.count({
+      where: { userId },
+    })
+
+    // First account is automatically primary
+    const isPrimary = existingAccountsCount === 0
+
+    const result = await prisma.bankAccount.create({
+      data: {
+        userId,
+        bankName: data.bankName,
+        accountNumber: data.accountNumber,
+        accountName: data.accountName,
+        isPrimary,
+      },
+    })
+
+    try {
+      revalidatePath(`/dashboard/${userId}/banks`)
+      revalidatePath(`/dashboard/${userId}/profile`)
+    } catch {}
+
+    return { success: true, data: result }
+  } catch (error) {
+    console.error('Error adding bank account:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to add bank account',
+    }
+  }
+}
+
+export const setPrimaryBankAccountAction = async (userId: string, bankAccountId: string) => {
+  try {
+    const session = await getSessionHelper()
+    if (!session || !session.user) {
+      return { success: false, error: 'Unauthorized' }
+    }
+
+    const isSelf = session.user.id === userId
+    const isAdmin = session.user.role === 'ADMIN' || session.user.role === 'OWNER'
+
+    if (!isSelf && !isAdmin) {
+      return { success: false, error: 'Permission Denied' }
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      // Unset all other primary accounts
+      await tx.bankAccount.updateMany({
+        where: { userId, isPrimary: true },
+        data: { isPrimary: false },
+      })
+
+      // Set target account as primary
+      const updated = await tx.bankAccount.update({
+        where: { id: bankAccountId, userId },
+        data: { isPrimary: true },
+      })
+
+      return updated
+    })
+
+    try {
+      revalidatePath(`/dashboard/${userId}/banks`)
+      revalidatePath(`/dashboard/${userId}/profile`)
+    } catch {}
+
+    return { success: true, data: result }
+  } catch (error) {
+    console.error('Error setting primary bank account:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to set primary bank account',
+    }
+  }
+}
+
+export const deleteBankAccountAction = async (userId: string, bankAccountId: string) => {
+  try {
+    const session = await getSessionHelper()
+    if (!session || !session.user) {
+      return { success: false, error: 'Unauthorized' }
+    }
+
+    const isSelf = session.user.id === userId
+    const isAdmin = session.user.role === 'ADMIN' || session.user.role === 'OWNER'
+
+    if (!isSelf && !isAdmin) {
+      return { success: false, error: 'Permission Denied' }
+    }
+
+    const targetAccount = await prisma.bankAccount.findUnique({
+      where: { id: bankAccountId, userId },
+    })
+
+    if (!targetAccount) {
+      return { success: false, error: 'Bank account not found' }
+    }
+
+    if (targetAccount.isPrimary) {
+      const totalAccounts = await prisma.bankAccount.count({
+        where: { userId },
+      })
+      if (totalAccounts > 1) {
+        return {
+          success: false,
+          error: 'Cannot delete primary bank account. Please set another account as primary first.',
+        }
+      }
+    }
+
+    const result = await prisma.bankAccount.delete({
+      where: { id: bankAccountId },
+    })
+
+    try {
+      revalidatePath(`/dashboard/${userId}/banks`)
+      revalidatePath(`/dashboard/${userId}/profile`)
+    } catch {}
+
+    return { success: true, data: result }
+  } catch (error) {
+    console.error('Error deleting bank account:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to delete bank account',
+    }
+  }
+}
+
+export const resolveAccountNameAction = async (bankName: string, accountNumber: string) => {
+  try {
+    if (accountNumber.length !== 10) {
+      return { success: false, error: 'Account number must be 10 digits' }
+    }
+
+    // Simulate NIBSS network latency (500ms)
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    let resolvedName = 'Olumide Bakare'
+    if (accountNumber.startsWith('0')) {
+      resolvedName = 'Ade Wale'
+    } else if (accountNumber.startsWith('1')) {
+      resolvedName = 'Chinelo Ngozi'
+    } else if (accountNumber.startsWith('2')) {
+      resolvedName = 'Chinedu Okafor'
+    } else if (accountNumber.startsWith('3')) {
+      resolvedName = 'Amina Ibrahim'
+    }
+
+    return { success: true, accountName: resolvedName }
+  } catch (error) {
+    console.error('Error resolving bank account name:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to resolve account name',
     }
   }
 }
