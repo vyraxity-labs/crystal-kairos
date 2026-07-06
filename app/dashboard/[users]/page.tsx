@@ -1,9 +1,8 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
-import MemberDashboardHero from '@/components/members/MemberDashboardHero'
-import { WalletLedgerSummary } from '@/components/members/WalletLedgerSummary'
-import { TransactionHistoryList } from '@/components/members/TransactionHistoryList'
+import { getMemberById, getEarningRecords } from '@/models/members/query'
 import { getUserLedgerBalances, getUserTransactions } from '@/models/transactions/actions'
+import { MemberDashboardBento } from '@/components/members/MemberDashboardBento'
 import { ShieldAlert } from 'lucide-react'
 
 interface PageProps {
@@ -34,12 +33,25 @@ const UserPage = async ({ params }: PageProps) => {
     )
   }
 
-  // Fetch ledger balance data and transaction list concurrently
-  const [balancesResult, transactionsResult] = await Promise.all([
+  // Fetch member info, earnings, ledger balances, and transactions concurrently
+  const [memberResult, earningResult, balancesResult, transactionsResult] = await Promise.all([
+    getMemberById(profileId),
+    getEarningRecords(profileId),
     getUserLedgerBalances(profileId),
     getUserTransactions(profileId),
   ])
 
+  if (!memberResult.success || !memberResult.data) {
+    return (
+      <div className="p-6 text-center text-muted-foreground font-semibold">
+        Member not found.
+      </div>
+    )
+  }
+
+  const member = memberResult.data
+  const earningRecords = earningResult.success && earningResult.data ? earningResult.data : []
+  
   const defaultBalances = {
     generalWalletBalance: 0,
     subLedgers: {
@@ -52,16 +64,29 @@ const UserPage = async ({ params }: PageProps) => {
   const balances = balancesResult.success && balancesResult.data ? balancesResult.data : defaultBalances
   const transactions = transactionsResult.success && transactionsResult.data ? transactionsResult.data : []
 
+  // Map earnings to Ajo records structure
+  const ajoRecords = earningRecords.map((earning) => ({
+    id: earning.id,
+    contributionAmount: Number(earning.contributionAmount),
+    totalParticipants: earning.totalParticipants,
+    duration: earning.duration,
+    frequency: earning.frequency,
+    payoutPosition: earning.payoutPosition,
+    netPayoutAmount: Number(earning.netPayoutAmount),
+    status: earning.status,
+  }))
+
   return (
-    <div className="w-[95%] sm:w-[90%] mx-auto py-6 flex flex-col gap-6 max-w-5xl">
-      {/* 1. Header Hero Panel */}
-      <MemberDashboardHero userId={profileId} />
-
-      {/* 2. Wallet & Product Sub-Ledger Balances Summary */}
-      <WalletLedgerSummary balances={balances} />
-
-      {/* 3. Transaction History Ledger Table */}
-      <TransactionHistoryList transactions={transactions} />
+    <div className="w-[95%] sm:w-[90%] mx-auto py-6 max-w-5xl">
+      <MemberDashboardBento
+        userId={profileId}
+        memberName={member.name}
+        walletBalance={balances.generalWalletBalance}
+        ajoRecords={ajoRecords}
+        transactions={transactions}
+        hasBankAccounts={(member.bankAccounts || []).length > 0}
+        hasNextOfKin={member.nextOfKin !== null}
+      />
     </div>
   )
 }
