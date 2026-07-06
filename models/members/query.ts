@@ -207,8 +207,12 @@ export const approveMember = async (
         membershipNumber,
       },
     })
-    revalidatePath('/admin/members')
-    revalidatePath(`/admin/members/${userId}`)
+    try {
+      revalidatePath('/admin/members')
+      revalidatePath(`/admin/members/${userId}`)
+    } catch (e) {
+      console.warn('revalidatePath skipped:', e instanceof Error ? e.message : e)
+    }
 
     try {
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL
@@ -252,8 +256,12 @@ export const rejectMember = async (
         rejectionReason: reason,
       },
     })
-    revalidatePath('/admin/members')
-    revalidatePath(`/admin/members/${userId}`)
+    try {
+      revalidatePath('/admin/members')
+      revalidatePath(`/admin/members/${userId}`)
+    } catch (e) {
+      console.warn('revalidatePath skipped:', e instanceof Error ? e.message : e)
+    }
 
     try {
       await onMembershipRejected(userId, reason)
