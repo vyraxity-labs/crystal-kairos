@@ -1,0 +1,50 @@
+{
+  "title": "Savings Plans",
+  "dashboard": {
+    "heading": "Track Savings",
+    "total_savings": "Total Savings Balance",
+    "interest_earned": "Total Accrued Interest",
+    "choose_plan": "Choose Savings Type",
+    "fixed_savings": "Fixed Savings",
+    "fixed_savings_desc": "Save a bulk amount upfront and lock it in for a fixed term with high interest rates.",
+    "regular_savings": "Regular Savings",
+    "regular_savings_desc": "Save a specific amount periodically (daily, weekly, monthly) toward a target goal.",
+    "staggered_savings": "Staggered Savings",
+    "staggered_savings_desc": "Save any amount, at any time, with absolute flexibility and no fixed schedule."
+  },
+  "create_plan": {
+    "title_fixed": "Create Fixed Savings Plan",
+    "title_regular": "Create Regular Savings Plan",
+    "amount_label": "Target Savings Amount",
+    "bulk_amount_label": "Upfront Bulk Amount",
+    "frequency": "Deposit Frequency",
+    "maturity": "Maturity Duration",
+    "interest_rate": "Interest Rate",
+    "success": "Savings plan created successfully. Awaiting approval by admins."
+  },
+  "detail": {
+    "heading": "Savings Plan Detail",
+    "start_date": "Start Date",
+    "maturity_date": "Maturity Date",
+    "withdrawn_at": "Withdrawn Date",
+    "expected_maturity": "Expected Maturity Amount",
+    "current_balance": "Current Principal Saved",
+    "accrued_interest": "Accrued Interest",
+    "deposit": "Deposit Funds",
+    "withdraw": "Request Withdrawal",
+    "early_withdrawal_warning": {
+      "title": "Confirm Early Withdrawal",
+      "warning_text": "Warning: You are requesting a withdrawal before the maturity date. By completing this action, you will forfeit 100% of your accrued interest.",
+      "accrued_forfeiture": "Interest Forfeited",
+      "payout_principal": "Principal Payout Amount",
+      "cancel": "Cancel",
+      "confirm": "Yes, Forfeit Interest & Withdraw"
+    },
+    "withdrawal_success": "Savings withdrawal successful. Funds have been disbursed."
+  },
+  "deposit_receipt": {
+    "title": "Upload Deposit Receipt",
+    "amount": "Deposited Amount",
+    "upload_instruction": "Drag & drop your proof of payment receipt (JPG, PNG, PDF up to 5MB)"
+  }
+}

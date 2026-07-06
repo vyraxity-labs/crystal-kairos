@@ -14,7 +14,17 @@ i18n
     lng: 'en',
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'admin', 'admin-dashboard', 'admin-members'],
+    ns: [
+      'common',
+      'auth',
+      'admin',
+      'admin-dashboard',
+      'admin-members',
+      'ajo',
+      'savings',
+      'loans',
+      'members-dashboard',
+    ],
     interpolation: {
       escapeValue: false,
     },

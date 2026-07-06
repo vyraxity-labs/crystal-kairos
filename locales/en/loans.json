@@ -1,0 +1,54 @@
+{
+  "title": "Cooperative Loans",
+  "dashboard": {
+    "heading": "Loan Home / Eligibility Overview",
+    "borrow_limit": "Maximum Loan Eligibility",
+    "borrow_limit_desc": "As a cooperative member, you qualify to borrow up to double (2x) the amount of your total confirmed savings.",
+    "outstanding_balance": "Outstanding Loan Balance",
+    "repaid_to_date": "Total Repaid to Date",
+    "apply_button": "Apply for a Loan",
+    "my_loans": "My Loans & Repayment Ledgers",
+    "grace_period_hint": "Grace period: 1 week after due date before overdue penalty kicks in."
+  },
+  "apply": {
+    "title": "Apply for a Loan",
+    "amount": "Requested Loan Amount",
+    "duration": "Loan Term (Months)",
+    "purpose": "Purpose of Loan",
+    "interest_preview": "Monthly Interest Rate",
+    "guarantor_selection": "Apply for Loan - Step 2: Guarantor Selection",
+    "guarantor_email": "Guarantor Member Email",
+    "guarantor_phone": "Guarantor Phone Number",
+    "guarantor_hint": "Guarantor must be a registered and active member of the cooperative.",
+    "collateral_selection": "Apply for Loan - Step 2: Collateral Details (Non-Member)",
+    "collateral_details": "Collateral Items Description",
+    "collateral_upload": "Upload Collateral Proof / Ownership Receipt",
+    "review_title": "Loan Review & Submit",
+    "submit": "Submit Loan Application",
+    "submitted_pending": "Loan Application Submitted - Pending Review",
+    "submitted_desc": "Your loan request is undergoing review by the cooperative credit committee. You will be notified once approved.",
+    "approved_awaiting": "Loan Approved - Awaiting Disbursement",
+    "approved_desc": "Your loan has been approved. The disbursement team is processing the payment offline to your nominated bank account."
+  },
+  "detail": {
+    "heading": "Loan Repayment Detail",
+    "approved_amount": "Approved Principal",
+    "interest_rate": "Interest Rate",
+    "repayment_schedule": "Repayment Schedule",
+    "due_date": "Due Date",
+    "amount_due": "Amount Due",
+    "penalty": "Default Penalty Fine",
+    "total_due": "Total Amount Due",
+    "status": "Repayment Status",
+    "pay_now": "Upload Repayment Receipt",
+    "repayment_rejected": "Repayment Receipt Status - Rejected State",
+    "rejection_reason": "Rejection Reason",
+    "disbursed_success": "Loan Disbursed - Confirmation State"
+  },
+  "upload_repayment": {
+    "title": "Upload Repayment Receipt (Side Drawer)",
+    "amount_paid": "Amount Deposited",
+    "notes": "Payment Reference / Notes",
+    "submit": "Submit Proof of Repayment"
+  }
+}
