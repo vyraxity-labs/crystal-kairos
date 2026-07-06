@@ -1,0 +1,52 @@
+{
+  "title": "Ajo Savings Groups",
+  "empty_state": {
+    "title": "No Active Ajo Groups",
+    "description": "You are not currently enrolled in any rotating group savings. Start a new Ajo cycle or join an existing group with your colleagues."
+  },
+  "create_group": {
+    "title": "Create Ajo Group",
+    "contribution_amount": "Contribution Amount",
+    "frequency": "Cadence / Frequency",
+    "duration": "Duration",
+    "pick_order": "Select Your Payout Position",
+    "guarantor_name": "Guarantor Name",
+    "guarantor_phone": "Guarantor Phone Number",
+    "submit": "Create Ajo Group",
+    "success": "Ajo Group created successfully. Awaiting approval by admins."
+  },
+  "join_group": {
+    "title": "Join Ajo Group",
+    "select_position": "Select Available Payout Position",
+    "confirm_title": "Confirm Join Ajo",
+    "confirm_description": "You are about to join this rotating group savings cycle. Please review your terms below.",
+    "position_card": "Position {{position}}",
+    "fee_preview": "Cooperative Maintenance Fee",
+    "net_payout_preview": "Estimated Net Payout",
+    "advanced_amount": "Advanced by Cooperative",
+    "fee_percentage": "Fee Rate",
+    "submit": "Confirm and Join Group"
+  },
+  "dashboard": {
+    "my_groups": "My Ajo Groups",
+    "details": "Ajo Cycle Details",
+    "status": "Group Status",
+    "payout_order": "Payout Schedule & Order",
+    "ledger": "Running Contribution Ledger",
+    "total_contributed": "Total Contributed",
+    "current_balance": "Current Cycle Balance",
+    "expected_payout": "Expected Gross Payout",
+    "net_payout": "Net Payout",
+    "has_received_payout": "Payout Received",
+    "payout_date": "Scheduled Payout Date",
+    "pay_contribution": "Pay Installment",
+    "upload_receipt": "Upload Contribution Receipt",
+    "no_transactions": "No contributions recorded yet."
+  },
+  "admin": {
+    "verification_title": "Ajo Verification Queue",
+    "confirm_payout_title": "Confirm Ajo Disbursement",
+    "recipient": "Receiving Member",
+    "bank_details": "Selected Bank Account"
+  }
+}
