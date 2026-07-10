@@ -1,14 +1,14 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
-import { getLoanRecords, getSavingsRecords } from '@/models/members/query'
-import { LoansHubClient } from '@/components/loans/LoansHubClient'
+import { getMemberById, getSavingsRecords } from '@/models/members/query'
+import { NewLoanClient } from '@/components/loans/NewLoanClient'
 import { ShieldAlert } from 'lucide-react'
 
 interface PageProps {
   params: Promise<{ users: string }>
 }
 
-const LoansHubPage = async ({ params }: PageProps) => {
+const NewLoanPage = async ({ params }: PageProps) => {
   const session = await auth()
 
   if (!session) {
@@ -25,44 +25,46 @@ const LoansHubPage = async ({ params }: PageProps) => {
         <ShieldAlert className="w-12 h-12 text-error" />
         <h3 className="font-bold text-lg text-primary">Access Denied</h3>
         <p className="text-muted-foreground text-sm max-w-sm text-center">
-          You do not have permission to view this borrowing dashboard.
+          You do not have permission to submit new loan applications.
         </p>
       </div>
     )
   }
 
-  // 1. Fetch member savings plans to sum total active savings balance
+  // 1. Fetch user's active savings to calculate borrow eligibility bounds
   const savingsRes = await getSavingsRecords(profileId)
   const activeSavings = savingsRes.success && savingsRes.data
     ? savingsRes.data.filter((s) => s.status === 'ACTIVE')
     : []
   const totalSavings = activeSavings.reduce((sum, s) => sum + Number(s.currentBalance), 0)
 
-  // 2. Fetch loan records (high limit page size to load list)
-  const loansRes = await getLoanRecords(profileId, { page: 1, pageSize: 50 })
-  const loans = loansRes.success && loansRes.data ? loansRes.data : []
+  // 2. Fetch member profile for saved bank payout accounts
+  const memberResult = await getMemberById(profileId)
 
-  // Map database structures to plain client formats
-  const mappedLoans = loans.map((l) => ({
-    id: l.id,
-    requestedAmount: Number(l.requestedAmount),
-    approvedAmount: l.approvedAmount ? Number(l.approvedAmount) : null,
-    interestRate: Number(l.interestRate),
-    duration: l.duration,
-    purpose: l.purpose,
-    outstandingBalance: Number(l.outstandingBalance),
-    totalRepaid: Number(l.totalRepaid),
-    status: l.status,
-    createdAt: l.createdAt,
+  if (!memberResult.success || !memberResult.data) {
+    return (
+      <div className="p-6 text-center text-muted-foreground font-semibold">
+        Member profile not found.
+      </div>
+    )
+  }
+
+  const member = memberResult.data
+  const bankAccounts = (member.bankAccounts || []).map((acct) => ({
+    id: acct.id,
+    bankName: acct.bankName,
+    accountNumber: acct.accountNumber,
+    accountName: acct.accountName,
+    isPrimary: acct.isPrimary,
   }))
 
   return (
-    <LoansHubClient
+    <NewLoanClient
       userId={profileId}
-      loans={mappedLoans}
+      bankAccounts={bankAccounts}
       totalSavings={totalSavings}
     />
   )
 }
 
-export default LoansHubPage
+export default NewLoanPage
