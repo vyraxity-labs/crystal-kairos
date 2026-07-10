@@ -19,7 +19,7 @@ const StatsCard = ({
   href?: string
 }) => {
   return (
-    <Card className='w-full max-w-[200px] rounded-md py-3'>
+    <Card className='w-full max-w-[240px] rounded-md py-3'>
       <Link href={href} className='flex flex-col gap-3'>
         <CardHeader className='flex gap-2 items-center px-3'>
           <Icon size={16} color={color} />{' '}
