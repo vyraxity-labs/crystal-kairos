@@ -171,3 +171,67 @@ export const getAdminStaffMembers = async () => {
     }
   }
 }
+
+/**
+ * Fetches all pending deposit receipts for the Verification Queue
+ */
+export const getPendingReceipts = async () => {
+  try {
+    const session = await getSessionHelper()
+    if (!session?.user || (session.user.role !== 'ADMIN' && session.user.role !== 'OWNER')) {
+      return { success: false, error: 'Unauthorized admin access.' }
+    }
+
+    const receipts = await prisma.transaction.findMany({
+      where: {
+        status: TransactionStatus.PENDING,
+        type: TransactionType.DEPOSIT,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            userInfo: {
+              select: {
+                phoneNumber: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    })
+
+    // Serialize Decimal values to prevent RSC errors
+    const serializedReceipts = receipts.map((rx) => ({
+      id: rx.id,
+      userId: rx.userId,
+      amount: Number(rx.amount),
+      category: rx.category,
+      type: rx.type,
+      status: rx.status,
+      eAjoId: rx.eAjoId,
+      savingsId: rx.savingsId,
+      loanId: rx.loanId,
+      receiptUrl: rx.receiptUrl,
+      rejectionReason: rx.rejectionReason,
+      referenceNumber: rx.referenceNumber,
+      notes: rx.notes,
+      recordedBy: rx.recordedBy,
+      createdAt: rx.createdAt,
+      user: rx.user,
+    }))
+
+    return { success: true, data: serializedReceipts }
+  } catch (error) {
+    console.error('Error fetching pending receipts:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch pending receipts.',
+    }
+  }
+}
