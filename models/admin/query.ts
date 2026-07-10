@@ -235,3 +235,76 @@ export const getPendingReceipts = async () => {
     }
   }
 }
+
+/**
+ * Fetches all pending money-out disbursements for the Disbursements Queue
+ */
+export const getPendingDisbursements = async () => {
+  try {
+    const session = await getSessionHelper()
+    if (!session?.user || (session.user.role !== 'ADMIN' && session.user.role !== 'OWNER')) {
+      return { success: false, error: 'Unauthorized admin access.' }
+    }
+
+    const disbursements = await prisma.transaction.findMany({
+      where: {
+        status: TransactionStatus.PENDING,
+        type: TransactionType.WITHDRAWAL,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            membership: {
+              select: {
+                membershipNumber: true,
+              },
+            },
+          },
+        },
+        bankAccount: {
+          select: {
+            bankName: true,
+            accountNumber: true,
+            accountName: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc', // Oldest first
+      },
+    })
+
+    // Serialize Decimal amounts to prevent RSC errors
+    const serializedDisbursements = disbursements.map((dx) => ({
+      id: dx.id,
+      userId: dx.userId,
+      amount: Number(dx.amount),
+      category: dx.category,
+      type: dx.type,
+      status: dx.status,
+      eAjoId: dx.eAjoId,
+      savingsId: dx.savingsId,
+      loanId: dx.loanId,
+      receiptUrl: dx.receiptUrl,
+      rejectionReason: dx.rejectionReason,
+      referenceNumber: dx.referenceNumber,
+      notes: dx.notes,
+      bankAccountId: dx.bankAccountId,
+      recordedBy: dx.recordedBy,
+      createdAt: dx.createdAt,
+      user: dx.user,
+      bankAccount: dx.bankAccount,
+    }))
+
+    return { success: true, data: serializedDisbursements }
+  } catch (error) {
+    console.error('Error fetching pending disbursements:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch pending disbursements.',
+    }
+  }
+}

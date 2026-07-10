@@ -213,6 +213,9 @@ export const transitionTransaction = async (
     })
 
     try {
+      revalidatePath('/admin')
+      revalidatePath('/admin/verification')
+      revalidatePath('/admin/disbursements')
       revalidatePath('/admin/transactions')
       revalidatePath(`/dashboard/${result.userId}`)
     } catch {}
