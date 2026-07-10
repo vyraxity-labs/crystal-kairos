@@ -1,25 +1,13 @@
-import Sample from '@/components/home/Sample'
-import { prisma } from '@/lib/prisma'
+import LandingPage from '@/components/home/LandingPage'
 
-const HomePage = async () => {
-  const users = await prisma.user.findMany({})
+export const metadata = {
+  title: 'Crystal Kairos — Digital Cooperative Savings',
+  description:
+    'Crystal Kairos brings the traditional Ajo/Esusu into the digital age. Transparent, auditable, and built for community trust. Join thousands securing their financial future together.',
+}
 
-  return (
-    <div>
-      <Sample />
-
-      <div>
-        {users.map((user) => {
-          return (
-            <div key={user.id}>
-              <h3>{user.name}</h3>
-              <p>{user.email}</p>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
+const HomePage = () => {
+  return <LandingPage />
 }
 
 export default HomePage
