@@ -130,8 +130,8 @@ export const transitionTransaction = async (
             updateData.status = SavingsStatus.ACTIVE
             updateData.startDate = new Date()
             
-            // If it is FIXED savings, calculate maturity date from startDate
-            if (transaction.savings.savingsType === 'FIXED') {
+            // Calculate maturity date from startDate for FIXED or REGULAR savings
+            if (transaction.savings.savingsType === 'FIXED' || transaction.savings.savingsType === 'REGULAR') {
               const maturityMonths = transaction.savings.maturity === 'SIX_MONTHS' ? 6 : 12
               const maturityDate = new Date()
               maturityDate.setMonth(maturityDate.getMonth() + maturityMonths)
