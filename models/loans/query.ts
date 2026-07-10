@@ -1,0 +1,61 @@
+'use server'
+
+import { prisma } from '@/lib/prisma'
+import { serializeLoan, calculateRepaymentSchedule } from '@/lib/loans'
+
+/**
+ * Fetches a single loan details along with its transactions, user details, and computed schedule
+ */
+export const getLoanPlanById = async (loanId: string) => {
+  try {
+    const loan = await prisma.loan.findUnique({
+      where: { id: loanId },
+      include: {
+        user: true,
+        transactions: {
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    })
+
+    if (!loan) {
+      return { success: false, error: 'Loan not found.' }
+    }
+
+    const serializedLoan = serializeLoan(loan)
+    const serializedTransactions = (loan.transactions || []).map((t) => ({
+      ...t,
+      amount: Number(t.amount),
+    }))
+
+    // Calculate dynamic schedule if disbursed (ACTIVE/OVERDUE/COMPLETED/DEFAULTED)
+    const schedule = calculateRepaymentSchedule(
+      loan.approvedAmount ? Number(loan.approvedAmount) : Number(loan.requestedAmount),
+      Number(loan.interestRate),
+      loan.duration,
+      loan.disbursedAt,
+      Number(loan.totalRepaid),
+      loan.gracePeriodDays
+    )
+
+    return {
+      success: true,
+      data: {
+        ...serializedLoan,
+        user: {
+          id: loan.user.id,
+          name: loan.user.name,
+          email: loan.user.email,
+        },
+        transactions: serializedTransactions,
+        schedule,
+      },
+    }
+  } catch (error) {
+    console.error('Error fetching loan plan:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch loan plan.',
+    }
+  }
+}
