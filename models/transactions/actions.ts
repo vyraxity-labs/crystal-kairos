@@ -94,14 +94,15 @@ export const transitionTransaction = async (
       }
 
       let newStatus: TransactionStatus = TransactionStatus.PENDING
+      const upperAction = action.toUpperCase()
 
-      if (action === 'CONFIRM') {
+      if (upperAction === 'CONFIRM') {
         newStatus = TransactionStatus.CONFIRMED
-      } else if (action === 'REJECT') {
+      } else if (upperAction === 'REJECT') {
         newStatus = TransactionStatus.REJECTED
-      } else if (action === 'DISBURSE') {
+      } else if (upperAction === 'DISBURSE') {
         newStatus = TransactionStatus.DISBURSED
-      } else if (action === 'FAIL') {
+      } else if (upperAction === 'FAIL') {
         newStatus = TransactionStatus.FAILED
       }
 

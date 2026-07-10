@@ -18,7 +18,7 @@ interface NextOfKinInput {
   accountName: string
 }
 
-const getSessionHelper = async () => {
+export const getSessionHelper = async () => {
   try {
     return await auth()
   } catch (e) {
