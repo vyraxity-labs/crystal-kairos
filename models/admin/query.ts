@@ -308,3 +308,138 @@ export const getPendingDisbursements = async () => {
     }
   }
 }
+
+// ============================================
+// E-AJO GROUP ADMIN QUERIES
+// ============================================
+
+/**
+ * Fetches all eAjo groups with member counts and slot fill status
+ */
+export const getAllEAjoGroups = async () => {
+  try {
+    const session = await getSessionHelper()
+    if (!session?.user || (session.user.role !== 'ADMIN' && session.user.role !== 'OWNER')) {
+      return { success: false, error: 'Unauthorized admin access.' }
+    }
+
+    const groups = await prisma.eAjoGroup.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: { select: { members: true } },
+        createdByUser: { select: { name: true } },
+      },
+    })
+
+    const serialized = groups.map((g) => ({
+      ...g,
+      contributionAmount: Number(g.contributionAmount),
+    }))
+
+    return { success: true, data: serialized }
+  } catch (error) {
+    console.error('Error fetching eAjo groups:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch eAjo groups.',
+    }
+  }
+}
+
+/**
+ * Fetches a single eAjo group with full member details
+ */
+export const getEAjoGroupById = async (groupId: string) => {
+  try {
+    const session = await getSessionHelper()
+    if (!session?.user || (session.user.role !== 'ADMIN' && session.user.role !== 'OWNER')) {
+      return { success: false, error: 'Unauthorized admin access.' }
+    }
+
+    const group = await prisma.eAjoGroup.findUnique({
+      where: { id: groupId },
+      include: {
+        createdByUser: { select: { name: true, email: true } },
+        members: {
+          orderBy: { payoutPosition: 'asc' },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                userInfo: { select: { phoneNumber: true } },
+                membership: { select: { membershipNumber: true } },
+              },
+            },
+          },
+        },
+      },
+    })
+
+    if (!group) return { success: false, error: 'Group not found.' }
+
+    const serialized = {
+      ...group,
+      contributionAmount: Number(group.contributionAmount),
+      members: group.members.map((m) => ({
+        ...m,
+        feePercentage: Number(m.feePercentage),
+        feeAmount: Number(m.feeAmount),
+        totalExpectedPayout: Number(m.totalExpectedPayout),
+        netPayoutAmount: Number(m.netPayoutAmount),
+        currentBalance: Number(m.currentBalance),
+        totalContributed: Number(m.totalContributed),
+      })),
+    }
+
+    return { success: true, data: serialized }
+  } catch (error) {
+    console.error('Error fetching eAjo group:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch eAjo group.',
+    }
+  }
+}
+
+/**
+ * Fetches all pending member applications across all groups
+ */
+export const getPendingEAjoApplications = async () => {
+  try {
+    const session = await getSessionHelper()
+    if (!session?.user || (session.user.role !== 'ADMIN' && session.user.role !== 'OWNER')) {
+      return { success: false, error: 'Unauthorized admin access.' }
+    }
+
+    const applications = await prisma.eAjoMember.findMany({
+      where: { status: 'PENDING' },
+      orderBy: { createdAt: 'asc' },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        group: { select: { id: true, title: true, contributionAmount: true, duration: true } },
+      },
+    })
+
+    const serialized = applications.map((a) => ({
+      ...a,
+      feePercentage: Number(a.feePercentage),
+      feeAmount: Number(a.feeAmount),
+      totalExpectedPayout: Number(a.totalExpectedPayout),
+      netPayoutAmount: Number(a.netPayoutAmount),
+      currentBalance: Number(a.currentBalance),
+      totalContributed: Number(a.totalContributed),
+      group: { ...a.group, contributionAmount: Number(a.group.contributionAmount) },
+    }))
+
+    return { success: true, data: serialized }
+  } catch (error) {
+    console.error('Error fetching pending eAjo applications:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch pending applications.',
+    }
+  }
+}
+

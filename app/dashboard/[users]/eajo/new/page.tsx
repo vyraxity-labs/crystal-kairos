@@ -1,26 +1,19 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { getMemberById } from '@/models/members/query'
-import { getAjoFeeConfigsForDuration } from '@/models/eajo/query'
+import { getEAjoGroupForJoin } from '@/models/eajo/query'
 import { NewAjoClient } from '@/components/eajo/NewAjoClient'
-import { EAjoDuration } from '@/generated/prisma/enums'
 import { ShieldAlert } from 'lucide-react'
+import { prisma } from '@/lib/prisma'
 
 interface PageProps {
   params: Promise<{ users: string }>
-  searchParams: Promise<{
-    duration?: string
-    amount?: string
-    slots?: string
-  }>
+  searchParams: Promise<{ groupId?: string }>
 }
 
 const NewEAjoPage = async ({ params, searchParams }: PageProps) => {
   const session = await auth()
-
-  if (!session) {
-    redirect('/login')
-  }
+  if (!session) redirect('/login')
 
   const profileId = (await params).users
   const isSelf = session.user.id === profileId
@@ -32,21 +25,20 @@ const NewEAjoPage = async ({ params, searchParams }: PageProps) => {
         <ShieldAlert className="w-12 h-12 text-error" />
         <h3 className="font-bold text-lg text-primary">Access Denied</h3>
         <p className="text-muted-foreground text-sm max-w-sm text-center">
-          You do not have permission to subscribe to Ajo pools.
+          You do not have permission to join Ajo groups.
         </p>
       </div>
     )
   }
 
   const query = await searchParams
-  const duration = (query.duration as EAjoDuration) || EAjoDuration.SIX_MONTHS
-  const amount = Number(query.amount) || 50000
-  const slots = Number(query.slots) || 6
+  const groupId = query.groupId
 
-  // Fetch member profile details (including bank accounts) and fee configs
-  const [memberResult, feeConfigsResult] = await Promise.all([
+  if (!groupId) redirect(`/dashboard/${profileId}/eajo`)
+
+  const [memberResult, groupResult] = await Promise.all([
     getMemberById(profileId),
-    getAjoFeeConfigsForDuration(duration),
+    getEAjoGroupForJoin(groupId),
   ])
 
   if (!memberResult.success || !memberResult.data) {
@@ -57,8 +49,27 @@ const NewEAjoPage = async ({ params, searchParams }: PageProps) => {
     )
   }
 
-  const member = memberResult.data
-  const bankAccounts = (member.bankAccounts || []).map((acct) => ({
+  if (!groupResult.success || !groupResult.data) {
+    return (
+      <div className="p-6 text-center text-muted-foreground font-semibold">
+        Ajo group not found or is no longer accepting applications.
+      </div>
+    )
+  }
+
+  // Fetch fee configs for this group's duration
+  const durationMonthsMap: Record<string, number> = {
+    FOUR_MONTHS: 4,
+    SIX_MONTHS: 6,
+    TWELVE_MONTHS: 12,
+  }
+  const months = durationMonthsMap[groupResult.data.duration] ?? 6
+  const feeConfigs = await prisma.ajoFeeConfig.findMany({
+    where: { durationMonths: months },
+    orderBy: { pickPosition: 'asc' },
+  })
+
+  const bankAccounts = (memberResult.data.bankAccounts || []).map((acct) => ({
     id: acct.id,
     bankName: acct.bankName,
     accountNumber: acct.accountNumber,
@@ -66,15 +77,16 @@ const NewEAjoPage = async ({ params, searchParams }: PageProps) => {
     isPrimary: acct.isPrimary,
   }))
 
-  const feeConfigs = feeConfigsResult.success && feeConfigsResult.data ? feeConfigsResult.data : []
+  const serializedFeeConfigs = feeConfigs.map((f) => ({
+    ...f,
+    feePercentage: Number(f.feePercentage),
+  }))
 
   return (
     <NewAjoClient
       userId={profileId}
-      duration={duration}
-      amount={amount}
-      slots={slots}
-      feeConfigs={feeConfigs}
+      group={groupResult.data}
+      feeConfigs={serializedFeeConfigs}
       bankAccounts={bankAccounts}
     />
   )

@@ -113,6 +113,15 @@ enum EAjoStatus {
   CANCELLED
 }
 
+enum EAjoMemberStatus {
+  PENDING    // Member applied, awaiting admin approval
+  APPROVED   // Admin approved the slot assignment
+  REJECTED   // Admin rejected the application
+  ACTIVE     // Group is running and member is contributing
+  COMPLETED  // Member received their payout
+  CANCELLED  // Member or admin cancelled
+}
+
 // SAVINGS ENUMS
 enum SavingsType {
   FIXED // UPFRONT - bulk amount once
@@ -196,6 +205,8 @@ model User {
   nextOfKin             NextOfKin?
   membership            Membership?
   eAjo                  EAjo[]
+  eAjoGroups            EAjoGroup[]  @relation("EAjoGroupCreator")
+  eAjoMembers           EAjoMember[]
   savings               Savings[]
   loans                 Loan[]
   transactions          Transaction[] @relation("TransactionOwner")
@@ -406,6 +417,69 @@ model EAjo {
   @@map("e_ajo")
 }
 
+// ============================================
+// E-AJO GROUP MODELS (Admin-Created)
+// ============================================
+
+model EAjoGroup {
+  id                 String        @id @default(uuid())
+  title              String
+  description        String?
+  contributionAmount Decimal       @db.Decimal(15, 2)
+  frequency          EAjoFrequency
+  duration           EAjoDuration
+  totalSlots         Int           // Number of positions (4, 6, or 12)
+  filledSlots        Int           @default(0)
+  status             EAjoStatus    @default(PENDING)
+  startDate          DateTime?
+  endDate            DateTime?
+  createdBy          String        // Admin User ID
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  createdByUser User         @relation("EAjoGroupCreator", fields: [createdBy], references: [id])
+  members       EAjoMember[]
+
+  @@index([status])
+  @@map("e_ajo_groups")
+}
+
+model EAjoMember {
+  id                   String           @id @default(uuid())
+  groupId              String
+  userId               String
+  payoutPosition       Int              // Requested/assigned slot number (1 to totalSlots)
+  feePercentage        Decimal          @default(0) @db.Decimal(5, 2)
+  feeAmount            Decimal          @default(0) @db.Decimal(15, 2)
+  totalExpectedPayout  Decimal          @default(0) @db.Decimal(15, 2)
+  netPayoutAmount      Decimal          @default(0) @db.Decimal(15, 2)
+  guarantorName        String
+  guarantorPhoneNumber String
+  bankName             String
+  accountNumber        String
+  accountName          String
+  currentBalance       Decimal          @default(0) @db.Decimal(15, 2)
+  totalContributed     Decimal          @default(0) @db.Decimal(15, 2)
+  hasReceivedPayout    Boolean          @default(false)
+  payoutDate           DateTime?
+  status               EAjoMemberStatus @default(PENDING)
+  approvedAt           DateTime?
+  approvedBy           String?          // Admin User ID
+  rejectionReason      String?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  group        EAjoGroup     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([groupId, payoutPosition]) // One member per slot per group
+  @@unique([groupId, userId])         // One application per user per group
+  @@index([userId])
+  @@index([groupId])
+  @@map("e_ajo_members")
+}
+
 enum TransactionStatus {
   PENDING
   CONFIRMED
@@ -449,9 +523,10 @@ model Transaction {
   status   TransactionStatus   @default(PENDING)
 
   // Reference IDs to specific packages
-  eAjoId    String?
-  savingsId String?
-  loanId    String?
+  eAjoId       String?
+  eAjoMemberId String?   // Reference to new EAjoMember model
+  savingsId    String?
+  loanId       String?
 
   // Offline/Manual payment tracking
   receiptUrl      String?
@@ -475,6 +550,7 @@ model Transaction {
   recorder    User         @relation("TransactionRecorder", fields: [recordedBy], references: [id])
   processor   User?        @relation("TransactionProcessor", fields: [processedBy], references: [id])
   eAjo        EAjo?        @relation(fields: [eAjoId], references: [id], onDelete: SetNull)
+  eAjoMember  EAjoMember?  @relation(fields: [eAjoMemberId], references: [id], onDelete: SetNull)
   savings     Savings?     @relation(fields: [savingsId], references: [id], onDelete: SetNull)
   loan        Loan?        @relation(fields: [loanId], references: [id], onDelete: SetNull)
   bankAccount BankAccount? @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)

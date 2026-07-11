@@ -109,9 +109,9 @@ export const transitionTransaction = async (
       // 2. Apply Ledger Invariants based on Category & Action
       if (newStatus === TransactionStatus.CONFIRMED) {
         // A. Ajo contributions
-        if (transaction.category === TransactionCategory.AJO_CONTRIBUTION && transaction.eAjoId) {
-          await tx.eAjo.update({
-            where: { id: transaction.eAjoId },
+        if (transaction.category === TransactionCategory.AJO_CONTRIBUTION && transaction.eAjoMemberId) {
+          await tx.eAjoMember.update({
+            where: { id: transaction.eAjoMemberId },
             data: {
               currentBalance: { increment: transaction.amount },
               totalContributed: { increment: transaction.amount },
@@ -163,9 +163,9 @@ export const transitionTransaction = async (
 
       if (newStatus === TransactionStatus.DISBURSED) {
         // A. Ajo Payouts (Money disbursed to member)
-        if (transaction.category === TransactionCategory.AJO_PAYOUT && transaction.eAjoId) {
-          await tx.eAjo.update({
-            where: { id: transaction.eAjoId },
+        if (transaction.category === TransactionCategory.AJO_PAYOUT && transaction.eAjoMemberId) {
+          await tx.eAjoMember.update({
+            where: { id: transaction.eAjoMemberId },
             data: {
               currentBalance: { decrement: transaction.amount },
               hasReceivedPayout: true,
