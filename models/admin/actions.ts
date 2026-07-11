@@ -35,7 +35,7 @@ export const createAdminStaffAction = async (formData: {
       data: { name, email, role: role as UserRole, passwordHash, hasSetPassword: true },
     })
 
-    revalidatePath('/admin/settings')
+    try { revalidatePath('/admin/settings') } catch {}
     return { success: true, data: user }
   } catch (error) {
     console.error('Error creating admin staff member:', error)
@@ -96,7 +96,7 @@ export const createEAjoGroupAction = async (formData: {
       },
     })
 
-    revalidatePath('/admin/eajo')
+    try { revalidatePath('/admin/eajo') } catch {}
     return { success: true, data: { ...group, contributionAmount: Number(group.contributionAmount) } }
   } catch (error) {
     console.error('Error creating eAjo group:', error)
@@ -145,8 +145,10 @@ export const updateEAjoGroupAction = async (
       },
     })
 
-    revalidatePath('/admin/eajo')
-    revalidatePath(`/admin/eajo/${groupId}`)
+    try {
+      revalidatePath('/admin/eajo')
+      revalidatePath(`/admin/eajo/${groupId}`)
+    } catch {}
     return { success: true, data: { ...updated, contributionAmount: Number(updated.contributionAmount) } }
   } catch (error) {
     console.error('Error updating eAjo group:', error)
@@ -180,8 +182,10 @@ export const activateEAjoGroupAction = async (groupId: string) => {
       data: { status: EAjoMemberStatus.ACTIVE },
     })
 
-    revalidatePath('/admin/eajo')
-    revalidatePath(`/admin/eajo/${groupId}`)
+    try {
+      revalidatePath('/admin/eajo')
+      revalidatePath(`/admin/eajo/${groupId}`)
+    } catch {}
     return { success: true, data: updated }
   } catch (error) {
     console.error('Error activating eAjo group:', error)
@@ -216,8 +220,10 @@ export const approveEAjoMemberAction = async (memberId: string) => {
       data: { filledSlots: { increment: 1 } },
     })
 
-    revalidatePath('/admin/eajo')
-    revalidatePath(`/admin/eajo/${member.groupId}`)
+    try {
+      revalidatePath('/admin/eajo')
+      revalidatePath(`/admin/eajo/${member.groupId}`)
+    } catch {}
     return { success: true, data: updated }
   } catch (error) {
     console.error('Error approving eAjo member:', error)
@@ -246,8 +252,10 @@ export const rejectEAjoMemberAction = async (memberId: string, rejectionReason: 
       data: { status: EAjoMemberStatus.REJECTED, rejectionReason, approvedBy: session.user.id },
     })
 
-    revalidatePath('/admin/eajo')
-    revalidatePath(`/admin/eajo/${member.groupId}`)
+    try {
+      revalidatePath('/admin/eajo')
+      revalidatePath(`/admin/eajo/${member.groupId}`)
+    } catch {}
     return { success: true, data: updated }
   } catch (error) {
     console.error('Error rejecting eAjo member:', error)
