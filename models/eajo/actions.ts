@@ -3,9 +3,8 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import {
-  EAjoDuration,
-  EAjoFrequency,
   EAjoStatus,
+  EAjoMemberStatus,
   TransactionCategory,
   TransactionType,
   TransactionStatus,
@@ -14,66 +13,75 @@ import { getSessionHelper } from '../members/actions'
 import { revalidatePath } from 'next/cache'
 import { uploadReceipt } from '@/lib/upload'
 
-const durationMonthsMap: Record<EAjoDuration, number> = {
-  [EAjoDuration.FOUR_MONTHS]: 4,
-  [EAjoDuration.SIX_MONTHS]: 6,
-  [EAjoDuration.TWELVE_MONTHS]: 12,
-}
+const serializeMember = (m: any) => ({
+  ...m,
+  feePercentage: Number(m.feePercentage),
+  feeAmount: Number(m.feeAmount),
+  totalExpectedPayout: Number(m.totalExpectedPayout),
+  netPayoutAmount: Number(m.netPayoutAmount),
+  currentBalance: Number(m.currentBalance),
+  totalContributed: Number(m.totalContributed),
+})
 
-const serializeAjo = (ajo: any) => {
-  return {
-    ...ajo,
-    contributionAmount: Number(ajo.contributionAmount),
-    feePercentage: Number(ajo.feePercentage),
-    feeAmount: Number(ajo.feeAmount),
-    totalExpectedPayout: Number(ajo.totalExpectedPayout),
-    netPayoutAmount: Number(ajo.netPayoutAmount),
-    currentBalance: Number(ajo.currentBalance),
-    totalContributed: Number(ajo.totalContributed),
-  }
-}
+const serializeTransaction = (tx: any) => ({
+  ...tx,
+  amount: Number(tx.amount),
+})
 
-const serializeTransaction = (tx: any) => {
-  return {
-    ...tx,
-    amount: Number(tx.amount),
-  }
-}
-
-export const joinEAjoAction = async (
+/**
+ * User applies to join an eAjo group slot
+ */
+export const applyToEAjoGroupAction = async (
   userId: string,
+  groupId: string,
   formData: {
-    contributionAmount: number
-    totalParticipants: number
-    duration: EAjoDuration
-    frequency: EAjoFrequency
     payoutPosition: number
     guarantorName: string
     guarantorPhoneNumber: string
     bankName: string
     accountNumber: string
     accountName: string
-  },
+  }
 ) => {
   try {
     const session = await getSessionHelper()
     const currentUser = session?.user
-
-    if (!currentUser) {
-      return { success: false, error: 'Unauthorized' }
-    }
+    if (!currentUser) return { success: false, error: 'Unauthorized' }
 
     const isSelf = currentUser.id === userId
     const isAdmin = currentUser.role === 'ADMIN' || currentUser.role === 'OWNER'
+    if (!isSelf && !isAdmin) return { success: false, error: 'Forbidden: Access Denied' }
 
-    if (!isSelf && !isAdmin) {
-      return { success: false, error: 'Forbidden: Access Denied' }
+    // Verify the group exists and is PENDING (accepting applications)
+    const group = await prisma.eAjoGroup.findUnique({ where: { id: groupId } })
+    if (!group) return { success: false, error: 'Ajo group not found.' }
+    if (group.status !== EAjoStatus.PENDING && group.status !== EAjoStatus.ACTIVE) {
+      return { success: false, error: 'This group is no longer accepting applications.' }
     }
 
-    // Map duration enum to months
-    const months = durationMonthsMap[formData.duration]
+    // Verify slot is still available
+    const slotTaken = await prisma.eAjoMember.findUnique({
+      where: { groupId_payoutPosition: { groupId, payoutPosition: formData.payoutPosition } },
+    })
+    if (slotTaken) {
+      return { success: false, error: 'This slot has already been taken. Please choose another.' }
+    }
 
-    // Fetch fee configuration from DB
+    // Verify user hasn't already applied to this group
+    const existingApplication = await prisma.eAjoMember.findUnique({
+      where: { groupId_userId: { groupId, userId } },
+    })
+    if (existingApplication) {
+      return { success: false, error: 'You have already applied to this group.' }
+    }
+
+    // Fetch fee config for position
+    const durationMonthsMap: Record<string, number> = {
+      FOUR_MONTHS: 4,
+      SIX_MONTHS: 6,
+      TWELVE_MONTHS: 12,
+    }
+    const months = durationMonthsMap[group.duration]
     const feeConfig = await prisma.ajoFeeConfig.findUnique({
       where: {
         durationMonths_pickPosition: {
@@ -84,18 +92,14 @@ export const joinEAjoAction = async (
     })
 
     const feePercentage = feeConfig ? Number(feeConfig.feePercentage) : 0
-    const totalExpectedPayout =
-      formData.contributionAmount * formData.totalParticipants
+    const totalExpectedPayout = Number(group.contributionAmount) * group.totalSlots
     const feeAmount = (totalExpectedPayout * feePercentage) / 100
     const netPayoutAmount = totalExpectedPayout - feeAmount
 
-    const newAjo = await prisma.eAjo.create({
+    const newMember = await prisma.eAjoMember.create({
       data: {
+        groupId,
         userId,
-        contributionAmount: formData.contributionAmount,
-        totalParticipants: formData.totalParticipants,
-        duration: formData.duration,
-        frequency: formData.frequency,
         payoutPosition: formData.payoutPosition,
         feePercentage,
         feeAmount,
@@ -106,60 +110,53 @@ export const joinEAjoAction = async (
         bankName: formData.bankName,
         accountNumber: formData.accountNumber,
         accountName: formData.accountName,
-        status: EAjoStatus.PENDING,
+        status: EAjoMemberStatus.PENDING,
       },
     })
 
     try {
       revalidatePath(`/dashboard/${userId}/eajo`)
-    } catch (e) {
-      // Ignored when running outside Next.js request context
-    }
+    } catch {}
 
-    return { success: true, data: serializeAjo(newAjo) }
+    return { success: true, data: serializeMember(newMember) }
   } catch (error) {
-    console.error('Error joining Ajo group:', error)
+    console.error('Error applying to eAjo group:', error)
     return {
       success: false,
-      error:
-        error instanceof Error ? error.message : 'Failed to join Ajo group',
+      error: error instanceof Error ? error.message : 'Failed to apply to group.',
     }
   }
 }
 
+/**
+ * User submits a contribution receipt for their eAjo membership
+ */
 export const submitEAjoContributionAction = async (
   userId: string,
-  eAjoId: string,
+  eAjoMemberId: string,
   amount: number,
   receiptUrl: string,
   referenceNumber?: string,
-  notes?: string,
+  notes?: string
 ) => {
   try {
     const session = await getSessionHelper()
     const currentUser = session?.user
-
-    if (!currentUser) {
-      return { success: false, error: 'Unauthorized' }
-    }
+    if (!currentUser) return { success: false, error: 'Unauthorized' }
 
     const isSelf = currentUser.id === userId
     const isAdmin = currentUser.role === 'ADMIN' || currentUser.role === 'OWNER'
+    if (!isSelf && !isAdmin) return { success: false, error: 'Forbidden: Access Denied' }
 
-    if (!isSelf && !isAdmin) {
-      return { success: false, error: 'Forbidden: Access Denied' }
-    }
-
-    // Verify the eAjo record exists and belongs to the user
-    const ajo = await prisma.eAjo.findFirst({
-      where: { id: eAjoId, userId },
+    // Verify membership record
+    const membership = await prisma.eAjoMember.findFirst({
+      where: { id: eAjoMemberId, userId },
     })
-
-    if (!ajo) {
-      return { success: false, error: 'Ajo plan subscription not found' }
+    if (!membership) return { success: false, error: 'Ajo membership record not found.' }
+    if (membership.status !== EAjoMemberStatus.ACTIVE && membership.status !== EAjoMemberStatus.APPROVED) {
+      return { success: false, error: 'Your membership is not yet active.' }
     }
 
-    // Create a pending contribution deposit transaction
     const newTransaction = await prisma.transaction.create({
       data: {
         userId,
@@ -167,7 +164,7 @@ export const submitEAjoContributionAction = async (
         category: TransactionCategory.AJO_CONTRIBUTION,
         type: TransactionType.DEPOSIT,
         status: TransactionStatus.PENDING,
-        eAjoId,
+        eAjoMemberId,
         receiptUrl,
         referenceNumber,
         notes,
@@ -178,30 +175,25 @@ export const submitEAjoContributionAction = async (
     try {
       revalidatePath(`/dashboard/${userId}/eajo`)
       revalidatePath(`/dashboard/${userId}`)
-    } catch (e) {
-      // Ignored when running outside Next.js request context
-    }
+    } catch {}
 
     return { success: true, data: serializeTransaction(newTransaction) }
   } catch (error) {
     console.error('Error submitting contribution receipt:', error)
     return {
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : 'Failed to submit contribution receipt',
+      error: error instanceof Error ? error.message : 'Failed to submit contribution receipt.',
     }
   }
 }
 
+/**
+ * Uploads a receipt file to cloud storage and returns the URL
+ */
 export const uploadReceiptAction = async (formData: FormData) => {
   try {
     const file = formData.get('file') as File | null
-
-    if (!file) {
-      return { success: false, error: 'No file uploaded' }
-    }
+    if (!file) return { success: false, error: 'No file uploaded' }
 
     const buffer = Buffer.from(await file.arrayBuffer())
     const uploadResult = await uploadReceipt(buffer, file.name)
@@ -210,10 +202,7 @@ export const uploadReceiptAction = async (formData: FormData) => {
     console.error('File upload action error:', error)
     return {
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : 'Failed to upload receipt file',
+      error: error instanceof Error ? error.message : 'Failed to upload receipt file.',
     }
   }
 }

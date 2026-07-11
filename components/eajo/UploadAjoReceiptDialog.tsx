@@ -17,7 +17,7 @@ import { AlertCircle, CheckCircle2, DollarSign } from 'lucide-react'
 
 interface UploadAjoReceiptDialogProps {
   userId: string
-  eAjoId: string
+  eAjoMemberId: string
   contributionAmount: number
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -25,7 +25,7 @@ interface UploadAjoReceiptDialogProps {
 
 export const UploadAjoReceiptDialog = ({
   userId,
-  eAjoId,
+  eAjoMemberId,
   contributionAmount,
   open,
   onOpenChange,
@@ -69,7 +69,7 @@ export const UploadAjoReceiptDialog = ({
       // 2. Submit contribution transaction record
       const result = await submitEAjoContributionAction(
         userId,
-        eAjoId,
+        eAjoMemberId,
         contributionAmount,
         uploadResult.url,
         referenceNumber.trim() || undefined,
