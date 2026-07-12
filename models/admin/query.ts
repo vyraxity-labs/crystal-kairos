@@ -443,3 +443,88 @@ export const getPendingEAjoApplications = async () => {
   }
 }
 
+// ============================================
+// ADMIN LOANS QUERIES
+// ============================================
+
+export const getAllLoansQuery = async (filters?: { status?: LoanStatus }) => {
+  try {
+    const session = await getSessionHelper()
+    if (!session?.user || (session.user.role !== 'ADMIN' && session.user.role !== 'OWNER')) {
+      return { success: false, error: 'Unauthorized admin access.' }
+    }
+
+    const loans = await prisma.loan.findMany({
+      where: filters?.status ? { status: filters.status } : undefined,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: { select: { id: true, name: true, email: true, photoUrl: true } }
+      }
+    })
+
+    const serialized = loans.map(loan => ({
+      ...loan,
+      requestedAmount: Number(loan.requestedAmount),
+      approvedAmount: loan.approvedAmount ? Number(loan.approvedAmount) : null,
+      interestRate: Number(loan.interestRate),
+      applicationFee: Number(loan.applicationFee),
+      outstandingBalance: Number(loan.outstandingBalance),
+      totalRepaid: Number(loan.totalRepaid),
+      defaultPenalty: Number(loan.defaultPenalty),
+    }))
+
+    return { success: true, data: serialized }
+  } catch (error) {
+    console.error('Error fetching admin loans:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to fetch loans.' }
+  }
+}
+
+export const getLoanByIdQuery = async (loanId: string) => {
+  try {
+    const session = await getSessionHelper()
+    if (!session?.user || (session.user.role !== 'ADMIN' && session.user.role !== 'OWNER')) {
+      return { success: false, error: 'Unauthorized admin access.' }
+    }
+
+    const loan = await prisma.loan.findUnique({
+      where: { id: loanId },
+      include: {
+        user: {
+          include: {
+            userInfo: true,
+            bankAccounts: true,
+            membership: true,
+          }
+        },
+        transactions: {
+          orderBy: { createdAt: 'desc' }
+        }
+      }
+    })
+
+    if (!loan) return { success: false, error: 'Loan not found.' }
+
+    const serialized = {
+      ...loan,
+      requestedAmount: Number(loan.requestedAmount),
+      approvedAmount: loan.approvedAmount ? Number(loan.approvedAmount) : null,
+      interestRate: Number(loan.interestRate),
+      applicationFee: Number(loan.applicationFee),
+      outstandingBalance: Number(loan.outstandingBalance),
+      totalRepaid: Number(loan.totalRepaid),
+      defaultPenalty: Number(loan.defaultPenalty),
+      transactions: loan.transactions.map(tx => ({
+        ...tx,
+        amount: Number(tx.amount)
+      }))
+    }
+
+    return { success: true, data: serialized }
+  } catch (error) {
+    console.error('Error fetching admin loan details:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to fetch loan details.' }
+  }
+}
+
+

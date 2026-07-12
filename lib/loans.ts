@@ -81,3 +81,30 @@ export const calculateRepaymentSchedule = (
 
   return schedule
 }
+
+/**
+ * Calculates a dynamic daily penalty fee for an overdue loan.
+ * Applies a small daily percentage (e.g., 0.5%) on the total approved amount 
+ * for every day past the due date after the 3-day grace period.
+ */
+export const calculateLoanPenaltyAmount = (
+  approvedAmount: number,
+  repaymentEndDate: Date | null,
+  currentDate: Date = new Date(),
+  dailyPenaltyPct: number = 0.5,
+  gracePeriodDays: number = 3
+): number => {
+  if (!repaymentEndDate || approvedAmount <= 0) return 0
+
+  const graceLimit = new Date(repaymentEndDate)
+  graceLimit.setDate(graceLimit.getDate() + gracePeriodDays)
+
+  if (currentDate <= graceLimit) return 0
+
+  const diffTime = Math.abs(currentDate.getTime() - graceLimit.getTime())
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+  // Calculate penalty: daily % of the total approved loan amount
+  const penalty = (approvedAmount * (dailyPenaltyPct / 100)) * diffDays
+  return penalty
+}

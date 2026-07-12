@@ -18,6 +18,7 @@ import {
   CheckCircle,
   Briefcase,
   Users,
+  XCircle,
 } from 'lucide-react'
 import Link from 'next/link'
 import { Card, CardContent } from '../ui/card'
@@ -71,6 +72,9 @@ interface LoanPlan {
   defaultPenalty: number
   status: string
   disbursedAt: any
+  repaymentEndDate?: any
+  rejectionReason?: string
+  computedPenaltyAmount?: number
   user: {
     id: string
     name: string
@@ -115,8 +119,41 @@ export const LoanDetailsClient = ({ userId, loan }: LoanDetailsClientProps) => {
   // Calculate repayment progress
   const approvedAmt = loan.approvedAmount || loan.requestedAmount
   const totalInterest = (approvedAmt * loan.interestRate * loan.duration) / 100
-  const totalDebt = approvedAmt + totalInterest
+  const penaltyAmt = loan.computedPenaltyAmount || 0
+  const totalDebt = approvedAmt + totalInterest + penaltyAmt
   const progressPct = Math.min(100, Math.max(0, (loan.totalRepaid / totalDebt) * 100))
+
+  const getAlertStatus = () => {
+    if (!loan.repaymentEndDate || (loan.status !== 'ACTIVE' && loan.status !== 'OVERDUE' && loan.status !== 'DEFAULTED')) return null
+    
+    const now = new Date()
+    const dueDate = new Date(loan.repaymentEndDate)
+    const diffTime = dueDate.getTime() - now.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+    if (diffDays <= 7 && diffDays >= 0) {
+      return {
+        type: 'WARNING',
+        message: `Your loan due date is approaching in ${diffDays} day(s). Please prepare for repayment.`
+      }
+    } else if (diffDays < 0) {
+      const pastDays = Math.abs(diffDays)
+      if (pastDays <= 3) {
+        return {
+          type: 'CAUTION',
+          message: `Your loan due date has passed! You have ${3 - pastDays} day(s) of grace period left before daily penalties begin.`
+        }
+      } else {
+        return {
+          type: 'CAUTION_PENALTY',
+          message: `Your loan is overdue! A daily penalty is now being applied. Current penalty amount: ${formatCurrency(penaltyAmt)}.`
+        }
+      }
+    }
+    return null
+  }
+
+  const alertStatus = getAlertStatus()
 
   const handleRepaySubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -181,6 +218,31 @@ export const LoanDetailsClient = ({ userId, loan }: LoanDetailsClientProps) => {
         <ArrowLeft className="w-4 h-4" />
         <Link href={`/dashboard/${userId}/loans`}>Back to Borrowing Hub</Link>
       </div>
+
+      {/* Alerts */}
+      {alertStatus && (
+        <div className={`p-4 rounded-xl border flex gap-3 ${
+          alertStatus.type === 'WARNING' ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-red-50 border-red-200 text-red-800'
+        }`}>
+          <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-bold text-sm mb-1">
+              {alertStatus.type === 'WARNING' ? 'Upcoming Due Date' : 'Action Required: Loan Overdue'}
+            </h4>
+            <p className="text-xs">{alertStatus.message}</p>
+          </div>
+        </div>
+      )}
+
+      {loan.status === 'REJECTED' && loan.rejectionReason && (
+        <div className="bg-red-50 border-red-200 text-red-800 p-4 rounded-xl border flex gap-3">
+          <XCircle className="w-5 h-5 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-bold text-sm mb-1">Application Rejected</h4>
+            <p className="text-xs">{loan.rejectionReason}</p>
+          </div>
+        </div>
+      )}
 
       {/* Loan Header */}
       <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-xl p-6 md:p-8 relative overflow-hidden">
@@ -253,9 +315,9 @@ export const LoanDetailsClient = ({ userId, loan }: LoanDetailsClientProps) => {
           <span className="text-xl font-extrabold text-primary font-mono mt-1">{loan.duration} Months</span>
         </Card>
 
-        <Card className="border-0 bg-surface-container rounded-md shadow-none p-5 flex flex-col justify-between min-h-[100px]">
-          <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Accrued Default Penalty</span>
-          <span className="text-xl font-extrabold text-secondary font-mono mt-1">{formatCurrency(loan.defaultPenalty)}</span>
+        <Card className={`border-0 rounded-md shadow-none p-5 flex flex-col justify-between min-h-[100px] ${penaltyAmt > 0 ? 'bg-red-50 text-red-800' : 'bg-surface-container'}`}>
+          <span className={`text-[10px] uppercase tracking-wider font-semibold ${penaltyAmt > 0 ? 'text-red-600' : 'text-muted-foreground'}`}>Accrued Penalty</span>
+          <span className={`text-xl font-extrabold font-mono mt-1 ${penaltyAmt > 0 ? 'text-red-700' : 'text-secondary'}`}>{formatCurrency(penaltyAmt)}</span>
         </Card>
       </section>
 
