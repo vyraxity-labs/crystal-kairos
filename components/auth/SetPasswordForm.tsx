@@ -66,19 +66,19 @@ const SetPasswordForm = ({
   }
 
   return (
-    <div className='w-[90%] max-w-[600px]'>
-      <Card className='rounded-md'>
-        <CardHeader>
-          <CardTitle className='font-semibold'>
+    <div className='w-full max-w-[440px] mx-auto'>
+      <Card className='rounded-2xl border-0 shadow-none bg-transparent'>
+        <CardHeader className='px-0 pb-6'>
+          <CardTitle className='font-heading font-bold text-2xl text-primary tracking-tight'>
             {t('set_password.page_title')}
           </CardTitle>
-          <CardDescription className='text-muted-foreground'>
+          <CardDescription className='text-muted-foreground text-sm mt-1'>
             {t('set_password.page_description')}
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
+        <CardContent className='px-0'>
+          <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-5'>
             <Controller
               control={control}
               name='email'
@@ -172,10 +172,12 @@ const SetPasswordForm = ({
               }}
             />
 
-            <Button className='w-full rounded-sm my-5' disabled={isLoading}>
-              {isLoading
-                ? t('set_password.form.buttons.loading')
-                : t('set_password.form.buttons.submit')}
+            <Button
+              className='w-full mt-6 cursor-pointer text-on-secondary rounded-xl py-6 font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all'
+              variant='secondary'
+              disabled={isLoading}
+            >
+              {isLoading ? t('set_password.form.loading') : t('set_password.form.submit')}
             </Button>
           </form>
         </CardContent>

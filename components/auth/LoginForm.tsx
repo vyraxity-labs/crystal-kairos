@@ -69,11 +69,11 @@ const LoginForm = () => {
   }, [session])
 
   return (
-    <div className='w-[90%] flex-1 mx-auto flex justify-center items-center'>
-      <div className='flex flex-col gap-5'>
+    <div className='w-full max-w-[440px] mx-auto flex justify-center items-center'>
+      <div className='flex flex-col gap-6 w-full'>
         <section className='flex flex-col items-start'>
-          <h3 className='font-semibold text-lg'>{t('login.welcome_back')}</h3>
-          <p className='text-muted-foreground'>
+          <h3 className='font-heading font-bold text-2xl text-primary tracking-tight'>{t('login.welcome_back')}</h3>
+          <p className='text-muted-foreground text-sm mt-1'>
             {t('login.access_your_portal')}
           </p>
         </section>
@@ -150,13 +150,13 @@ const LoginForm = () => {
           </FieldGroup>
 
           <Button
-            className='w-full cursor-pointer text-on-secondary rounded-sm'
+            className='w-full cursor-pointer text-on-secondary rounded-xl py-6 font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all'
             variant='secondary'
             disabled={loading}
           >
             {loading && <Spinner />}{' '}
             {loading ? t('login.form.loading') : t('login.form.login')}{' '}
-            {!loading && <ArrowRight />}
+            {!loading && <ArrowRight className='w-5 h-5 ml-1' />}
           </Button>
         </form>
 

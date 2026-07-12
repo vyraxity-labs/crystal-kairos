@@ -2,6 +2,7 @@ export const publicRoutes = [
   '/login',
   '/register',
   '/register/success',
+  '/forgot-password',
   '/',
   '/unauthorized',
   '/set-password',
@@ -16,4 +17,9 @@ export const publicRoutes = [
   '/faq',
 ]
 
-export const loggedInRestrictedRoutes = ['/set-password', '/login', '/register']
+export const loggedInRestrictedRoutes = [
+  '/set-password',
+  '/login',
+  '/register',
+  '/forgot-password',
+]

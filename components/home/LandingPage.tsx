@@ -11,10 +11,10 @@ import {
   ShieldCheck,
   TrendingUp,
   Star,
-  ChevronRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
+import heroImage from '@/public/cooperative_hero.png'
 
 const STATS = [
   { label: 'Active Members', value: '12,400+', icon: Users },
@@ -168,7 +168,7 @@ export const LandingPage = () => {
           {/* Right — hero image */}
           <div className='relative h-[350px] md:h-[460px] w-full rounded-2xl overflow-hidden shadow-xl z-10'>
             <Image
-              src='/cooperative_hero.png'
+              src={heroImage}
               alt='Crystal Kairos Digital Cooperative Platform'
               fill
               className='object-cover'
