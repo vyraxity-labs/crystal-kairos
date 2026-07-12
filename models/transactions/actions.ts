@@ -185,13 +185,18 @@ export const transitionTransaction = async (
         }
 
         // C. Loan Disbursements (Approved borrow amount paid to applicant)
-        if (transaction.category === TransactionCategory.LOAN_DISBURSEMENT && transaction.loanId) {
+        if (transaction.category === TransactionCategory.LOAN_DISBURSEMENT && transaction.loanId && transaction.loan) {
+          const approvedAmountNum = Number(transaction.loan.approvedAmount || 0)
+          const interestRateNum = Number(transaction.loan.interestRate || 0)
+          const totalInterest = (approvedAmountNum * interestRateNum * transaction.loan.duration) / 100
+          const initialDebt = approvedAmountNum + totalInterest
+
           await tx.loan.update({
             where: { id: transaction.loanId },
             data: {
               status: LoanStatus.ACTIVE,
               disbursedAt: new Date(),
-              outstandingBalance: transaction.amount, // Initial debt matches approved amount
+              outstandingBalance: initialDebt, // Initial debt matches approved amount + interest
             },
           })
         }

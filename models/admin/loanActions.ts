@@ -96,6 +96,11 @@ export const disburseLoanAction = async (loanId: string, receiptUrl: string) => 
     const repaymentEndDate = new Date(now)
     repaymentEndDate.setMonth(repaymentEndDate.getMonth() + loan.duration)
 
+    const approvedAmountNum = Number(loan.approvedAmount || 0)
+    const interestRateNum = Number(loan.interestRate || 0)
+    const totalInterest = (approvedAmountNum * interestRateNum * loan.duration) / 100
+    const initialDebt = approvedAmountNum + totalInterest
+
     // Run in a transaction: Create disbursement record + update loan
     const result = await prisma.$transaction(async (tx) => {
       // Create the disbursement transaction
@@ -123,7 +128,7 @@ export const disburseLoanAction = async (loanId: string, receiptUrl: string) => 
           disbursedAt: now,
           repaymentStartDate: now,
           repaymentEndDate,
-          outstandingBalance: loan.approvedAmount || 0, // initial debt
+          outstandingBalance: initialDebt, // initial debt matches approved amount + interest
         },
       })
 
