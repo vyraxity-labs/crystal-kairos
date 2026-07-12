@@ -1,12 +1,14 @@
-import LoginBanner from '@/components/auth/LoginBanner'
+import { AuthShowcase } from '@/components/auth/AuthShowcase'
 import LoginForm from '@/components/auth/LoginForm'
 
 const LoginPage = () => {
   return (
-    <div className='flex-1 md:grid md:grid-cols-[1.2fr_1fr] flex flex-col'>
-      <LoginBanner />
+    <div className='min-h-screen md:grid md:grid-cols-[1fr_1.1fr] lg:grid-cols-[1.2fr_1fr] flex flex-col bg-surface-container-lowest'>
+      <AuthShowcase />
 
-      <LoginForm />
+      <div className='flex items-center justify-center p-6 sm:p-12'>
+        <LoginForm />
+      </div>
     </div>
   )
 }
