@@ -1,7 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { serializeLoan, calculateRepaymentSchedule } from '@/lib/loans'
+import { serializeLoan, calculateRepaymentSchedule, calculateLoanPenaltyAmount } from '@/lib/loans'
 
 /**
  * Fetches a single loan details along with its transactions, user details, and computed schedule
@@ -38,10 +38,20 @@ export const getLoanPlanById = async (loanId: string) => {
       loan.gracePeriodDays
     )
 
+    // Calculate dynamic penalty
+    const computedPenaltyAmount = calculateLoanPenaltyAmount(
+      loan.approvedAmount ? Number(loan.approvedAmount) : Number(loan.requestedAmount),
+      loan.repaymentEndDate,
+      new Date(),
+      0.5, // 0.5% daily fee
+      3 // 3 days grace period
+    )
+
     return {
       success: true,
       data: {
         ...serializedLoan,
+        computedPenaltyAmount,
         user: {
           id: loan.user.id,
           name: loan.user.name,
